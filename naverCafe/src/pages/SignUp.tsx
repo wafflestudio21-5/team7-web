@@ -235,15 +235,20 @@ const AuthDiv = styled.div`
     height: 40px;
     padding: 11.5px 12px;
     background-clip: content-box;
-    // 버튼을 오른쪽 끝으로 붙여야하는데 적절한 방법을 모르겠습니다.
+    position: relative;
+    left: 200px;
+    // position: relative로 오른쪽 정렬을 하는 것이 적절한지 모르겠습니다.
   }
 `;
 const SignUpButton = styled.button`
   width: 460px;
   height: 52px;
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, 0%);
   bottom: 20px;
-  // bottom에 20px을 남기고 붙이려고 하는데, 어떻게 해야할지 모르겠습니다.
-  // 그렇다고 윗 margin을 주면 클라이언트 환경에 따라 달라질 것 같아서 조심스럽습니다.
+  // position: absolute로 버튼의 위치를 조정하는 것이 적절한지 모르겠습니다.
+
   border-radius: 6px;
   border: 1px solid rgba(0, 0, 0, 0.05);
   background: #09aa5c;
