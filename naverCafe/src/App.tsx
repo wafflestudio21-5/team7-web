@@ -1,5 +1,6 @@
 import styled from "styled-components";
-import Login from "./pages/Login";
+import SignUp from "./pages/SignUp";
+import { GlobalStyle } from "./contexts/CssContext";
 
 const Wrapper = styled.div`
   max-width: 1280px;
@@ -9,9 +10,12 @@ const Wrapper = styled.div`
 
 function App() {
   return (
-    <Wrapper>
-      <Login />
-    </Wrapper>
+    <>
+      <GlobalStyle></GlobalStyle>
+      <Wrapper>
+        <SignUp />
+      </Wrapper>
+    </>
   );
 }
 
