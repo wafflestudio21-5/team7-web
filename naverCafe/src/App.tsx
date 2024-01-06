@@ -1,10 +1,21 @@
-import "./App.css";
-import Login from "./pages/Login";
+import styled from "styled-components";
+import SignUp from "./pages/SignUp";
+import { GlobalStyle } from "./contexts/CssContext";
+
+const Wrapper = styled.div`
+  max-width: 1280px;
+  margin: 0 auto;
+  text-align: center;
+`;
+
 function App() {
   return (
-    <div>
-      <Login />
-    </div>
+    <>
+      <GlobalStyle></GlobalStyle>
+      <Wrapper>
+        <SignUp />
+      </Wrapper>
+    </>
   );
 }
 
