@@ -225,7 +225,7 @@ const AuthDiv = styled.div`
       margin-right: 4px;
     }
   }
-  .AuthPaper {
+  .authPaper {
     display: block;
     background-image: url(https://ssl.pstatic.net/static/nid/join/m_sp_06_realname_48b1e603.png);
     background-size: 372px 326px;
@@ -389,7 +389,7 @@ const SignUp = () => {
             <em>[필수]</em>
             인증 약관 전체동의
           </label>
-          <button className="AuthPaper" />
+          <button className="authPaper" />
         </AuthDiv>
       </Content>
       <SignUpButton onClick={() => createAccount()}>회원가입</SignUpButton>

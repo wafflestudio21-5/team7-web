@@ -1,6 +1,7 @@
-import styled, { createGlobalStyle, css } from "styled-components";
+import { createGlobalStyle, css } from "styled-components";
 
 export const GlobalStyle = createGlobalStyle`
+  // naverCafe 전체적으로 적용되는 css입니다.
   :root {
     /* font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif; */
     font-family:  Malgun Gothic,'맑은 고딕',Helvetica,sans-serif;
@@ -20,17 +21,24 @@ export const GlobalStyle = createGlobalStyle`
   body {
     margin: 0;
   }
-
+  p {
+    margin: 0;
+  }
+  a {
+    text-decoration: none;
+    color: #000;
+   }
+  ul {
+    margin: 0;
+    padding: 0;
+  }
+  li {
+    list-style: none;
+  }
   @media (prefers-color-scheme: light) {
     :root {
       color: #213547;
       background-color: #ffffff;
-    }
-    a:hover {
-      color: #747bff;
-    }
-    button {
-      background-color: #f9f9f9;
     }
   }
 `;
