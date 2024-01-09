@@ -279,7 +279,7 @@ type FinalError = {
   name?: string;
   birth?: string;
   phoneNumber?: string;
-}
+};
 
 const SignUp = () => {
   const [userId, setUserId] = useState<string>("");
@@ -327,7 +327,7 @@ const SignUp = () => {
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,16}$/;
   const correctEmail = /^[a-zA-Z0-9_]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   const correctName = /^[가-힣A-Za-z]+$/;
-  const correctBirth = /^(19|20)\d\d(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])$/;
+  const correctBirth = /^(19|20)\d\d[.\s]?(0[1-9]|1[0-2])[.\s]?(0[1-9]|[12]\d|3[01])$/;
   const correctPhoneNumber = /^010[-\s]?\d{4}[-\s]?\d{4}$/;
 
   //handleValidation 내부에서 반복적으로 실행되는 작업을 수행하는 함수
@@ -408,12 +408,19 @@ const SignUp = () => {
         correctPhoneNumber
       )
     ) {
-      if (phoneNumber.length < 13) {
-        //하이픈이 추가되지 않은 번호일 경우 (하이픈 모두 입력된 문자열은 13자리)
-        const digitsOnly = phoneNumber.replace(/-/g, '');
-        setUserPhoneNumber(
-          digitsOnly.replace(/(\d{3})(\d{4})(\d{4})/, "$1-$2-$3"));
-      }
+      const cleaned = phoneNumber.replace(/[\s-]/g, "");
+      setUserPhoneNumber(cleaned.replace(/(\d{3})(\d{4})(\d{4})/, "$1-$2-$3"));
+    }
+  };
+
+  //birth의 경우, .을 자동으로 추가
+  const autoPoint = (e: FocusEvent<HTMLInputElement, Element>) => {
+    const birth = e.target.value;
+
+    //birth에 오류가 없는 경우
+    if (!checkError(e.target.name, birth, errorBirthMessage, correctBirth)) {
+      const cleaned = birth.replace(/[\s.]/g, "");
+      setUserBirth(cleaned.replace(/(\d{4})(\d{2})(\d{2})/, "$1.$2.$3"));
     }
   };
 
@@ -453,6 +460,7 @@ const SignUp = () => {
       });
   };
 
+  //handleCreateAccount에서 전체 input 필드에 대한 유효성 검사를 한번에 진행하는 함수입니다.
   const validateAll = () => {
     return {
       id: checkError("id", userId, errorIdMessage, correctId) || undefined,
@@ -483,7 +491,7 @@ const SignUp = () => {
   };
 
   const handleCreateAccount = () => {
-    const finalError:FinalError = validateAll();
+    const finalError: FinalError = validateAll();
     setError(finalError);
 
     const hasErrors = Object.values(finalError).some((error) => error !== null);
@@ -573,7 +581,10 @@ const SignUp = () => {
               placeholder="생년월일 8자리"
               value={userBirth}
               onChange={(e) => setUserBirth(e.target.value)}
-              onBlur={(e) => handleValidation(e)}
+              onBlur={(e) => {
+                handleValidation(e);
+                autoPoint(e);
+              }}
             />
           </InfoDiv>
           <InfoDiv className="phoneNumber">
@@ -584,7 +595,10 @@ const SignUp = () => {
               placeholder="휴대전화번호"
               value={userPhoneNumber}
               onChange={(e) => setUserPhoneNumber(e.target.value)}
-              onBlur={(e) => { handleValidation(e); autoHyphen(e); }}
+              onBlur={(e) => {
+                handleValidation(e);
+                autoHyphen(e);
+              }}
             />
           </InfoDiv>
         </InfoBunch>
