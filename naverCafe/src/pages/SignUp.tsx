@@ -219,7 +219,7 @@ const AuthDiv = styled.div`
     small {
       /* display: inline-block;
       vertical-align: middle; */
-      // em 태그 안에 있는 글자([필수])가 세로 가운데 정렬이 안되어 보이는 문제 발생
+      // small 태그 안에 있는 글자([필수])가 세로 가운데 정렬이 안되어 보이는 문제 발생 (원래 회원가입 창에 기울어지지 않은 모양이길래 small로 수정했습니다!)
       font-size: 13px;
       color: #09aa5c;
       margin-right: 4px;
@@ -395,13 +395,35 @@ const SignUp = () => {
     phoneNumber: "휴대전화번호",
   };
 
+  //phoneNumber의 경우, 하이픈을 자동으로 추가
+  const autoHyphen = (e: FocusEvent<HTMLInputElement, Element>) => {
+    const phoneNumber = e.target.value;
+
+    //phoneNumber에 오류가 없는 경우
+    if (
+      !checkError(
+        e.target.name,
+        phoneNumber,
+        errorPhoneNumberMessage,
+        correctPhoneNumber
+      )
+    ) {
+      if (phoneNumber.length < 13) {
+        //하이픈이 추가되지 않은 번호일 경우 (하이픈 모두 입력된 문자열은 13자리)
+        const digitsOnly = phoneNumber.replace(/-/g, '');
+        setUserPhoneNumber(
+          digitsOnly.replace(/(\d{3})(\d{4})(\d{4})/, "$1-$2-$3"));
+      }
+    }
+  };
+
   //password 가시 여부를 나타내는 state
   const [isActiveShowPassword, setIsActiveShowPassword] =
     useState<boolean>(false);
   //인증 약관 동의 여부를 나타내는 state
   const [isAuthPaperChecked, setIsAuthPaperChecked] = useState<boolean>(false);
   //인증 약관 동의 버튼의 최초 클릭 여부를 나타내는 state
-  const [isAuthPaperNotClicked, setIsAuthPaperNotClicked] =
+  const [isAuthPaperNeverClicked, setIsAuthPaperNeverClicked] =
     useState<boolean>(true);
 
   const createAccount = () => {
@@ -562,7 +584,7 @@ const SignUp = () => {
               placeholder="휴대전화번호"
               value={userPhoneNumber}
               onChange={(e) => setUserPhoneNumber(e.target.value)}
-              onBlur={(e) => handleValidation(e)}
+              onBlur={(e) => { handleValidation(e); autoHyphen(e); }}
             />
           </InfoDiv>
         </InfoBunch>
@@ -588,7 +610,7 @@ const SignUp = () => {
             id="authPaperCheck"
             onClick={() => {
               setIsAuthPaperChecked(!isAuthPaperChecked);
-              setIsAuthPaperNotClicked(false);
+              setIsAuthPaperNeverClicked(false);
             }}
           />
           <label htmlFor="authPaperCheck">
@@ -597,7 +619,7 @@ const SignUp = () => {
           </label>
           <button className="authPaper" />
         </AuthDiv>
-        {isAuthPaperChecked || isAuthPaperNotClicked ? null : (
+        {isAuthPaperChecked || isAuthPaperNeverClicked ? null : (
           <p>필수 약관에 모두 동의해 주세요.</p>
         )}
       </Content>
