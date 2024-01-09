@@ -267,16 +267,111 @@ const SignUp = () => {
   const [userBirth, setUserBirth] = useState<string>("");
   const [userPhoneNumber, setUserPhoneNumber] = useState<string>("");
 
-  const [errorId, setErrorId] = useState<boolean>(false);
-  const [errorPassword, setErrorPassword] = useState<boolean>(false);
-  const [errorEmail, setErrorEmail] = useState<boolean>(false);
-  const [errorName, setErrorName] = useState<boolean>(false);
-  const [errorBirth, setErrorBirth] = useState<boolean>(false);
-  const [errorPhoneNumber, setErrorPhoneNumber] = useState<boolean>(false);
+  const errorIdMessage = [
+    "필수 정보입니다.",
+    "5~20자의 영문 소문자, 숫자와 특수기호(_),(-)만 사용 가능합니다.",
+  ];
+  const errorPasswordMessage = [
+    "필수 정보입니다.",
+    "8~16자의 영문 대/소문자, 숫자, 특수문자를 사용해 주세요.",
+  ];
+  const errorEmailMessage = ["이메일 주소가 정확한지 확인해 주세요."];
+  const errorNameMessage = [
+    "필수 정보입니다.",
+    "한글, 영문 대/소문자를 사용해 주세요. (특수기호, 공백 사용 불가)",
+  ];
+  const errorBirthMessage = [
+    "필수 정보입니다.",
+    "생년월일은 8자리 숫자로 입력해 주세요.",
+  ];
+  const errorPhoneNumberMessage = [
+    "필수 정보입니다.",
+    "휴대전화번호가 정확한지 확인해 주세요.",
+  ];
+
+  //각 필드의 error 메시지를 담는 배열
+  const [error, setError] = useState<{
+    id?: string;
+    password?: string;
+    email?: string;
+    name?: string;
+    birth?: string;
+    phoneNumber?: string;
+  }>({});
+
+  const correctId = /^[a-z0-9_-]{5,20}$/;
+  const correctPassword =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,16}$/;
+  const correctEmail = /^[a-zA-Z0-9_]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  const correctName = /^[가-힣A-Za-z]+$/;
+  const correctBirth = /^(19|20)\d\d(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])$/;
+  const correctPhoneNumber = /^010[-\s]?\d{4}[-\s]?\d{4}$/;
+
+
+  //handleValidation 내부에서 반복적으로 실행되는 작업을 수행하는 함수
+  const checkError = (
+    userInfo: string | null,
+    errorMessageList: string[],
+    correctUserInfo: RegExp
+  ) => {
+    if (userInfo === userEmail) {
+      //이메일은 필수 정보가 아니므로 비어 있어도 괜찮음
+      if (userInfo && !correctEmail.test(userEmail)) {
+        return errorEmailMessage[0];
+      }
+      return null; //이메일이 비어있거나 유효한 경우
+    } else {
+      //나머지(아이디, 비밀번호, 이름, 생일, 전화번호) 필드는 필수 정보임
+      if (!userInfo || userInfo === null) {
+        return errorMessageList[0]; //필수 정보입니다.
+      } else if (!correctUserInfo.test(userInfo)) {
+        return errorMessageList[1]; //해당 필드에 대한 특정 오류 메시지
+      }
+      return null; //오류가 없는 경우
+    }
+  };
+
+  //각 input 필드가 blur일 때, handleValidation이 작동
+  const handleValidation = () => {
+    console.log("onBlur!");
+
+    const idError = checkError(userId, errorIdMessage, correctId)!;
+    const passwordError = checkError(
+      userPassword,
+      errorPasswordMessage,
+      correctPassword
+    )!;
+    const emailError = checkError(userEmail, errorEmailMessage, correctEmail)!;
+    const nameError = checkError(userName, errorNameMessage, correctName)!;
+    const birthError = checkError(userBirth, errorBirthMessage, correctBirth)!;
+    const phoneNumberError = checkError(
+      userPhoneNumber,
+      errorPhoneNumberMessage,
+      correctPhoneNumber
+    )!;
+
+    if (
+      idError ||
+      passwordError ||
+      emailError ||
+      nameError ||
+      birthError ||
+      phoneNumberError
+    ) {
+      setError({
+        id: idError,
+        password: passwordError,
+        email: emailError,
+        name: nameError,
+        birth: birthError,
+        phoneNumber: phoneNumberError,
+      });
+    }
+  };
 
   //password 가시 여부를 나타내는 state
   const [isActiveShowPassword, setIsActiveShowPassword] =
-    useState<boolean>(true);
+    useState<boolean>(false);
   //인증 약관 동의 여부를 나타내는 state
   const [isAuthPaperChecked, setIsAuthPaperChecked] = useState<boolean>(false);
 
@@ -321,6 +416,7 @@ const SignUp = () => {
               placeholder="아이디"
               value={userId}
               onChange={(e) => setUserId(e.target.value)}
+              onBlur={handleValidation}
             />
             <span className="idNaver">@naver.com</span>
           </InfoDiv>
@@ -331,6 +427,7 @@ const SignUp = () => {
               placeholder="비밀번호"
               value={userPassword}
               onChange={(e) => setUserPassword(e.target.value)}
+              onBlur={handleValidation}
             />
             <button
               className={isActiveShowPassword ? "showPassword" : "hidePassword"}
@@ -344,9 +441,19 @@ const SignUp = () => {
               placeholder="[선택] 비밀번호 분실 시 확인용 이메일"
               value={userEmail}
               onChange={(e) => setUserEmail(e.target.value)}
+              onBlur={handleValidation}
             />
           </InfoDiv>
         </InfoBunch>
+
+        <ul>
+          {Object.entries(error).map(([key, value]) => {
+            if (["id", "password", "email"].includes(key) && value) {
+              return <li key={key}>{value}</li>;
+            }
+            return null;
+          })}
+        </ul>
 
         <InfoBunch>
           <InfoDiv className="name">
@@ -356,6 +463,7 @@ const SignUp = () => {
               placeholder="이름"
               value={userName}
               onChange={(e) => setUserName(e.target.value)}
+              onBlur={handleValidation}
             />
           </InfoDiv>
           <InfoDiv className="birth">
@@ -365,6 +473,7 @@ const SignUp = () => {
               placeholder="생년월일 8자리"
               value={userBirth}
               onChange={(e) => setUserBirth(e.target.value)}
+              onBlur={handleValidation}
             />
           </InfoDiv>
           <InfoDiv className="phoneNumber">
@@ -374,9 +483,20 @@ const SignUp = () => {
               placeholder="휴대전화번호"
               value={userPhoneNumber}
               onChange={(e) => setUserPhoneNumber(e.target.value)}
+              onBlur={handleValidation}
             />
           </InfoDiv>
         </InfoBunch>
+
+        <ul>
+          {Object.entries(error).map(([key, value]) => {
+            if (["name", "birth", "phoneNumber"].includes(key) && value) {
+              return <li key={key}>{value}</li>;
+            }
+            return null;
+          })}
+        </ul>
+
         <AuthDiv>
           <button
             className={
