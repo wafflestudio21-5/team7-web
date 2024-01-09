@@ -49,23 +49,32 @@ const Content = styled.div`
   }
 `;
 const InfoBunch = styled.div`
-  border: 1px solid #c6c6c6;
-  border-radius: 8px;
   margin: 10px 0px;
 `;
-const InfoDiv = styled.div`
+const InfoDiv = styled.div<{ $error: boolean; $correctActive: boolean }>`
   display: flex;
   align-items: center;
   height: 50px;
-  border: 1px solid #dfdfdf;
   box-sizing: border-box;
-  /* border-radius: ; */
-  // border radius 값을 어떻게 주어야지 깔끔할지 모르겠습니다.
+  border: ${(props) =>
+    props.$error
+      ? "3px solid red"
+      : props.$correctActive
+      ? "3px solid green"
+      : "1px solid #c6c6c6"};
+
   input {
     cursor: pointer;
     border: none;
     outline: none;
     font-size: 16px;
+
+    color: ${(props) => (props.$error ? "red" : "black")};
+    text-decoration: ${(props) => (props.$error ? "underline" : "none")};
+
+    &::placeholder {
+      color: ${(props) => (props.$error ? "red" : "gray")};
+    }
   }
   & > button {
     border: none;
@@ -205,16 +214,38 @@ const InfoDiv = styled.div`
     }
   }}
 `;
-const AuthDiv = styled.div`
+
+const FirstInfoDiv = styled(InfoDiv)<{ $error: boolean }>`
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+
+  margin-bottom: ${(props) => (props.$error ? "0.7px" : "0")};
+`;
+
+const MiddleInfoDiv = styled(InfoDiv)<{ $error: boolean }>`
+  margin-top: ${(props) => (props.$error ? "-3px" : "-1px")};
+  margin-bottom: ${(props) => (props.$error ? "-3px" : "-1px")};
+`;
+
+const LastInfoDiv = styled(InfoDiv)<{ $error: boolean }>`
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
+
+  margin-top: ${(props) => (props.$error ? "0.7px" : "0")};
+`;
+
+const AuthDiv = styled.div<{ $error?: boolean }>`
   display: flex;
   height: 50px;
   align-items: center;
   padding: 14px;
-  border: 1px solid #c6c6c6;
+  border: ${(props) =>
+    props.$error ? "3px solid #ff3f3f" : "1px solid #c6c6c6"};
   box-sizing: border-box;
   border-radius: 8px;
-  font-weight: 600;
+  font-weight: 800;
   font-size: 15px;
+  vertical-align: middle;
   & > button {
     border: none;
     outline: none;
@@ -240,9 +271,10 @@ const AuthDiv = styled.div`
   label {
     cursor: pointer;
     small {
-      /* display: inline-block;
-      vertical-align: middle; */
-      // small 태그 안에 있는 글자([필수])가 세로 가운데 정렬이 안되어 보이는 문제 발생 (원본 회원가입 창에서는 기울어지지 않은 모양이길래 small로 수정했습니다!)
+      // small 태그 안에 있는 글자([필수])가 세로 가운데 정렬이 안되어 보이는 문제 발생
+      //(일단 원본 회원가입 창에서는 기울어지지 않은 모양이길래 small로 수정했습니다!)
+      //원본에서는 em 이랑 label을 상속관계(?)가 아니도록 정렬한 것 같더라구요.. 그리고 원본에서도 수직 관계가 완벽히 맞진 않아서 괜찮을 것 같습니다ㅎㅎ!!
+
       font-size: 13px;
       color: #09aa5c;
       margin-right: 4px;
@@ -312,6 +344,14 @@ const SignUp = () => {
   const [userBirth, setUserBirth] = useState<string>("");
   const [userPhoneNumber, setUserPhoneNumber] = useState<string>("");
 
+  const [infoOnClick, setInfoOnClick] = useState({
+    id: false,
+    password: false,
+    name: false,
+    birth: false,
+    phonNumber: false,
+  });
+
   const errorIdMessage = [
     "필수 정보입니다.",
     "5~20자의 영문 소문자, 숫자와 특수기호(_),(-)만 사용 가능합니다.",
@@ -350,7 +390,8 @@ const SignUp = () => {
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,16}$/;
   const correctEmail = /^[a-zA-Z0-9_]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   const correctName = /^[가-힣A-Za-z]+$/;
-  const correctBirth = /^(19|20)\d\d[.\s]?(0[1-9]|1[0-2])[.\s]?(0[1-9]|[12]\d|3[01])$/;
+  const correctBirth =
+    /^(19|20)\d\d[.\s]?(0[1-9]|1[0-2])[.\s]?(0[1-9]|[12]\d|3[01])$/;
   const correctPhoneNumber = /^010[-\s]?\d{4}[-\s]?\d{4}$/;
 
   //handleValidation 내부에서 반복적으로 실행되는 작업을 수행하는 함수
@@ -531,7 +572,11 @@ const SignUp = () => {
       </Header>
       <Content>
         <InfoBunch>
-          <InfoDiv className="id">
+          <FirstInfoDiv
+            className="id"
+            $error={error.id ? true : false}
+            $correctActive={infoOnClick.id}
+          >
             <span className="idLogo" />
             <input
               type="text"
@@ -539,11 +584,21 @@ const SignUp = () => {
               placeholder="아이디"
               value={userId}
               onChange={(e) => setUserId(e.target.value)}
-              onBlur={(e) => handleValidation(e)}
+              onBlur={(e) => {
+                handleValidation(e);
+                setInfoOnClick((prev) => ({ ...prev, [e.target.name]: false }));
+              }}
+              onFocus={(e) => {
+                setInfoOnClick((prev) => ({ ...prev, [e.target.name]: userId ? true : false }));
+              }}
             />
             <span className="idNaver">@naver.com</span>
-          </InfoDiv>
-          <InfoDiv className="password">
+          </FirstInfoDiv>
+          <MiddleInfoDiv
+            className="password"
+            $error={error.password ? true : false}
+            $correctActive={infoOnClick.password}
+          >
             <span className="passwordLogo" />
             <input
               type={isActiveShowPassword ? "text" : "password"}
@@ -551,14 +606,20 @@ const SignUp = () => {
               placeholder="비밀번호"
               value={userPassword}
               onChange={(e) => setUserPassword(e.target.value)}
-              onBlur={(e) => handleValidation(e)}
+              onBlur={(e) => {
+                handleValidation(e);
+                setInfoOnClick((prev) => ({ ...prev, [e.target.name]: false }));
+              }}
+              onFocus={(e) => {
+                setInfoOnClick((prev) => ({ ...prev, [e.target.name]: userPassword ? true : false }));
+              }}
             />
             <button
               className={isActiveShowPassword ? "showPassword" : "hidePassword"}
               onClick={() => setIsActiveShowPassword(!isActiveShowPassword)}
             />
-          </InfoDiv>
-          <InfoDiv className="email">
+          </MiddleInfoDiv>
+          <LastInfoDiv className="email" $error={error.email ? true : false} $correctActive={false}>
             <span className="emailLogo" />
             <input
               type="text"
@@ -566,9 +627,15 @@ const SignUp = () => {
               placeholder="[선택] 비밀번호 분실 시 확인용 이메일"
               value={userEmail}
               onChange={(e) => setUserEmail(e.target.value)}
-              onBlur={(e) => handleValidation(e)}
+              onBlur={(e) => {
+                handleValidation(e);
+                setInfoOnClick((prev) => ({ ...prev, [e.target.name]: false }));
+              }}
+              onFocus={(e) => {
+                setInfoOnClick((prev) => ({ ...prev, [e.target.name]: true }));
+              }}
             />
-          </InfoDiv>
+          </LastInfoDiv>
         </InfoBunch>
 
         <ul>
@@ -585,7 +652,11 @@ const SignUp = () => {
         </ul>
 
         <InfoBunch>
-          <InfoDiv className="name">
+          <FirstInfoDiv
+            className="name"
+            $error={error.name ? true : false}
+            $correctActive={infoOnClick.name}
+          >
             <span className="nameLogo" />
             <input
               type="text"
@@ -593,10 +664,20 @@ const SignUp = () => {
               placeholder="이름"
               value={userName}
               onChange={(e) => setUserName(e.target.value)}
-              onBlur={(e) => handleValidation(e)}
+              onBlur={(e) => {
+                handleValidation(e);
+                setInfoOnClick((prev) => ({ ...prev, [e.target.name]: false }));
+              }}
+              onFocus={(e) => {
+                setInfoOnClick((prev) => ({ ...prev, [e.target.name]: userName ? true : false }));
+              }}
             />
-          </InfoDiv>
-          <InfoDiv className="birth">
+          </FirstInfoDiv>
+          <MiddleInfoDiv
+            className="birth"
+            $error={error.birth ? true : false}
+            $correctActive={infoOnClick.birth}
+          >
             <span className="birthLogo" />
             <input
               type="text"
@@ -607,10 +688,18 @@ const SignUp = () => {
               onBlur={(e) => {
                 handleValidation(e);
                 autoPoint(e);
+                setInfoOnClick((prev) => ({ ...prev, [e.target.name]: false }));
+              }}
+              onFocus={(e) => {
+                setInfoOnClick((prev) => ({ ...prev, [e.target.name]: userBirth ? true : false }));
               }}
             />
-          </InfoDiv>
-          <InfoDiv className="phoneNumber">
+          </MiddleInfoDiv>
+          <LastInfoDiv
+            className="phoneNumber"
+            $error={error.phoneNumber ? true : false}
+            $correctActive={infoOnClick.phonNumber}
+          >
             <span className="phoneNumberLogo" />
             <input
               type="text"
@@ -621,9 +710,13 @@ const SignUp = () => {
               onBlur={(e) => {
                 handleValidation(e);
                 autoHyphen(e);
+                setInfoOnClick((prev) => ({ ...prev, [e.target.name]: false }));
+              }}
+              onFocus={(e) => {
+                setInfoOnClick((prev) => ({ ...prev, [e.target.name]: userPhoneNumber ? true : false }));
               }}
             />
-          </InfoDiv>
+          </LastInfoDiv>
         </InfoBunch>
 
         <ul>
@@ -639,7 +732,9 @@ const SignUp = () => {
           })}
         </ul>
 
-        <AuthDiv>
+        <AuthDiv
+          $error={isAuthPaperChecked || isAuthPaperNeverClicked ? false : true}
+        >
           <button
             className={
               isAuthPaperChecked ? "authPaperChecked" : "authPaperNotchecked"
