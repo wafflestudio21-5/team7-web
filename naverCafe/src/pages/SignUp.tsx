@@ -60,7 +60,7 @@ const InfoDiv = styled.div<{ $error: boolean; $correctActive: boolean }>`
     props.$error
       ? "3px solid red"
       : props.$correctActive
-      ? "3px solid green"
+      ? "3px solid #09aa5c"
       : "1px solid #c6c6c6"};
 
   input {
@@ -73,7 +73,7 @@ const InfoDiv = styled.div<{ $error: boolean; $correctActive: boolean }>`
     text-decoration: ${(props) => (props.$error ? "underline" : "none")};
 
     &::placeholder {
-      color: ${(props) => (props.$error ? "red" : "gray")};
+      color: ${(props) => (props.$error ? "red" : "#c6c6c6")};
     }
   }
   & > button {
@@ -91,7 +91,11 @@ const InfoDiv = styled.div<{ $error: boolean; $correctActive: boolean }>`
             margin: 7.5px;
             background-image: url(https://ssl.pstatic.net/static/nid/join/m_sp_06_realname_48b1e603.png);
             background-size: 372px 326px;
-            background-position: -342px -64px;
+            background-position: ${props.$error
+              ? "-310px -96px"
+              : props.$correctActive
+              ? "-310px -160px"
+              : "-342px -64px"};
             background-repeat: no-repeat;
             width: 30px;
             height: 30px;
@@ -112,7 +116,11 @@ const InfoDiv = styled.div<{ $error: boolean; $correctActive: boolean }>`
             margin: 7.5px;
             background-image: url(https://ssl.pstatic.net/static/nid/join/m_sp_06_realname_48b1e603.png);
             background-size: 372px 326px;
-            background-position: -310px 0;
+            background-position: ${props.$error
+              ? "-310px -32px"
+              : props.$correctActive
+              ? "-310px -64px"
+              : "-310px 0"};
             background-repeat: no-repeat;
             width: 30px;
             height: 30px;
@@ -146,7 +154,9 @@ const InfoDiv = styled.div<{ $error: boolean; $correctActive: boolean }>`
             margin: 7.5px;
             background-image: url(https://ssl.pstatic.net/static/nid/join/m_sp_06_realname_48b1e603.png);
             background-size: 372px 326px;
-            background-position: -96px -296px;
+            background-position: ${props.$error
+              ? "-310px -256px"
+              : " -96px -296px"}; //email의 경우 correctActive를 따로 정의해주어야 하는데 아직 못함
             background-repeat: no-repeat;
             width: 30px;
             height: 30px;
@@ -164,7 +174,11 @@ const InfoDiv = styled.div<{ $error: boolean; $correctActive: boolean }>`
             margin: 7.5px;
             background-image: url(https://ssl.pstatic.net/static/nid/join/m_sp_06_realname_48b1e603.png);
             background-size: 372px 326px;
-            background-position: -342px -64px;
+            background-position: ${props.$error
+              ? "-310px -96px"
+              : props.$correctActive
+              ? ""
+              : "-342px -64px"};
             background-repeat: no-repeat;
             width: 30px;
             height: 30px;
@@ -182,7 +196,11 @@ const InfoDiv = styled.div<{ $error: boolean; $correctActive: boolean }>`
             margin: 7.5px;
             background-image: url(https://ssl.pstatic.net/static/nid/join/m_sp_06_realname_48b1e603.png);
             background-size: 372px 326px;
-            background-position: -192px -296px;
+            background-position: ${props.$error
+              ? "-64px -296px"
+              : props.$correctActive
+              ? "-32px -296px"
+              : "-192px -296px"};
             background-repeat: no-repeat;
             width: 30px;
             height: 30px;
@@ -200,7 +218,11 @@ const InfoDiv = styled.div<{ $error: boolean; $correctActive: boolean }>`
             margin: 7.5px;
             background-image: url(https://ssl.pstatic.net/static/nid/join/m_sp_06_realname_48b1e603.png);
             background-size: 372px 326px;
-            background-position: -310px -128px;
+            background-position: ${props.$error
+              ? "-128px -296px"
+              : props.$correctActive
+              ? "-160px -296px"
+              : "-310px -128px"};
             background-repeat: no-repeat;
             width: 30px;
             height: 30px;
@@ -589,7 +611,10 @@ const SignUp = () => {
                 setInfoOnClick((prev) => ({ ...prev, [e.target.name]: false }));
               }}
               onFocus={(e) => {
-                setInfoOnClick((prev) => ({ ...prev, [e.target.name]: userId ? true : false }));
+                setInfoOnClick((prev) => ({
+                  ...prev,
+                  [e.target.name]: userId ? true : false,
+                }));
               }}
             />
             <span className="idNaver">@naver.com</span>
@@ -611,7 +636,10 @@ const SignUp = () => {
                 setInfoOnClick((prev) => ({ ...prev, [e.target.name]: false }));
               }}
               onFocus={(e) => {
-                setInfoOnClick((prev) => ({ ...prev, [e.target.name]: userPassword ? true : false }));
+                setInfoOnClick((prev) => ({
+                  ...prev,
+                  [e.target.name]: userPassword ? true : false,
+                }));
               }}
             />
             <button
@@ -619,7 +647,11 @@ const SignUp = () => {
               onClick={() => setIsActiveShowPassword(!isActiveShowPassword)}
             />
           </MiddleInfoDiv>
-          <LastInfoDiv className="email" $error={error.email ? true : false} $correctActive={false}>
+          <LastInfoDiv
+            className="email"
+            $error={error.email ? true : false}
+            $correctActive={false}
+          >
             <span className="emailLogo" />
             <input
               type="text"
@@ -669,7 +701,10 @@ const SignUp = () => {
                 setInfoOnClick((prev) => ({ ...prev, [e.target.name]: false }));
               }}
               onFocus={(e) => {
-                setInfoOnClick((prev) => ({ ...prev, [e.target.name]: userName ? true : false }));
+                setInfoOnClick((prev) => ({
+                  ...prev,
+                  [e.target.name]: userName ? true : false,
+                }));
               }}
             />
           </FirstInfoDiv>
@@ -691,7 +726,10 @@ const SignUp = () => {
                 setInfoOnClick((prev) => ({ ...prev, [e.target.name]: false }));
               }}
               onFocus={(e) => {
-                setInfoOnClick((prev) => ({ ...prev, [e.target.name]: userBirth ? true : false }));
+                setInfoOnClick((prev) => ({
+                  ...prev,
+                  [e.target.name]: userBirth ? true : false,
+                }));
               }}
             />
           </MiddleInfoDiv>
@@ -713,7 +751,10 @@ const SignUp = () => {
                 setInfoOnClick((prev) => ({ ...prev, [e.target.name]: false }));
               }}
               onFocus={(e) => {
-                setInfoOnClick((prev) => ({ ...prev, [e.target.name]: userPhoneNumber ? true : false }));
+                setInfoOnClick((prev) => ({
+                  ...prev,
+                  [e.target.name]: userPhoneNumber ? true : false,
+                }));
               }}
             />
           </LastInfoDiv>
