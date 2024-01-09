@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useState } from "react";
+import { FocusEvent, useEffect, useState } from "react";
 import styled, { css } from "styled-components";
 
 const Wrapper = styled.div`
@@ -259,6 +259,15 @@ const SignUpButton = styled.button`
   cursor: pointer;
 `;
 
+type ValidationRule = {
+  regex: RegExp;
+  errorMessages: string[];
+};
+
+type ValidationRules = {
+  [key: string]: ValidationRule;
+};
+
 const SignUp = () => {
   const [userId, setUserId] = useState<string>("");
   const [userPassword, setUserPassword] = useState<string>("");
@@ -307,14 +316,14 @@ const SignUp = () => {
   const correctBirth = /^(19|20)\d\d(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])$/;
   const correctPhoneNumber = /^010[-\s]?\d{4}[-\s]?\d{4}$/;
 
-
   //handleValidation 내부에서 반복적으로 실행되는 작업을 수행하는 함수
   const checkError = (
+    fieldName:string,
     userInfo: string | null,
     errorMessageList: string[],
     correctUserInfo: RegExp
   ) => {
-    if (userInfo === userEmail) {
+    if (fieldName === "email") {
       //이메일은 필수 정보가 아니므로 비어 있어도 괜찮음
       if (userInfo && !correctEmail.test(userEmail)) {
         return errorEmailMessage[0];
@@ -322,9 +331,9 @@ const SignUp = () => {
       return null; //이메일이 비어있거나 유효한 경우
     } else {
       //나머지(아이디, 비밀번호, 이름, 생일, 전화번호) 필드는 필수 정보임
-      if (!userInfo || userInfo === null) {
+      if (userInfo === "" || userInfo === null) {
         return errorMessageList[0]; //필수 정보입니다.
-      } else if (!correctUserInfo.test(userInfo)) {
+      } else if (!correctUserInfo.test(userInfo!)) {
         return errorMessageList[1]; //해당 필드에 대한 특정 오류 메시지
       }
       return null; //오류가 없는 경우
@@ -332,42 +341,43 @@ const SignUp = () => {
   };
 
   //각 input 필드가 blur일 때, handleValidation이 작동
-  const handleValidation = () => {
-    console.log("onBlur!");
+  const handleValidation = (e: FocusEvent<HTMLInputElement, Element>) => {
+    const fieldName = e.target.name;
+    const fieldValue = e.target.value;
 
-    const idError = checkError(userId, errorIdMessage, correctId)!;
-    const passwordError = checkError(
-      userPassword,
-      errorPasswordMessage,
-      correctPassword
-    )!;
-    const emailError = checkError(userEmail, errorEmailMessage, correctEmail)!;
-    const nameError = checkError(userName, errorNameMessage, correctName)!;
-    const birthError = checkError(userBirth, errorBirthMessage, correctBirth)!;
-    const phoneNumberError = checkError(
-      userPhoneNumber,
-      errorPhoneNumberMessage,
-      correctPhoneNumber
-    )!;
 
-    if (
-      idError ||
-      passwordError ||
-      emailError ||
-      nameError ||
-      birthError ||
-      phoneNumberError
-    ) {
-      setError({
-        id: idError,
-        password: passwordError,
-        email: emailError,
-        name: nameError,
-        birth: birthError,
-        phoneNumber: phoneNumberError,
-      });
-    }
+    // 각 필드에 맞는 정규식과 오류 메시지를 매핑
+    const validationRules: ValidationRules = {
+      id: { regex: correctId, errorMessages: errorIdMessage },
+      password: { regex: correctPassword, errorMessages: errorPasswordMessage },
+      email: { regex: correctEmail, errorMessages: errorEmailMessage },
+      name: { regex: correctName, errorMessages: errorNameMessage },
+      birth: { regex: correctBirth, errorMessages: errorBirthMessage },
+      phoneNumber: {
+        regex: correctPhoneNumber,
+        errorMessages: errorPhoneNumberMessage,
+      },
+    };
+
+    const newError = checkError(
+      fieldName,
+      fieldValue,
+      validationRules[fieldName].errorMessages,
+      validationRules[fieldName].regex
+    );
+
+    console.log(newError);
+
+    // 오류 상태 업데이트 (이전 오류 상태 유지)
+    setError((prevErrors) => ({
+      ...prevErrors,
+      [fieldName]: newError,
+    }));
   };
+
+  useEffect(() => {
+    console.log("updated userinfo");
+  }, [error]);
 
   //password 가시 여부를 나타내는 state
   const [isActiveShowPassword, setIsActiveShowPassword] =
@@ -413,10 +423,11 @@ const SignUp = () => {
             <span className="idLogo" />
             <input
               type="text"
+              name="id"
               placeholder="아이디"
               value={userId}
               onChange={(e) => setUserId(e.target.value)}
-              onBlur={handleValidation}
+              onBlur={(e) => handleValidation(e)}
             />
             <span className="idNaver">@naver.com</span>
           </InfoDiv>
@@ -424,10 +435,11 @@ const SignUp = () => {
             <span className="passwordLogo" />
             <input
               type={isActiveShowPassword ? "text" : "password"}
+              name="password"
               placeholder="비밀번호"
               value={userPassword}
               onChange={(e) => setUserPassword(e.target.value)}
-              onBlur={handleValidation}
+              onBlur={(e) => handleValidation(e)}
             />
             <button
               className={isActiveShowPassword ? "showPassword" : "hidePassword"}
@@ -438,10 +450,11 @@ const SignUp = () => {
             <span className="emailLogo" />
             <input
               type="text"
+              name="email"
               placeholder="[선택] 비밀번호 분실 시 확인용 이메일"
               value={userEmail}
               onChange={(e) => setUserEmail(e.target.value)}
-              onBlur={handleValidation}
+              onBlur={(e) => handleValidation(e)}
             />
           </InfoDiv>
         </InfoBunch>
@@ -460,30 +473,33 @@ const SignUp = () => {
             <span className="nameLogo" />
             <input
               type="text"
+              name="name"
               placeholder="이름"
               value={userName}
               onChange={(e) => setUserName(e.target.value)}
-              onBlur={handleValidation}
+              onBlur={(e) => handleValidation(e)}
             />
           </InfoDiv>
           <InfoDiv className="birth">
             <span className="birthLogo" />
             <input
               type="text"
+              name="birth"
               placeholder="생년월일 8자리"
               value={userBirth}
               onChange={(e) => setUserBirth(e.target.value)}
-              onBlur={handleValidation}
+              onBlur={(e) => handleValidation(e)}
             />
           </InfoDiv>
           <InfoDiv className="phoneNumber">
             <span className="phoneNumberLogo" />
             <input
               type="text"
+              name="phoneNumber"
               placeholder="휴대전화번호"
               value={userPhoneNumber}
               onChange={(e) => setUserPhoneNumber(e.target.value)}
-              onBlur={handleValidation}
+              onBlur={(e) => handleValidation(e)}
             />
           </InfoDiv>
         </InfoBunch>
