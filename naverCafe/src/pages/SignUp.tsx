@@ -58,7 +58,7 @@ const InfoDiv = styled.div<{ $error: boolean; $correctActive: boolean }>`
   box-sizing: border-box;
   border: ${(props) =>
     props.$error
-      ? "3px solid red"
+      ? "3px solid #ff3f3f"
       : props.$correctActive
       ? "3px solid #09aa5c"
       : "1px solid #c6c6c6"};
@@ -69,11 +69,11 @@ const InfoDiv = styled.div<{ $error: boolean; $correctActive: boolean }>`
     outline: none;
     font-size: 16px;
 
-    color: ${(props) => (props.$error ? "red" : "black")};
+    color: ${(props) => (props.$error ? "#ff3f3f" : "black")};
     text-decoration: ${(props) => (props.$error ? "underline" : "none")};
 
     &::placeholder {
-      color: ${(props) => (props.$error ? "red" : "#c6c6c6")};
+      color: ${(props) => (props.$error ? "#ff3f3f" : "#929294")};
     }
   }
   & > button {
@@ -177,7 +177,7 @@ const InfoDiv = styled.div<{ $error: boolean; $correctActive: boolean }>`
             background-position: ${props.$error
               ? "-310px -96px"
               : props.$correctActive
-              ? ""
+              ? "-310px -160px"
               : "-342px -64px"};
             background-repeat: no-repeat;
             width: 30px;
@@ -369,9 +369,10 @@ const SignUp = () => {
   const [infoOnClick, setInfoOnClick] = useState({
     id: false,
     password: false,
+    email: false,
     name: false,
     birth: false,
-    phonNumber: false,
+    phoneNumber: false,
   });
 
   const errorIdMessage = [
@@ -650,7 +651,7 @@ const SignUp = () => {
           <LastInfoDiv
             className="email"
             $error={error.email ? true : false}
-            $correctActive={false}
+            $correctActive={infoOnClick.email}
           >
             <span className="emailLogo" />
             <input
@@ -664,7 +665,7 @@ const SignUp = () => {
                 setInfoOnClick((prev) => ({ ...prev, [e.target.name]: false }));
               }}
               onFocus={(e) => {
-                setInfoOnClick((prev) => ({ ...prev, [e.target.name]: true }));
+                setInfoOnClick((prev) => ({ ...prev, [e.target.name]: userEmail ? false : true }));
               }}
             />
           </LastInfoDiv>
@@ -736,7 +737,7 @@ const SignUp = () => {
           <LastInfoDiv
             className="phoneNumber"
             $error={error.phoneNumber ? true : false}
-            $correctActive={infoOnClick.phonNumber}
+            $correctActive={infoOnClick.phoneNumber}
           >
             <span className="phoneNumberLogo" />
             <input
