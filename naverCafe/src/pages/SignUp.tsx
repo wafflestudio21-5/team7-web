@@ -24,6 +24,29 @@ const Header = styled.div`
 `;
 const Content = styled.div`
   padding: 30px 20px;
+  ul {
+    color: #ff3f3f; // 글씨 색상을 빨간색으로 설정
+    text-align: left;
+    margin: 10px 0 10px 18px;
+    letter-spacing: -0.4px;
+
+    li {
+      list-style: disc;
+      padding-left: -10px;
+      position: relative;
+      font-size: 13px;
+      line-height: 18px;
+    }
+  }
+  p {
+    margin-top: 10px;
+    color: #ff3f3f;
+    text-align: left;
+    font-size: 13px;
+
+    padding-left: 8px;
+    letter-spacing: -0.4px;
+  }
 `;
 const InfoBunch = styled.div`
   border: 1px solid #c6c6c6;
@@ -219,7 +242,7 @@ const AuthDiv = styled.div`
     small {
       /* display: inline-block;
       vertical-align: middle; */
-      // small 태그 안에 있는 글자([필수])가 세로 가운데 정렬이 안되어 보이는 문제 발생 (원래 회원가입 창에 기울어지지 않은 모양이길래 small로 수정했습니다!)
+      // small 태그 안에 있는 글자([필수])가 세로 가운데 정렬이 안되어 보이는 문제 발생 (원본 회원가입 창에서는 기울어지지 않은 모양이길래 small로 수정했습니다!)
       font-size: 13px;
       color: #09aa5c;
       margin-right: 4px;
