@@ -1,5 +1,5 @@
 import axios from "axios";
-import { FocusEvent, useEffect, useState } from "react";
+import { FocusEvent, useState } from "react";
 import styled, { css } from "styled-components";
 
 const Wrapper = styled.div`
@@ -216,7 +216,7 @@ const AuthDiv = styled.div`
   }
   label {
     cursor: pointer;
-    em {
+    small {
       /* display: inline-block;
       vertical-align: middle; */
       // em 태그 안에 있는 글자([필수])가 세로 가운데 정렬이 안되어 보이는 문제 발생
@@ -268,6 +268,19 @@ type ValidationRules = {
   [key: string]: ValidationRule;
 };
 
+type FieldName2Kor = {
+  [key: string]: string;
+};
+
+type FinalError = {
+  id?: string;
+  password?: string;
+  email?: string;
+  name?: string;
+  birth?: string;
+  phoneNumber?: string;
+}
+
 const SignUp = () => {
   const [userId, setUserId] = useState<string>("");
   const [userPassword, setUserPassword] = useState<string>("");
@@ -279,6 +292,7 @@ const SignUp = () => {
   const errorIdMessage = [
     "필수 정보입니다.",
     "5~20자의 영문 소문자, 숫자와 특수기호(_),(-)만 사용 가능합니다.",
+    "사용할 수 없는 아이디입니다. 다른 아이디를 입력해 주세요.", //중복되는 아이디가 있는 경우로, 백엔드와 연결 후 진행해야 할 것 같습니다.
   ];
   const errorPasswordMessage = [
     "필수 정보입니다.",
@@ -318,7 +332,7 @@ const SignUp = () => {
 
   //handleValidation 내부에서 반복적으로 실행되는 작업을 수행하는 함수
   const checkError = (
-    fieldName:string,
+    fieldName: string,
     userInfo: string | null,
     errorMessageList: string[],
     correctUserInfo: RegExp
@@ -345,7 +359,6 @@ const SignUp = () => {
     const fieldName = e.target.name;
     const fieldValue = e.target.value;
 
-
     // 각 필드에 맞는 정규식과 오류 메시지를 매핑
     const validationRules: ValidationRules = {
       id: { regex: correctId, errorMessages: errorIdMessage },
@@ -366,8 +379,6 @@ const SignUp = () => {
       validationRules[fieldName].regex
     );
 
-    console.log(newError);
-
     // 오류 상태 업데이트 (이전 오류 상태 유지)
     setError((prevErrors) => ({
       ...prevErrors,
@@ -375,15 +386,23 @@ const SignUp = () => {
     }));
   };
 
-  useEffect(() => {
-    console.log("updated userinfo");
-  }, [error]);
+  const fieldName2Kor: FieldName2Kor = {
+    id: "아이디",
+    password: "비밀번호",
+    email: "이메일",
+    name: "이름",
+    birth: "생년월일",
+    phoneNumber: "휴대전화번호",
+  };
 
   //password 가시 여부를 나타내는 state
   const [isActiveShowPassword, setIsActiveShowPassword] =
     useState<boolean>(false);
   //인증 약관 동의 여부를 나타내는 state
   const [isAuthPaperChecked, setIsAuthPaperChecked] = useState<boolean>(false);
+  //인증 약관 동의 버튼의 최초 클릭 여부를 나타내는 state
+  const [isAuthPaperNotClicked, setIsAuthPaperNotClicked] =
+    useState<boolean>(true);
 
   const createAccount = () => {
     console.log({
@@ -410,6 +429,46 @@ const SignUp = () => {
       .catch((err) => {
         console.log(err);
       });
+  };
+
+  const validateAll = () => {
+    return {
+      id: checkError("id", userId, errorIdMessage, correctId) || undefined,
+      password:
+        checkError(
+          "password",
+          userPassword,
+          errorPasswordMessage,
+          correctPassword
+        ) || undefined,
+      email:
+        checkError("email", userEmail, errorEmailMessage, correctEmail) ||
+        undefined,
+      name:
+        checkError("name", userName, errorNameMessage, correctName) ||
+        undefined,
+      birth:
+        checkError("birth", userBirth, errorBirthMessage, correctBirth) ||
+        undefined,
+      phoneNumber:
+        checkError(
+          "phoneNumber",
+          userPhoneNumber,
+          errorPhoneNumberMessage,
+          correctPhoneNumber
+        ) || undefined,
+    };
+  };
+
+  const handleCreateAccount = () => {
+    const finalError:FinalError = validateAll();
+    setError(finalError);
+
+    const hasErrors = Object.values(finalError).some((error) => error !== null);
+
+    if (!hasErrors || isAuthPaperChecked) {
+      createAccount();
+    }
   };
 
   return (
@@ -462,7 +521,11 @@ const SignUp = () => {
         <ul>
           {Object.entries(error).map(([key, value]) => {
             if (["id", "password", "email"].includes(key) && value) {
-              return <li key={key}>{value}</li>;
+              return (
+                <li key={key}>
+                  {fieldName2Kor[key]}: {value}
+                </li>
+              );
             }
             return null;
           })}
@@ -507,7 +570,11 @@ const SignUp = () => {
         <ul>
           {Object.entries(error).map(([key, value]) => {
             if (["name", "birth", "phoneNumber"].includes(key) && value) {
-              return <li key={key}>{value}</li>;
+              return (
+                <li key={key}>
+                  {fieldName2Kor[key]}: {value}
+                </li>
+              );
             }
             return null;
           })}
@@ -519,16 +586,24 @@ const SignUp = () => {
               isAuthPaperChecked ? "authPaperChecked" : "authPaperNotchecked"
             }
             id="authPaperCheck"
-            onClick={() => setIsAuthPaperChecked(!isAuthPaperChecked)}
+            onClick={() => {
+              setIsAuthPaperChecked(!isAuthPaperChecked);
+              setIsAuthPaperNotClicked(false);
+            }}
           />
           <label htmlFor="authPaperCheck">
-            <em>[필수]</em>
+            <small>[필수]</small>
             인증 약관 전체동의
           </label>
           <button className="authPaper" />
         </AuthDiv>
+        {isAuthPaperChecked || isAuthPaperNotClicked ? null : (
+          <p>필수 약관에 모두 동의해 주세요.</p>
+        )}
       </Content>
-      <SignUpButton onClick={() => createAccount()}>회원가입</SignUpButton>
+      <SignUpButton onClick={() => handleCreateAccount()}>
+        회원가입
+      </SignUpButton>
     </Wrapper>
   );
 };
