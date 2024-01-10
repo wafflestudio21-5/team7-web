@@ -1,5 +1,5 @@
 import axios from "axios";
-import { FocusEvent,  useState } from "react";
+import { FocusEvent, useState } from "react";
 import styled, { css } from "styled-components";
 
 const Wrapper = styled.div`
@@ -268,28 +268,30 @@ const AuthDiv = styled.div<{ $error?: boolean }>`
   font-weight: 800;
   font-size: 15px;
   vertical-align: middle;
+
   & > button {
     border: none;
     outline: none;
     cursor: pointer;
     background-color: white;
-  }
-  button {
+
     display: block;
     background-image: url(https://ssl.pstatic.net/static/nid/join/m_sp_06_realname_48b1e603.png);
     background-size: 372px 326px;
-    background-position: -342px -200px;
     background-repeat: no-repeat;
     width: 22px;
     height: 22px;
     margin-right: 6px;
+
+    &.authPaperChecked {
+      background-position: -342px -224px;
+    }
+    &.authPaperNotChecked {
+      background-position: ${(props) =>
+        props.$error ? "-342px -176px" : "-342px -200px"};
+    }
   }
-  .authPaperChecked {
-    background-position: -342px -224px;
-  }
-  .authPaperNotChecked {
-    background-position: -342px -200px;
-  }
+
   label {
     cursor: pointer;
     small {
@@ -750,7 +752,9 @@ const SignUp = () => {
         <ul>
           {error.name ? <li>이름: {error.name}</li> : null}
           {error.birth ? <li>생년월일: {error.birth}</li> : null}
-          {error.phoneNumber ? <li>휴대전화번호: {error.phoneNumber}</li> : null}
+          {error.phoneNumber ? (
+            <li>휴대전화번호: {error.phoneNumber}</li>
+          ) : null}
         </ul>
 
         <AuthDiv
@@ -758,7 +762,7 @@ const SignUp = () => {
         >
           <button
             className={
-              isAuthPaperChecked ? "authPaperChecked" : "authPaperNotchecked"
+              isAuthPaperChecked ? "authPaperChecked" : "authPaperNotChecked"
             }
             id="authPaperCheck"
             onClick={() => {
