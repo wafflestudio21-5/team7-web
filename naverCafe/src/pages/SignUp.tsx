@@ -51,7 +51,7 @@ const Content = styled.div`
 const InfoBunch = styled.div`
   margin: 10px 0px;
 `;
-const InfoDiv = styled.div<{ $error: boolean; $correctActive: boolean }>`
+const InfoDiv = styled.div<{ $error: boolean; $correctActive: boolean; $length: number; }>`
   display: flex;
   align-items: center;
   height: 50px;
@@ -93,7 +93,7 @@ const InfoDiv = styled.div<{ $error: boolean; $correctActive: boolean }>`
             background-size: 372px 326px;
             background-position: ${props.$error
               ? "-310px -96px"
-              : props.$correctActive
+              : (props.$length !==0)
               ? "-310px -160px"
               : "-342px -64px"};
             background-repeat: no-repeat;
@@ -118,7 +118,7 @@ const InfoDiv = styled.div<{ $error: boolean; $correctActive: boolean }>`
             background-size: 372px 326px;
             background-position: ${props.$error
               ? "-310px -32px"
-              : props.$correctActive
+              : (props.$length !== 0)
               ? "-310px -64px"
               : "-310px 0"};
             background-repeat: no-repeat;
@@ -156,7 +156,7 @@ const InfoDiv = styled.div<{ $error: boolean; $correctActive: boolean }>`
             background-size: 372px 326px;
             background-position: ${props.$error
               ? "-310px -256px"
-              : " -96px -296px"}; //email의 경우 correctActive를 따로 정의해주어야 하는데 아직 못함
+              : (props.$length !== 0) ? "-216px -128px": " -96px -296px"};
             background-repeat: no-repeat;
             width: 30px;
             height: 30px;
@@ -176,7 +176,7 @@ const InfoDiv = styled.div<{ $error: boolean; $correctActive: boolean }>`
             background-size: 372px 326px;
             background-position: ${props.$error
               ? "-310px -96px"
-              : props.$correctActive
+              : (props.$length !== 0)
               ? "-310px -160px"
               : "-342px -64px"};
             background-repeat: no-repeat;
@@ -198,7 +198,7 @@ const InfoDiv = styled.div<{ $error: boolean; $correctActive: boolean }>`
             background-size: 372px 326px;
             background-position: ${props.$error
               ? "-64px -296px"
-              : props.$correctActive
+              : (props.$length !== 0)
               ? "-32px -296px"
               : "-192px -296px"};
             background-repeat: no-repeat;
@@ -220,7 +220,7 @@ const InfoDiv = styled.div<{ $error: boolean; $correctActive: boolean }>`
             background-size: 372px 326px;
             background-position: ${props.$error
               ? "-128px -296px"
-              : props.$correctActive
+              : (props.$length !== 0)
               ? "-160px -296px"
               : "-310px -128px"};
             background-repeat: no-repeat;
@@ -591,6 +591,7 @@ const SignUp = () => {
             className="id"
             $error={error.id ? true : false}
             $correctActive={infoOnClick.id}
+            $length={userId.length}
           >
             <span className="idLogo" />
             <input
@@ -606,7 +607,7 @@ const SignUp = () => {
               onFocus={(e) => {
                 setInfoOnClick((prev) => ({
                   ...prev,
-                  [e.target.name]: userId ? true : false,
+                  [e.target.name]:  true ,
                 }));
               }}
             />
@@ -616,6 +617,7 @@ const SignUp = () => {
             className="password"
             $error={error.password ? true : false}
             $correctActive={infoOnClick.password}
+            $length={userPassword.length}
           >
             <span className="passwordLogo" />
             <input
@@ -631,7 +633,7 @@ const SignUp = () => {
               onFocus={(e) => {
                 setInfoOnClick((prev) => ({
                   ...prev,
-                  [e.target.name]: userPassword ? true : false,
+                  [e.target.name]: true,
                 }));
               }}
             />
@@ -644,6 +646,7 @@ const SignUp = () => {
             className="email"
             $error={error.email ? true : false}
             $correctActive={infoOnClick.email}
+            $length={userEmail.length}
           >
             <span className="emailLogo" />
             <input
@@ -659,7 +662,7 @@ const SignUp = () => {
               onFocus={(e) => {
                 setInfoOnClick((prev) => ({
                   ...prev,
-                  [e.target.name]: userEmail ? false : true,
+                  [e.target.name]: true,
                 }));
               }}
             />
@@ -677,6 +680,7 @@ const SignUp = () => {
             className="name"
             $error={error.name ? true : false}
             $correctActive={infoOnClick.name}
+            $length={userName.length}
           >
             <span className="nameLogo" />
             <input
@@ -692,7 +696,7 @@ const SignUp = () => {
               onFocus={(e) => {
                 setInfoOnClick((prev) => ({
                   ...prev,
-                  [e.target.name]: userName ? true : false,
+                  [e.target.name]: true,
                 }));
               }}
             />
@@ -701,6 +705,7 @@ const SignUp = () => {
             className="birth"
             $error={error.birth ? true : false}
             $correctActive={infoOnClick.birth}
+            $length={userBirth.length}
           >
             <span className="birthLogo" />
             <input
@@ -717,7 +722,7 @@ const SignUp = () => {
               onFocus={(e) => {
                 setInfoOnClick((prev) => ({
                   ...prev,
-                  [e.target.name]: userBirth ? true : false,
+                  [e.target.name]: true,
                 }));
               }}
             />
@@ -726,6 +731,7 @@ const SignUp = () => {
             className="phoneNumber"
             $error={error.phoneNumber ? true : false}
             $correctActive={infoOnClick.phoneNumber}
+            $length={userPhoneNumber.length}
           >
             <span className="phoneNumberLogo" />
             <input
@@ -742,7 +748,7 @@ const SignUp = () => {
               onFocus={(e) => {
                 setInfoOnClick((prev) => ({
                   ...prev,
-                  [e.target.name]: userPhoneNumber ? true : false,
+                  [e.target.name]:  true,
                 }));
               }}
             />
