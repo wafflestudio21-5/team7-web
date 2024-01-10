@@ -450,18 +450,18 @@ const SideBar = () => {
               src="https://cafe.pstatic.net/cafe4/hidden.gif"
               alt="전체글보기"
             />
-            <Link to={`/`}>전체글보기</Link>
+            <Link to={`/totalboard`}>전체글보기</Link>
           </div>
           <div>
             <img src="https://cafe.pstatic.net/cafe4/hidden.gif" alt="인기글" />
-            <Link to={`/`}>인기글</Link>
+            <Link to={`/popularboard`}>인기글</Link>
           </div>
           <div>
             <img
               src="https://cafe.pstatic.net/cafe4/hidden.gif"
               alt="자유게시판"
             />
-            <Link to={`/`}>자유게시판</Link>
+            <Link to={`/freeboard`}>자유게시판</Link>
           </div>
           {/* 그 외 게시판 새로 추가시 더해지는 기능이 있으면 좋겠습니다. */}
           {/* 그러러면 boards div 안에 있는 div들이 state로서 선언되면 될 것 같습니다. */}
