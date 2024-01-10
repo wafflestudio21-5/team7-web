@@ -58,9 +58,9 @@ const InfoDiv = styled.div<{ $error: boolean; $correctActive: boolean }>`
   box-sizing: border-box;
   border: ${(props) =>
     props.$error
-      ? "3px solid #ff3f3f"
+      ? "2px solid #ff3f3f"
       : props.$correctActive
-      ? "3px solid #09aa5c"
+      ? "2px solid #09aa5c"
       : "1px solid #c6c6c6"};
 
   input {
@@ -262,10 +262,10 @@ const AuthDiv = styled.div<{ $error?: boolean }>`
   align-items: center;
   padding: 14px;
   border: ${(props) =>
-    props.$error ? "3px solid #ff3f3f" : "1px solid #c6c6c6"};
+    props.$error ? "2px solid #ff3f3f" : "1px solid #c6c6c6"};
   box-sizing: border-box;
   border-radius: 8px;
-  font-weight: 800;
+  font-weight: 700;
   font-size: 15px;
   vertical-align: middle;
 
