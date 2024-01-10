@@ -1,5 +1,5 @@
 import axios from "axios";
-import { FocusEvent, useState } from "react";
+import { FocusEvent,  useState } from "react";
 import styled, { css } from "styled-components";
 
 const Wrapper = styled.div`
@@ -345,10 +345,6 @@ type ValidationRules = {
   [key: string]: ValidationRule;
 };
 
-type FieldName2Kor = {
-  [key: string]: string;
-};
-
 type FinalError = {
   id?: string;
   password?: string;
@@ -473,15 +469,6 @@ const SignUp = () => {
     }));
   };
 
-  const fieldName2Kor: FieldName2Kor = {
-    id: "아이디",
-    password: "비밀번호",
-    email: "이메일",
-    name: "이름",
-    birth: "생년월일",
-    phoneNumber: "휴대전화번호",
-  };
-
   //phoneNumber의 경우, 하이픈을 자동으로 추가
   const autoHyphen = (e: FocusEvent<HTMLInputElement, Element>) => {
     const phoneNumber = e.target.value;
@@ -583,8 +570,11 @@ const SignUp = () => {
 
     const hasErrors = Object.values(finalError).some((error) => error !== null);
 
-    if (!hasErrors || isAuthPaperChecked) {
+    if (!hasErrors && isAuthPaperChecked) {
       createAccount();
+    } else if (!isAuthPaperChecked) {
+      setIsAuthPaperChecked(false);
+      setIsAuthPaperNeverClicked(false);
     }
   };
 
@@ -665,23 +655,19 @@ const SignUp = () => {
                 setInfoOnClick((prev) => ({ ...prev, [e.target.name]: false }));
               }}
               onFocus={(e) => {
-                setInfoOnClick((prev) => ({ ...prev, [e.target.name]: userEmail ? false : true }));
+                setInfoOnClick((prev) => ({
+                  ...prev,
+                  [e.target.name]: userEmail ? false : true,
+                }));
               }}
             />
           </LastInfoDiv>
         </InfoBunch>
 
         <ul>
-          {Object.entries(error).map(([key, value]) => {
-            if (["id", "password", "email"].includes(key) && value) {
-              return (
-                <li key={key}>
-                  {fieldName2Kor[key]}: {value}
-                </li>
-              );
-            }
-            return null;
-          })}
+          {error.id ? <li>아이디: {error.id}</li> : null}
+          {error.password ? <li>비밀번호: {error.password}</li> : null}
+          {error.email ? <li>이메일: {error.email}</li> : null}
         </ul>
 
         <InfoBunch>
@@ -762,16 +748,9 @@ const SignUp = () => {
         </InfoBunch>
 
         <ul>
-          {Object.entries(error).map(([key, value]) => {
-            if (["name", "birth", "phoneNumber"].includes(key) && value) {
-              return (
-                <li key={key}>
-                  {fieldName2Kor[key]}: {value}
-                </li>
-              );
-            }
-            return null;
-          })}
+          {error.name ? <li>이름: {error.name}</li> : null}
+          {error.birth ? <li>생년월일: {error.birth}</li> : null}
+          {error.phoneNumber ? <li>휴대전화번호: {error.phoneNumber}</li> : null}
         </ul>
 
         <AuthDiv
