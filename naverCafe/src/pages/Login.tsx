@@ -1,6 +1,8 @@
 import styled, { css } from "styled-components";
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Wrapper = styled.div`
   width: 458px;
@@ -9,6 +11,7 @@ const Wrapper = styled.div`
 const Header = styled.div`
   height: 186px;
   padding-bottom: 48px;
+  box-sizing: border-box;
   & > a {
     display: inline-block;
     margin-top: 108px;
@@ -33,21 +36,25 @@ const LoginPannel = styled.div<{ $isIDLoginSelected: boolean }>`
     border-radius: 6px 6px 0 0;
     background-color: white;
     position: relative;
-    bottom: -5px;
-    /* z-index: 2; */
-    /* z-index를 사용하는 게 적절한지 모르겠습니다. */
+    bottom: -13px;
     & > li {
       padding: 17px 0 0;
       width: 50%;
       font-size: 16px;
       font-weight: 500;
       line-height: 20px;
+      background-color: white;
+      border-radius: inherit;
       cursor: pointer;
+      /* 선택되지 않은 tab의 border는 더 연한 색이어야 하는데 어떻게 구현할지 고민이 필요할 것 같습니다. */
     }
     & > .idLogin {
       position: relative;
       color: ${(props) => (props.$isIDLoginSelected ? "#213547" : "#777")};
       z-index: ${(props) => (props.$isIDLoginSelected ? 2 : 0)};
+      background-color: ${(props) =>
+        props.$isIDLoginSelected ? "white" : "#f8f9fa"};
+      /* before 가상 선택자는 ID 로그인의 Logo에 대한 작업입니다. */
       &::before {
         display: inline-block;
         content: "";
@@ -68,15 +75,55 @@ const LoginPannel = styled.div<{ $isIDLoginSelected: boolean }>`
         height: 16px;
         margin-right: 8px;
       }
+      /* after 가상 선택자는 tab 선택에 따른 border 작업입니다. */
+      &::after {
+        ${(props) =>
+          props.$isIDLoginSelected
+            ? css`
+                content: "";
+                position: absolute;
+                top: -1px;
+                right: -8px;
+                background-repeat: no-repeat;
+                width: 15px;
+                height: 62px;
+                background-image: url(https://ssl.pstatic.net/static/nid/login/m_sp_01_login_008d5216.png);
+                background-size: 266px 225px;
+                background-position: 0 -139px;
+              `
+            : css``}
+      }
     }
     & > .socialLogin {
+      position: relative;
       color: ${(props) => (props.$isIDLoginSelected ? "#777" : "#213547")};
+      z-index: ${(props) => (props.$isIDLoginSelected ? 0 : 2)};
+      background-color: ${(props) =>
+        props.$isIDLoginSelected ? "#f8f9fa" : "white"};
+      /* before 가상 선택자는 tab 선택에 따른 border에 대한 작업입니다. */
+      &::before {
+        ${(props) =>
+          props.$isIDLoginSelected
+            ? css``
+            : css`
+                content: "";
+                position: absolute;
+                top: -1px;
+                left: -8px;
+                background-repeat: no-repeat;
+                width: 15px;
+                height: 62px;
+                background-image: url(https://ssl.pstatic.net/static/nid/login/m_sp_01_login_0c98137b.png);
+                background-size: 283px 246px;
+                background-position: -212px 0;
+              `}
+      }
     }
   }
 `;
 const Inner = styled.div`
   width: 458px;
-  height: 255px;
+  min-height: 255px;
   padding: 20px 28px;
   border: 1px solid #c6c6c6;
   border-radius: 6px;
@@ -90,6 +137,7 @@ const Inner = styled.div`
     width: 402px;
     height: 52px;
     background-color: #03c75a;
+    margin-top: 16px;
     padding: 13px 0;
     color: white;
     border: solid 1px rgba(0, 0, 0, 0.15);
@@ -98,9 +146,6 @@ const Inner = styled.div`
     font-size: 20px;
     font-weight: 700;
     line-height: 24px;
-    position: absolute;
-    bottom: 20px;
-    transform: translate(-50%, 0%);
     cursor: pointer;
   }
 `;
@@ -188,6 +233,7 @@ const IDLogin = styled.div<{
   /* 로그인할 때 추가 설정(로그인 상태 유지, IP 보안 설정) */
   /* IP 보안의 경우, 실제 사용할 일이 없을 거 같아서 미완성인 상태로 놔두었습니다. */
   & > .loginSetting {
+    height: 20px;
     position: relative;
     margin-top: 10px;
     & > .maintainLogin {
@@ -229,6 +275,15 @@ const IDLogin = styled.div<{
       }
     }
   }
+  & > .errorMessage {
+    margin-top: 24px;
+    display: inline-block;
+    width: 100%;
+    font-size: 12px;
+    line-height: 16px;
+    color: #ff003e;
+    text-align: left;
+  }
 `;
 const Find = styled.div`
   margin-top: 20px;
@@ -261,6 +316,48 @@ const Login = () => {
   const [userPassword, setUserPassword] = useState<string>("");
   const [isIDLoginSelected, setIsIDLoginSelected] = useState<boolean>(true);
   const [isLoginMaintained, setIsLoginMaintained] = useState<boolean>(false);
+
+  const [isErrorOnId, setIsErrorOnId] = useState<boolean>(false);
+  const [isErrorOnPassword, setIsErrorOnPassword] = useState<boolean>(false);
+  const [isErrorOnBoth, setIsErrorOnBoth] = useState<boolean>(false);
+
+  const navigate = useNavigate();
+
+  const handleLogin = () => {
+    setIsErrorOnBoth(false);
+    if (userId.length == 0) {
+      setIsErrorOnId(true);
+      return;
+    } else {
+      setIsErrorOnId(false);
+    }
+    if (userPassword.length === 0) {
+      setIsErrorOnPassword(true);
+      return;
+    } else {
+      setIsErrorOnPassword(false);
+    }
+    login();
+    return;
+  };
+
+  const login = () => {
+    console.log({});
+    return axios
+      .post("", {
+        id: userId,
+        password: userPassword,
+      })
+      .then((res) => {
+        console.log(res);
+        navigate("/");
+        return res;
+      })
+      .catch((err) => {
+        console.log(err);
+        setIsErrorOnBoth(true);
+      });
+  };
 
   return (
     <Wrapper>
@@ -321,8 +418,27 @@ const Login = () => {
                 <label htmlFor="">IP 보안</label>
               </div>
             </div>
+            <div className="errorMessage">
+              {isErrorOnId ? <span>아이디를 입력해 주세요.</span> : <></>}
+              {isErrorOnPassword ? (
+                <span>비밀번호를 입력해 주세요.</span>
+              ) : (
+                <></>
+              )}
+              {isErrorOnBoth ? (
+                <span>
+                  아이디(로그인 전용 아이디) 또는 비밀번호를 잘못 입력했습니다.
+                  <br />
+                  입력하신 내용을 다시 확인해주세요.
+                </span>
+              ) : (
+                <></>
+              )}
+            </div>
           </IDLogin>
-          <button className="loginButton">로그인</button>
+          <button className="loginButton" onClick={() => handleLogin()}>
+            로그인
+          </button>
         </Inner>
         <Find>
           <ul>
