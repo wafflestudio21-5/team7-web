@@ -1,6 +1,6 @@
 import styled, { css } from "styled-components";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Wrapper = styled.div`
   display: inline-block;
@@ -343,6 +343,7 @@ const CafeSmartBot = styled.div`
 
 const SideBar = () => {
   const [isCafeInfoChecked, setIsCafeInfoChecked] = useState<boolean>(true);
+  const navigate = useNavigate();
 
   return (
     <Wrapper>
@@ -425,7 +426,7 @@ const SideBar = () => {
         </MyActivity>
       )}
       <Buttons>
-        <button className="writePost">카페 글쓰기</button>
+        <button className="writePost" onClick={()=>{navigate('/write')}}>카페 글쓰기</button>
         <br />
         <button className="cafeChat">카페 채팅</button>
       </Buttons>

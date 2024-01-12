@@ -51,7 +51,11 @@ const Content = styled.div`
 const InfoBunch = styled.div`
   margin: 10px 0px;
 `;
-const InfoDiv = styled.div<{ $error: boolean; $correctActive: boolean; $length: number; }>`
+const InfoDiv = styled.div<{
+  $error: boolean;
+  $correctActive: boolean;
+  $length: number;
+}>`
   display: flex;
   align-items: center;
   height: 50px;
@@ -93,7 +97,7 @@ const InfoDiv = styled.div<{ $error: boolean; $correctActive: boolean; $length: 
             background-size: 372px 326px;
             background-position: ${props.$error
               ? "-310px -96px"
-              : (props.$length !==0)
+              : props.$length !== 0
               ? "-310px -160px"
               : "-342px -64px"};
             background-repeat: no-repeat;
@@ -118,7 +122,7 @@ const InfoDiv = styled.div<{ $error: boolean; $correctActive: boolean; $length: 
             background-size: 372px 326px;
             background-position: ${props.$error
               ? "-310px -32px"
-              : (props.$length !== 0)
+              : props.$length !== 0
               ? "-310px -64px"
               : "-310px 0"};
             background-repeat: no-repeat;
@@ -156,7 +160,9 @@ const InfoDiv = styled.div<{ $error: boolean; $correctActive: boolean; $length: 
             background-size: 372px 326px;
             background-position: ${props.$error
               ? "-310px -256px"
-              : (props.$length !== 0) ? "-216px -128px": " -96px -296px"};
+              : props.$length !== 0
+              ? "-216px -128px"
+              : " -96px -296px"};
             background-repeat: no-repeat;
             width: 30px;
             height: 30px;
@@ -176,7 +182,7 @@ const InfoDiv = styled.div<{ $error: boolean; $correctActive: boolean; $length: 
             background-size: 372px 326px;
             background-position: ${props.$error
               ? "-310px -96px"
-              : (props.$length !== 0)
+              : props.$length !== 0
               ? "-310px -160px"
               : "-342px -64px"};
             background-repeat: no-repeat;
@@ -198,7 +204,7 @@ const InfoDiv = styled.div<{ $error: boolean; $correctActive: boolean; $length: 
             background-size: 372px 326px;
             background-position: ${props.$error
               ? "-64px -296px"
-              : (props.$length !== 0)
+              : props.$length !== 0
               ? "-32px -296px"
               : "-192px -296px"};
             background-repeat: no-repeat;
@@ -220,7 +226,7 @@ const InfoDiv = styled.div<{ $error: boolean; $correctActive: boolean; $length: 
             background-size: 372px 326px;
             background-position: ${props.$error
               ? "-128px -296px"
-              : (props.$length !== 0)
+              : props.$length !== 0
               ? "-160px -296px"
               : "-310px -128px"};
             background-repeat: no-repeat;
@@ -570,11 +576,14 @@ const SignUp = () => {
     const finalError: FinalError = validateAll();
     setError(finalError);
 
-    const hasErrors = Object.values(finalError).some((error) => error !== null);
+    const hasErrors = Object.values(finalError).some(
+      (error) => error !== undefined
+    );
 
     if (!hasErrors && isAuthPaperChecked) {
       createAccount();
     } else if (!isAuthPaperChecked) {
+      console.log("auth paper is not checked");
       setIsAuthPaperChecked(false);
       setIsAuthPaperNeverClicked(false);
     }
@@ -607,7 +616,7 @@ const SignUp = () => {
               onFocus={(e) => {
                 setInfoOnClick((prev) => ({
                   ...prev,
-                  [e.target.name]:  true ,
+                  [e.target.name]: true,
                 }));
               }}
             />
@@ -748,7 +757,7 @@ const SignUp = () => {
               onFocus={(e) => {
                 setInfoOnClick((prev) => ({
                   ...prev,
-                  [e.target.name]:  true,
+                  [e.target.name]: true,
                 }));
               }}
             />
@@ -786,7 +795,11 @@ const SignUp = () => {
           <p>필수 약관에 모두 동의해 주세요.</p>
         )}
       </Content>
-      <SignUpButton onClick={() => handleCreateAccount()}>
+      <SignUpButton
+        onClick={() => {
+          handleCreateAccount();
+        }}
+      >
         회원가입
       </SignUpButton>
     </Wrapper>
