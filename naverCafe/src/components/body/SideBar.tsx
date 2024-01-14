@@ -1,6 +1,7 @@
 import styled, { css } from "styled-components";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { waffleCafe, useCafeInfo } from "../../API/CafeAPI";
 
 const Wrapper = styled.div`
   display: inline-block;
@@ -343,6 +344,7 @@ const CafeSmartBot = styled.div`
 
 const SideBar = () => {
   const [isCafeInfoChecked, setIsCafeInfoChecked] = useState<boolean>(true);
+  const { memberCount } = useCafeInfo(); //백엔드와 연결하고 난 뒤 사용하는 것이 좋을 것 같습니다.
   const navigate = useNavigate();
 
   return (
@@ -362,8 +364,8 @@ const SideBar = () => {
                 />
               </div>
               <div className="managerInfo">
-                <p>메니저 이름</p>
-                <p>2024.00.00 개설</p>
+                <p>{waffleCafe.manager}</p>
+                <p>{waffleCafe.createdAt}</p>
                 <p>카페소개</p>
               </div>
             </div>
@@ -380,7 +382,7 @@ const SideBar = () => {
             </p>
             <p>
               <span className="peopleLogo" />
-              카페 인원수
+              {/*memberCount*/}카페 인원수
               <Link to={`/`}>초대</Link>
             </p>
           </div>
@@ -426,7 +428,14 @@ const SideBar = () => {
         </MyActivity>
       )}
       <Buttons>
-        <button className="writePost" onClick={()=>{navigate('/write')}}>카페 글쓰기</button>
+        <button
+          className="writePost"
+          onClick={() => {
+            navigate("/write");
+          }}
+        >
+          카페 글쓰기
+        </button>
         <br />
         <button className="cafeChat">카페 채팅</button>
       </Buttons>

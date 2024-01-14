@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { Link } from "react-router-dom";
+import { waffleCafe } from "../../API/CafeAPI";
 
 const Wrapper = styled.div`
   display: flex;
@@ -55,9 +56,9 @@ const Wrapper = styled.div`
 const Footer = () => {
   return (
     <Wrapper>
-      <span className="cafeName">{"{카페 이름}"}</span>
+      <span className="cafeName">{waffleCafe.name}</span>
       <span className="cafeLink">
-        <Link to={`/`}>{"{https://cafe.naver.com/toyprojecttest}"}</Link>
+        <Link to={`/`}>{waffleCafe.url}</Link>
       </span>
       <Link to={"/"}>
         <span className="cafeLogo"></span>
