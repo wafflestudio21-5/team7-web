@@ -1,7 +1,8 @@
 import styled, { css } from "styled-components";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { waffleCafe, useCafeInfo } from "../../API/CafeAPI";
+import { useCafeInfo } from "../../API/CafeAPI";
+import { waffleCafe } from "../../Constants";
 
 const Wrapper = styled.div`
   display: inline-block;

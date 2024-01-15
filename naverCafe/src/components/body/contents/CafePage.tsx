@@ -1,4 +1,5 @@
-import { waffleCafe, useCafeInfo } from "../../../API/CafeAPI";
+import { useCafeInfo } from "../../../API/CafeAPI";
+import { waffleCafe } from "../../../Constants";
 
 //사용 예시라, 간단하게 적었습니다.
 
