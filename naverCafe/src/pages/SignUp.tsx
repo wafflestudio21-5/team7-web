@@ -1,6 +1,7 @@
 import axios from "axios";
 import { FocusEvent, useState } from "react";
 import styled, { css } from "styled-components";
+import { baseURL } from "../Constants";
 
 const Wrapper = styled.div`
   width: 500px;
@@ -525,7 +526,7 @@ const SignUp = () => {
       userPhoneNumber: userPhoneNumber,
     });
     return axios
-      .post("", {
+      .post(baseURL + "", {
         userId: userId,
         username: userName,
         password: userPassword,
@@ -583,6 +584,7 @@ const SignUp = () => {
     if (!hasErrors && isAuthPaperChecked) {
       createAccount();
     } else if (!isAuthPaperChecked) {
+      console.log("auth paper is not checked");
       setIsAuthPaperChecked(false);
       setIsAuthPaperNeverClicked(false);
     }
@@ -794,7 +796,11 @@ const SignUp = () => {
           <p>필수 약관에 모두 동의해 주세요.</p>
         )}
       </Content>
-      <SignUpButton onClick={() => handleCreateAccount()}>
+      <SignUpButton
+        onClick={() => {
+          handleCreateAccount();
+        }}
+      >
         회원가입
       </SignUpButton>
     </Wrapper>
