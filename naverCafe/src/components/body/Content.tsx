@@ -4,8 +4,8 @@ import styled from "styled-components";
 const Wrapper = styled.div`
   display: inline-block;
   width: 860px;
-  height: 1385.5px;
-  background-color: bisque;
+  min-height: 1385.5px;
+  /* background-color: bisque; */
 `;
 const Content = () => {
   return (
