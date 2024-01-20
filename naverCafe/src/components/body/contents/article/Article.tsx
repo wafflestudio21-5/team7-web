@@ -9,6 +9,9 @@ import shareIcon from "../../../../assets/article-shareIcon.svg";
 import writeArticleIcon from "../../../../assets/article-writeArticleIcon.svg";
 import upTriangle from "../../../../assets/article-upTriangleIcon.svg";
 import ShareModal from "./ShareModal";
+import { clickLike } from "../../../../API/ArticleAPI";
+import { cancelLike } from "../../../../API/ArticleAPI";
+
 const Wrapper = styled.div`
   /* class가 auth에 포함되어 있을 떄 article의 author와 현재 로그인 상의 user의 id를 비교 */
   /* 다를 때만 display: none */
@@ -408,7 +411,21 @@ const Article = () => {
   // 공유 버튼을 눌렀을 때 공유 모달이 뜹니다.
   const [isShareModalOpen, setIsShareModalOpen] = useState<boolean>(false);
 
-  console.log(location);
+  // 좋아요 기능을 다룹니다.
+  const handleLikes = async () => {
+    if (isArticleLiked) {
+      // 이미 좋아요 -> 좋아요 취소 인 경우
+      setIsArticleLiked(false);
+      await cancelLike(Number(articleId));
+      // 추가로 좋아요 -1
+    } else {
+      // 새롭게 좋아요를 누르는 경우
+      setIsArticleLiked(true);
+      await clickLike(Number(articleId));
+      // 추가로 좋아요 +1
+    }
+  };
+
   // comment 개수 세기
   const commentCount = useMemo(() => {
     let count = exampleComment.comments.length;
@@ -513,10 +530,7 @@ const Article = () => {
           </div>
           <div className="articleInfo">
             <div className="left">
-              <button
-                className="likes"
-                onClick={() => setIsArticleLiked(!isArticleLiked)}
-              >
+              <button className="likes" onClick={() => handleLikes()}>
                 <img
                   src={
                     isArticleLiked
