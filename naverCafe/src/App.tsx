@@ -13,6 +13,7 @@ import FreeBoard from "./components/body/contents/FreeBoard";
 import SearchBoard from "./components/body/contents/SearchBoard";
 import Content from "./components/body/Content";
 import Writing from "./components/Writing";
+import Article from "./components/body/contents/article/Article";
 
 const Wrapper = styled.div`
   margin: 0 auto;
@@ -38,10 +39,17 @@ function App() {
           <Route path="/" element={<Body />}>
             <Route path="/" element={<Content />}>
               <Route path="/" element={<HomeBoard />} />
+
+              {/* Boards */}
               <Route path="/totalboard" element={<TotalBoard />} />
               <Route path="/popularboard" element={<PopularBoard />} />
               <Route path="/freeboard" element={<FreeBoard />} />
               <Route path="/searchboard/:keyword" element={<SearchBoard />} />
+
+              {/* Article */}
+              <Route path="/articles/:articleId" element={<Article />} />
+
+              {/* userInfo */}
             </Route>
           </Route>
 

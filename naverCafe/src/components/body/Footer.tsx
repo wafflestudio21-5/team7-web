@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { Link } from "react-router-dom";
-import { waffleCafe } from "../../API/CafeAPI";
+import { waffleCafe } from "../../Constants";
 
 const Wrapper = styled.div`
   display: flex;
