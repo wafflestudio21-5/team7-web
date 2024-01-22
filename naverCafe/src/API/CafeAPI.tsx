@@ -6,10 +6,10 @@ export function useCafeInfo() {
   const [memberCount, setMemberCount] = useState(0);
   const [articleCount, setArticleCount] = useState(0);
 
-  axios.get(baseURL + "").then((res) => {
-    setMemberCount(res.data);
+  axios.get(baseURL + "/api/v1/cafe-info").then((res) => {
+    setMemberCount(res.data.member_count);
   });
-  axios.get(baseURL + "").then((res) => {
+  axios.get(baseURL + "/api/v1/cafe-info").then((res) => {
     setArticleCount(res.data);
   });
 
