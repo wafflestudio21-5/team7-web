@@ -72,7 +72,7 @@ const UserInfoPaginationBox = ({
       checkedArticleIdList,
       setCheckedArticleIdList,
     });
-  }, [id, checkedArticleIdList, userInfo]);
+  }, [id, checkedArticleIdList, userInfo, setCheckedArticleIdList]);
 
   // pageNumber 관리도 현재 컴포넌트 상에서 하고 싶은데, 그렇게 하면 다른 tab으로 옮겨질 때 오류가 나는 경우가 있어서...
 
@@ -112,7 +112,12 @@ const UserInfoPaginationBox = ({
         </button>
       );
     });
-  }, [newUserRelatedArticleList, pageNumber]);
+  }, [
+    newUserRelatedArticleList,
+    pageNumber,
+    setCheckedArticleIdList,
+    setPageNumber,
+  ]);
 
   //   현재 보이는 page 상의 모든 article의 id를 모아둔 list입니다
   const articleIdList = newUserRelatedArticleList
