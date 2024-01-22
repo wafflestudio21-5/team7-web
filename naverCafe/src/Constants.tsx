@@ -38,7 +38,7 @@ export const aList = [
     like: 2,
   },
   {
-    title: "기말 공부 해야하는데....... 화이팅!",
+    title: "세번째 게시글 입니다.",
     id: 3,
     board: "자유게시판",
     comment: 5,
@@ -48,17 +48,7 @@ export const aList = [
     like: 100,
   },
   {
-    title: "기말 공부 해야하는데....... 화이팅!",
-    id: 3,
-    board: "자유게시판",
-    comment: 5,
-    author: "허유민",
-    date: "2024.01.14.",
-    viewCnt: 33,
-    like: 100,
-  },
-  {
-    title: "기말 공부 해야하는데....... 화이팅!",
+    title: "네번째 게시글",
     id: 4,
     board: "자유게시판",
     comment: 5,
@@ -68,7 +58,7 @@ export const aList = [
     like: 100,
   },
   {
-    title: "기말 공부 해야하는데....... 화이팅!",
+    title: "다섯번째 게시글",
     id: 5,
     board: "자유게시판",
     comment: 5,
@@ -78,7 +68,7 @@ export const aList = [
     like: 100,
   },
   {
-    title: "기말 공부 해야하는데....... 화이팅!",
+    title: "6 게시글",
     id: 6,
     board: "자유게시판",
     comment: 5,
@@ -88,7 +78,7 @@ export const aList = [
     like: 100,
   },
   {
-    title: "기말 공부 해야하는데....... 화이팅!",
+    title: "7 게시글",
     id: 7,
     board: "자유게시판",
     comment: 5,
@@ -98,7 +88,7 @@ export const aList = [
     like: 100,
   },
   {
-    title: "기말 공부 해야하는데....... 화이팅!",
+    title: "8 게시글",
     id: 8,
     board: "자유게시판",
     comment: 5,
@@ -108,7 +98,7 @@ export const aList = [
     like: 100,
   },
   {
-    title: "기말 공부 해야하는데....... 화이팅!",
+    title: "9 게시글",
     id: 9,
     board: "자유게시판",
     comment: 5,
@@ -118,7 +108,7 @@ export const aList = [
     like: 100,
   },
   {
-    title: "기말 공부 해야하는데....... 화이팅!",
+    title: "10 게시글",
     id: 10,
     board: "자유게시판",
     comment: 5,
@@ -128,8 +118,8 @@ export const aList = [
     like: 100,
   },
   {
-    title: "기말 공부 해야하는데....... 화이팅!",
-    id:11,
+    title: "11 게시글",
+    id: 11,
     board: "자유게시판",
     comment: 5,
     author: "허유민",
@@ -138,7 +128,7 @@ export const aList = [
     like: 100,
   },
   {
-    title: "기말 공부 해야하는데....... 화이팅!",
+    title: "12 게시글",
     id: 12,
     board: "자유게시판",
     comment: 5,
@@ -148,7 +138,7 @@ export const aList = [
     like: 100,
   },
   {
-    title: "기말 공부 해야하는데....... 화이팅!",
+    title: "13 게시글",
     id: 13,
     board: "자유게시판",
     comment: 5,
@@ -158,8 +148,18 @@ export const aList = [
     like: 100,
   },
   {
-    title: "기말 공부 해야하는데....... 화이팅!",
+    title: "14 게시글",
     id: 14,
+    board: "자유게시판",
+    comment: 5,
+    author: "허유민",
+    date: "2024.01.14.",
+    viewCnt: 33,
+    like: 100,
+  },
+  {
+    title: "15 게시글",
+    id: 15,
     board: "자유게시판",
     comment: 5,
     author: "허유민",
