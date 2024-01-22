@@ -15,7 +15,7 @@ import { CommonBoardTopOption } from "../../../contexts/BoardStyle/BoardTopOptio
 
 const CommonBoard = ({ board }) => {
   const { articleList } = useArticleList(board.id);
-  const { setTotalLength, indexOfFirstItem, indexOfLastItem } = usePagination(
+  const { setTotalLength, indexOfFirstItem, indexOfLastItem,  } = usePagination(
     board.id
   );
   const currentItems = articleList?.slice(indexOfFirstItem, indexOfLastItem);
@@ -23,7 +23,7 @@ const CommonBoard = ({ board }) => {
   useEffect(() => {
     // setTotalLength(articleList ? articleList.length : 0);
     setTotalLength(aList.length * 2);
-  }, [articleList, setTotalLength]);
+  }, []);
 
   return (
     <>

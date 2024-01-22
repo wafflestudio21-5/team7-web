@@ -20,7 +20,7 @@ const TotalBoard = () => {
   useEffect(() => {
     // setTotalLength(articleList ? articleList.length : 0);
     setTotalLength(aList.length * 2);
-  }, []);
+  },[]);
 
   return (
     <>

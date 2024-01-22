@@ -1,6 +1,12 @@
 //게시판 별로 페이지네이션에 필요한 값을 전역적으로 관리하는 context입니다.
 
-import { useState, createContext, useContext, ReactNode } from "react";
+import {
+  useState,
+  createContext,
+  useContext,
+  ReactNode,
+  useEffect,
+} from "react";
 import { itemsPerPage } from "../../../Constants";
 
 interface PaginationState {
@@ -64,12 +70,17 @@ export const PaginationProvider = ({ children }: { children: ReactNode }) => {
 export const usePagination = (boardId: number) => {
   const { paginationState, updatePagination } = useContext(PaginationContext);
   const paginationInfo = paginationState[boardId] || {};
+  const { currentPage, articleLength } = paginationInfo;
 
   const setCurrentPage = (pageNumber: number) =>
     updatePagination({ boardId, currentPage: pageNumber });
 
   const setTotalLength = (totalLength: number) =>
     updatePagination({ boardId, articleLength: totalLength, currentPage: 1 });
+
+  useEffect(() => {
+    updatePagination({ boardId, currentPage, articleLength });
+  }, [currentPage]);
 
   return { ...paginationInfo, setCurrentPage, setTotalLength };
 };
