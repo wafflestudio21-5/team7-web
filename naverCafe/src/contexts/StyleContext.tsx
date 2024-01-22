@@ -4,7 +4,7 @@ export const GlobalStyle = createGlobalStyle`
   // naverCafe 전체적으로 적용되는 css입니다.
   :root {
     /* font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif; */
-    font-family:  Malgun Gothic,'맑은 고딕',Helvetica,sans-serif;
+    font-family: '맑은 고딕', Malgun Gothic, Helvetica,sans-serif;
     line-height: 1.5;
     font-weight: 400;
 
