@@ -1,8 +1,7 @@
 import styled from "styled-components";
 import { Link } from "react-router-dom";
-import { useUserContext } from "../../../../contexts/UserContext";
-import { useState, useEffect } from "react";
-
+import { useUserContext } from "../../../../../contexts/UserContext";
+import { useEffect, useState } from "react";
 const Wrapper = styled.li`
   display: grid;
   height: 38px;
@@ -91,7 +90,7 @@ const Wrapper = styled.li`
   }
 `;
 
-interface PropsUserLikedArticle {
+interface PropsUserArticle {
   article: {
     id: number;
     content: string;
@@ -108,39 +107,38 @@ interface PropsUserLikedArticle {
     visit_count: number;
     my_article_count: number;
   };
-  checkedLikedArticleIdList: number[];
-  setCheckedLikedArticleIdList: (value: number[]) => void;
+  checkedArticleIdList: number[];
+  setCheckedArticleIdList: (value: number[]) => void;
 }
-const UserLikedArticle = ({
+const UserArticle = ({
   article,
   userInfo,
-  checkedLikedArticleIdList,
-  setCheckedLikedArticleIdList,
-}: PropsUserLikedArticle) => {
+  checkedArticleIdList,
+  setCheckedArticleIdList,
+}: PropsUserArticle) => {
   const myInfo = useUserContext();
+
   const [isCheckBoxClicked, setIsCheckBoxClicked] = useState<boolean>(false);
 
   useEffect(() => {
-    if (checkedLikedArticleIdList.includes(article.id)) {
+    if (checkedArticleIdList.includes(article.id)) {
       setIsCheckBoxClicked(true);
-    } else if (checkedLikedArticleIdList.length === 0) {
+    } else if (checkedArticleIdList.length === 0) {
       setIsCheckBoxClicked(false);
     }
-  }, [checkedLikedArticleIdList, article.id]);
+  }, [checkedArticleIdList, article.id]);
 
   const handleCheckBoxClick = () => {
     if (isCheckBoxClicked) {
       // checked -> not checked
       setIsCheckBoxClicked(false);
-      setCheckedLikedArticleIdList(
-        checkedLikedArticleIdList.filter(
-          (articleId) => articleId !== article.id
-        )
+      setCheckedArticleIdList(
+        checkedArticleIdList.filter((articleId) => articleId !== article.id)
       );
     } else {
       // not checked -> checked
       setIsCheckBoxClicked(true);
-      setCheckedLikedArticleIdList([...checkedLikedArticleIdList, article.id]);
+      setCheckedArticleIdList([...checkedArticleIdList, article.id]);
     }
   };
   return (
@@ -181,4 +179,4 @@ const UserLikedArticle = ({
   );
 };
 
-export default UserLikedArticle;
+export default UserArticle;

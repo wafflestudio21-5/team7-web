@@ -1,9 +1,10 @@
 import styled from "styled-components";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import UserBottomButtons from "./UserBottomButtons";
+import UserRelatedArticleList from "./UserRelatedArticleList";
 
 const Wrapper = styled.div``;
-const UserRelatedList = styled.ul`
+const UserRelatedArticleListUl = styled.ul`
   & > li:first-child {
     border-top: 1px solid #ebecef;
   }
@@ -36,30 +37,56 @@ const PageButtons = styled.div<{ $pageNumber: number }>`
 `;
 
 interface PropsUserInfoPaginationBox {
-  children: JSX.Element;
-  userRelatedList: JSX.Element[];
   bunch: number;
+  id: number;
+  userInfo: {
+    userId: string;
+    username: string;
+    userNickname: string;
+    rank: number;
+    visit_count: number;
+    my_article_count: number;
+  };
 }
 
 const UserInfoPaginationBox = ({
-  children,
-  userRelatedList,
   bunch,
+  id,
+  userInfo,
 }: PropsUserInfoPaginationBox) => {
+  // checked 된 article의 id를 담는 list입니다.
+  const [checkedArticleIdList, setCheckedArticleIdList] = useState<number[]>(
+    []
+  );
+  //   userRelatedArticleList입니다.
+  const userRelatedArticleList = useMemo(() => {
+    return UserRelatedArticleList({
+      id,
+      userInfo,
+      checkedArticleIdList,
+      setCheckedArticleIdList,
+    });
+  }, [id, checkedArticleIdList, userInfo]);
+
   // 현재 보고 있는 page의 숫자입니다.
   const [pageNumber, setPageNumber] = useState<number>(1);
+  //   tab select에 따른 pageNumber, checkArticleIdList 초기화
+  useEffect(() => {
+    setPageNumber(1);
+    // setCheckedArticleIdList([]);
+  }, [id]);
 
   //   pagination 버튼의 총 개수입니다.
   const buttonNumber =
-    Math.floor(userRelatedList.length / bunch) +
-    (userRelatedList.length % bunch === 0 ? 0 : 1);
+    Math.floor(userRelatedArticleList.length / bunch) +
+    (userRelatedArticleList.length % bunch === 0 ? 0 : 1);
 
   //   {page: number, elements: JSX.Element}를 담는 리스트입니다.
-  // elements는 13개씩 담겨있습니다.
-  const newUserRelatedList = useMemo(() => {
+  // elements는 bunch개씩 담겨있습니다.
+  const newUserRelatedArticleList = useMemo(() => {
     const list = [];
     for (let i = 0; i < buttonNumber; i++) {
-      list.push(userRelatedList.slice(bunch * i, bunch * (i + 1)));
+      list.push(userRelatedArticleList.slice(bunch * i, bunch * (i + 1)));
     }
     return list.map((elements, index) => {
       return {
@@ -67,42 +94,58 @@ const UserInfoPaginationBox = ({
         elements: elements,
       };
     });
-  }, [buttonNumber, userRelatedList, bunch]);
+  }, [buttonNumber, userRelatedArticleList, bunch]);
 
   //   pagination button을 생성합니다.
   const paginationButtons = useMemo(() => {
-    return newUserRelatedList.map((element) => {
+    return newUserRelatedArticleList.map((element) => {
       return (
         <button
           key={element.page}
           className={element.page === pageNumber ? "active" : "inactive"}
-          onClick={() => setPageNumber(element.page)}
+          onClick={() => {
+            setPageNumber(element.page);
+            setCheckedArticleIdList([]);
+          }}
         >
           {element.page}
         </button>
       );
     });
-  }, [newUserRelatedList, pageNumber]);
+  }, [newUserRelatedArticleList, pageNumber]);
 
-  //   전체 선택 기능 구현
-  //   checked 된 article의 number 리스트
-  const [checkedArticleIdList, setCheckedArticleIdList] = useState<number[]>(
-    []
-  );
-  //   전체 선택 기능을 위한 check할 수 있는 article의 총 length입니다.
-  const checkedListTotalLength = newUserRelatedList.filter(
-    (element) => element.page === pageNumber
-  )[0].elements.length;
+  //   현재 보이는 page 상의 모든 article의 id를 모아둔 list입니다
+  const [articleIdList, setArticleIdList] = useState<number[]>([]);
+  useEffect(() => {
+    setArticleIdList(
+      newUserRelatedArticleList
+        .filter((element) => element.page === pageNumber)[0]
+        .elements.map((element) => Number(element.key))
+    );
+  }, [newUserRelatedArticleList, setArticleIdList, pageNumber]);
+
+  console.log("userREaltedArticleList");
+  console.log(userRelatedArticleList);
+  console.log("newUserRealted");
+  console.log(newUserRelatedArticleList);
+  //   pageNumber가 늦게 update되는 문제 발생...
 
   return (
     <Wrapper>
-      <UserRelatedList>
-        {
-          newUserRelatedList.filter((element) => element.page === pageNumber)[0]
-            .elements
-        }
-      </UserRelatedList>
-      <BottomButtons>{children}</BottomButtons>
+      <UserRelatedArticleListUl>
+        {newUserRelatedArticleList
+          .filter((element) => element.page === pageNumber)[0]
+          .elements.reverse()}
+      </UserRelatedArticleListUl>
+      <BottomButtons>
+        <UserBottomButtons
+          id={id}
+          userInfo={userInfo}
+          checkedArticleIdList={checkedArticleIdList}
+          setCheckedArticleIdList={setCheckedArticleIdList}
+          articleIdList={articleIdList}
+        />
+      </BottomButtons>
       <PageButtons $pageNumber={pageNumber}>
         {paginationButtons.length === 1 ? null : paginationButtons}
       </PageButtons>

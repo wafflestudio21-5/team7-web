@@ -74,112 +74,59 @@ interface PropsUserBottomButtons {
     visit_count: number;
     my_article_count: number;
   };
-  articleIdList?: number[];
-  checkedArticleIdList?: number[];
-  setCheckedArticleIdList?: (value: number[]) => void;
-  likedArticleList?: number[];
-  checkedLikedArticleIdList?: number[];
-  setCheckedLikedArticleIdList?: (value: number[]) => void;
+  checkedArticleIdList: number[];
+  setCheckedArticleIdList: (value: number[]) => void;
+  articleIdList: number[];
 }
 const UserBottomButtons = ({
   id,
   userInfo,
-  articleIdList,
   checkedArticleIdList,
   setCheckedArticleIdList,
-  likedArticleList,
-  checkedLikedArticleIdList,
-  setCheckedLikedArticleIdList,
+  articleIdList,
 }: PropsUserBottomButtons) => {
   const myInfo = useUserContext();
   const [isCheckAllArticleClicked, setIsCheckAllArticleClicked] =
     useState<boolean>(false);
-  const [isCheckAllLikedArticleClicked, setIsCheckAllLikedArticleClicked] =
-    useState<boolean>(false);
   const [isNotCheckedModalOpen, setIsNotCheckedModalOpen] =
     useState<boolean>(false);
 
-  // "작성글" tab 전체 선택에 대한 useEffect와 함수입니다.
-  useEffect(() => {
-    if (checkedArticleIdList && articleIdList && setCheckedArticleIdList) {
-      if (checkedArticleIdList.length === articleIdList.length) {
-        setIsCheckAllArticleClicked(true);
-      } else if (checkedArticleIdList.length < articleIdList.length) {
-        setIsCheckAllArticleClicked(false);
-      }
-    }
-  }, [articleIdList, checkedArticleIdList, setCheckedArticleIdList]);
   const handleCheckAllArticles = () => {
     if (isCheckAllArticleClicked) {
-      // all checked -> none of them checked로
+      // all checked -> none of them checked
       setIsCheckAllArticleClicked(false);
-      if (setCheckedArticleIdList) {
-        setCheckedArticleIdList([]);
-      }
+      setCheckedArticleIdList([]);
     } else {
-      // none of them checked -> all checked로
+      // none of them checked -> all checked
       setIsCheckAllArticleClicked(true);
-      if (setCheckedArticleIdList && articleIdList) {
-        setCheckedArticleIdList(articleIdList);
-      }
+      setCheckedArticleIdList(articleIdList);
     }
   };
-  const handleDeleteArticle = () => {
-    if (checkedArticleIdList?.length === 0) {
-      setIsNotCheckedModalOpen(true);
-    } else {
-      alert("게시글을 삭제하시겠습니까?");
-      //   checkedArticleIdList?.map((articleId) => {
-      //     // delete요청
-      //   });
-      if (setCheckedArticleIdList) {
-        setCheckedArticleIdList([]);
-      }
-    }
-  };
-
-  //   "좋아요한 글" tab 전체 선택에 대한 useEffect와 함수입니다.
+  //   전체선택 버튼을 눌렀을 때 실행
   useEffect(() => {
-    if (
-      checkedLikedArticleIdList &&
-      likedArticleList &&
-      setCheckedLikedArticleIdList
-    ) {
-      if (checkedLikedArticleIdList.length === likedArticleList.length) {
-        setIsCheckAllLikedArticleClicked(true);
-      } else if (checkedLikedArticleIdList.length < likedArticleList.length) {
-        setIsCheckAllLikedArticleClicked(false);
-      }
+    if (checkedArticleIdList.length === articleIdList.length) {
+      setIsCheckAllArticleClicked(true);
+    } else if (checkedArticleIdList.length < articleIdList.length) {
+      setIsCheckAllArticleClicked(false);
     }
-  }, [
-    checkedLikedArticleIdList,
-    setCheckedLikedArticleIdList,
-    likedArticleList,
-  ]);
-  const handleCheckAllLikedArticles = () => {
-    if (isCheckAllLikedArticleClicked) {
-      setIsCheckAllLikedArticleClicked(false);
-      if (setCheckedLikedArticleIdList) {
-        setCheckedLikedArticleIdList([]);
-      }
-    } else {
-      setIsCheckAllLikedArticleClicked(true);
-      if (setCheckedLikedArticleIdList && likedArticleList) {
-        setCheckedLikedArticleIdList(likedArticleList);
-      }
-    }
-  };
-  const handleDeleteLikedArticle = () => {
-    if (checkedLikedArticleIdList?.length === 0) {
+  }, [articleIdList, checkedArticleIdList]);
+
+  const handleDeleteArticles = () => {
+    if (checkedArticleIdList.length === 0) {
       setIsNotCheckedModalOpen(true);
     } else {
-      alert("게시글을 삭제하시겠습니까?");
-      //   checkedLikedArticleIdList?.map((articleId) => {
-      //     // delete요청
-      //   });
-      if (setCheckedLikedArticleIdList) {
-        setCheckedLikedArticleIdList([]);
+      if (id === 0) {
+        alert("게시글을 삭제하시겠습니까?");
+        //   checkedArticleIdList?.map((articleId) => {
+        //     // delete요청
+        //   });
+      } else if (id === 3) {
+        alert("좋아요를 취소하시겠습니까?");
+        //   checkedArticleIdList?.map((articleId) => {
+        //     // delete요청
+        //   });
       }
+      setCheckedArticleIdList([]);
     }
   };
 
@@ -202,7 +149,7 @@ const UserBottomButtons = ({
         </div>
         <div className="right">
           <div className="delete auth">
-            <button onClick={() => handleDeleteArticle()}>삭제</button>
+            <button onClick={() => handleDeleteArticles()}>삭제</button>
           </div>
           <div className="writeArticle">
             <button>
@@ -245,19 +192,15 @@ const UserBottomButtons = ({
         <div className="left">
           <div className="checkAll auth">
             <button
-              className={
-                isCheckAllLikedArticleClicked ? "checked" : "notChecked"
-              }
-              onClick={() => handleCheckAllLikedArticles()}
+              className={isCheckAllArticleClicked ? "checked" : "notChecked"}
+              onClick={() => handleCheckAllArticles()}
             />
             <span>전체선택</span>
           </div>
         </div>
         <div className="right">
           <div className="cancelLike auth">
-            <button onClick={() => handleDeleteLikedArticle()}>
-              좋아요 취소
-            </button>
+            <button onClick={() => handleDeleteArticles()}>좋아요 취소</button>
           </div>
           <div className="writeArticle">
             <button>글쓰기</button>

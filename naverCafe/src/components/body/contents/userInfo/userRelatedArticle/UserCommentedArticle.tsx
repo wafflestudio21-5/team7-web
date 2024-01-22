@@ -73,7 +73,7 @@ interface PropsUserCommentedArticle {
   };
 }
 const UserCommentedArticle = ({ article }: PropsUserCommentedArticle) => {
-  // checkBox는 기능 구현이 너무 복잡할 것 같아 일단 보류하겠습니다.
+  // comment의 checkBox는 기능 구현이 너무 복잡할 것 같아 일단 보류하겠습니다.
   //   const [isCheckBoxClicked, setIsCheckBoxClicked] = useState<boolean>(false);
   return (
     <Wrapper>

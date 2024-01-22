@@ -1,12 +1,8 @@
 //UserPage에서 MyPage, MemberPage로 나뉘면 될 것 같습니다.
 import styled from "styled-components";
 import { useState } from "react";
-import UserArticleList from "./UserArticleList";
-import UserCommentList from "./UserCommentList";
-import UserCommentedArticleList from "./UserCommentedArticleList";
-import UserLikedArticleList from "./UserLikedArticleList";
 import { useUserContext } from "../../../../contexts/UserContext";
-
+import UserInfoPaginationBox from "./UserInfoPaginationBox";
 const Wrapper = styled.div``;
 const Header = styled.div`
   & > .userInfo {
@@ -72,7 +68,32 @@ const Tab = styled.ul`
     }
   }
 `;
-const List = styled.div``;
+const List = styled.div`
+  & > .headerComment {
+    display: flex;
+    padding: 2px;
+    height: 40px;
+    justify-content: center;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  & > .header {
+    display: grid;
+    height: 40px;
+    grid-template-columns: 660px 120px 80px;
+    & > div {
+      display: flex;
+      padding: 2px;
+      box-sizing: border-box;
+      color: #4e4e4e;
+      font-size: 13px;
+      font-weight: 700;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+`;
 const exampleUserInfo = {
   userId: "gryffindorGoat",
   username: "harry potter",
@@ -86,26 +107,27 @@ const UserInfo = () => {
   const myInfo = useUserContext();
   // exampleUserInfo를 context로서 전달, checkBox 표시 여부는 userId 비교를 통해?
   // 아니면 list -> 요소 props 전달을 통해?
+  const userInfo = exampleUserInfo;
   const infoList = [
     {
       id: 0,
       title: "작성글",
-      dataList: <UserArticleList userInfo={exampleUserInfo} />,
+      dataList: <UserInfoPaginationBox id={0} bunch={3} userInfo={userInfo} />,
     },
     {
       id: 1,
       title: "작성댓글",
-      dataList: <UserCommentList userInfo={exampleUserInfo} />,
+      dataList: <UserInfoPaginationBox id={1} bunch={13} userInfo={userInfo} />,
     },
     {
       id: 2,
       title: "댓글단 글",
-      dataList: <UserCommentedArticleList userInfo={exampleUserInfo} />,
+      dataList: <UserInfoPaginationBox id={2} bunch={26} userInfo={userInfo} />,
     },
     {
       id: 3,
       title: "좋아요한 글",
-      dataList: <UserLikedArticleList userInfo={exampleUserInfo} />,
+      dataList: <UserInfoPaginationBox id={3} bunch={26} userInfo={userInfo} />,
     },
   ];
 
@@ -162,7 +184,20 @@ const UserInfo = () => {
         </Tab>
       </Header>
       <List>
-        {infoList.filter((info) => info.id === tabSelectIndex)[0].dataList}
+        {tabSelectIndex === 1 ? (
+          <div className="headerComment">
+            <div>댓글</div>
+          </div>
+        ) : (
+          <div className="header">
+            <div className="title">제목</div>
+            <div className="date">작성일</div>
+            <div className="viewCount">조회</div>
+          </div>
+        )}
+        <div>
+          {infoList.filter((info) => info.id === tabSelectIndex)[0].dataList}
+        </div>
       </List>
     </Wrapper>
   );

@@ -1,7 +1,8 @@
 import styled from "styled-components";
 import { Link } from "react-router-dom";
-import { useUserContext } from "../../../../contexts/UserContext";
-import { useEffect, useState } from "react";
+import { useUserContext } from "../../../../../contexts/UserContext";
+import { useState, useEffect } from "react";
+
 const Wrapper = styled.li`
   display: grid;
   height: 38px;
@@ -90,7 +91,7 @@ const Wrapper = styled.li`
   }
 `;
 
-interface PropsUserArticle {
+interface PropsUserLikedArticle {
   article: {
     id: number;
     content: string;
@@ -110,14 +111,13 @@ interface PropsUserArticle {
   checkedArticleIdList: number[];
   setCheckedArticleIdList: (value: number[]) => void;
 }
-const UserArticle = ({
+const UserLikedArticle = ({
   article,
   userInfo,
   checkedArticleIdList,
   setCheckedArticleIdList,
-}: PropsUserArticle) => {
+}: PropsUserLikedArticle) => {
   const myInfo = useUserContext();
-
   const [isCheckBoxClicked, setIsCheckBoxClicked] = useState<boolean>(false);
 
   useEffect(() => {
@@ -179,4 +179,4 @@ const UserArticle = ({
   );
 };
 
-export default UserArticle;
+export default UserLikedArticle;
