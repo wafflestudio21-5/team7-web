@@ -526,7 +526,7 @@ const SignUp = () => {
       userPhoneNumber: userPhoneNumber,
     });
     return axios
-      .post(baseURL + "", {
+      .post("http://localhost:8080/api/v1/signup", {
         userId: userId,
         username: userName,
         password: userPassword,
