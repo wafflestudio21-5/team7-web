@@ -104,6 +104,14 @@ const exampleUserInfo = {
 };
 const UserInfo = () => {
   const [tabSelectIndex, setTabSelectIndex] = useState<number>(0);
+  // pageNumber와 checkedArticleIdList는 PaginationBox안에서 다루고 싶었지만...
+  // 계속 오류가 생겨 적절해보이진 않지만 UserInfo에서 관리합니다.
+  // 나중에 원인을 찾으면 refactoring 하겠습니다.
+  const [pageNumber, setPageNumber] = useState<number>(1);
+  const [checkedArticleIdList, setCheckedArticleIdList] = useState<number[]>(
+    []
+  );
+
   const myInfo = useUserContext();
   // exampleUserInfo를 context로서 전달, checkBox 표시 여부는 userId 비교를 통해?
   // 아니면 list -> 요소 props 전달을 통해?
@@ -112,22 +120,62 @@ const UserInfo = () => {
     {
       id: 0,
       title: "작성글",
-      dataList: <UserInfoPaginationBox id={0} bunch={3} userInfo={userInfo} />,
+      dataList: (
+        <UserInfoPaginationBox
+          id={0}
+          bunch={3}
+          userInfo={userInfo}
+          pageNumber={pageNumber}
+          setPageNumber={setPageNumber}
+          checkedArticleIdList={checkedArticleIdList}
+          setCheckedArticleIdList={setCheckedArticleIdList}
+        />
+      ),
     },
     {
       id: 1,
       title: "작성댓글",
-      dataList: <UserInfoPaginationBox id={1} bunch={13} userInfo={userInfo} />,
+      dataList: (
+        <UserInfoPaginationBox
+          id={1}
+          bunch={13}
+          userInfo={userInfo}
+          pageNumber={pageNumber}
+          setPageNumber={setPageNumber}
+          checkedArticleIdList={checkedArticleIdList}
+          setCheckedArticleIdList={setCheckedArticleIdList}
+        />
+      ),
     },
     {
       id: 2,
       title: "댓글단 글",
-      dataList: <UserInfoPaginationBox id={2} bunch={26} userInfo={userInfo} />,
+      dataList: (
+        <UserInfoPaginationBox
+          id={2}
+          bunch={26}
+          userInfo={userInfo}
+          pageNumber={pageNumber}
+          setPageNumber={setPageNumber}
+          checkedArticleIdList={checkedArticleIdList}
+          setCheckedArticleIdList={setCheckedArticleIdList}
+        />
+      ),
     },
     {
       id: 3,
       title: "좋아요한 글",
-      dataList: <UserInfoPaginationBox id={3} bunch={26} userInfo={userInfo} />,
+      dataList: (
+        <UserInfoPaginationBox
+          id={3}
+          bunch={26}
+          userInfo={userInfo}
+          pageNumber={pageNumber}
+          setPageNumber={setPageNumber}
+          checkedArticleIdList={checkedArticleIdList}
+          setCheckedArticleIdList={setCheckedArticleIdList}
+        />
+      ),
     },
   ];
 
@@ -163,7 +211,11 @@ const UserInfo = () => {
                     className={
                       info.id === tabSelectIndex ? "active" : "inactive"
                     }
-                    onClick={() => setTabSelectIndex(info.id)}
+                    onClick={() => {
+                      setPageNumber(1);
+                      setCheckedArticleIdList([]);
+                      setTabSelectIndex(info.id);
+                    }}
                   >
                     {info.title}
                   </li>
@@ -174,7 +226,12 @@ const UserInfo = () => {
                 <li
                   key={info.id}
                   className={info.id === tabSelectIndex ? "active" : "inactive"}
-                  onClick={() => setTabSelectIndex(info.id)}
+                  onClick={() => {
+                    setPageNumber(1);
+                    setCheckedArticleIdList([]);
+
+                    setTabSelectIndex(info.id);
+                  }}
                 >
                   {info.title}
                 </li>

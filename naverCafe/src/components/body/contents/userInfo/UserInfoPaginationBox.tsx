@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import UserBottomButtons from "./UserBottomButtons";
 import UserRelatedArticleList from "./UserRelatedArticleList";
 
@@ -47,17 +47,23 @@ interface PropsUserInfoPaginationBox {
     visit_count: number;
     my_article_count: number;
   };
+  pageNumber: number;
+  setPageNumber: (value: number) => void;
+  checkedArticleIdList: number[];
+  setCheckedArticleIdList: (value: number[]) => void;
 }
 
 const UserInfoPaginationBox = ({
   bunch,
   id,
   userInfo,
+  pageNumber,
+  setPageNumber,
+  checkedArticleIdList,
+  setCheckedArticleIdList,
 }: PropsUserInfoPaginationBox) => {
   // checked 된 article의 id를 담는 list입니다.
-  const [checkedArticleIdList, setCheckedArticleIdList] = useState<number[]>(
-    []
-  );
+
   //   userRelatedArticleList입니다.
   const userRelatedArticleList = useMemo(() => {
     return UserRelatedArticleList({
@@ -68,13 +74,7 @@ const UserInfoPaginationBox = ({
     });
   }, [id, checkedArticleIdList, userInfo]);
 
-  // 현재 보고 있는 page의 숫자입니다.
-  const [pageNumber, setPageNumber] = useState<number>(1);
-  //   tab select에 따른 pageNumber, checkArticleIdList 초기화
-  useEffect(() => {
-    setPageNumber(1);
-    // setCheckedArticleIdList([]);
-  }, [id]);
+  // pageNumber 관리도 현재 컴포넌트 상에서 하고 싶은데, 그렇게 하면 다른 tab으로 옮겨질 때 오류가 나는 경우가 있어서...
 
   //   pagination 버튼의 총 개수입니다.
   const buttonNumber =
@@ -115,20 +115,9 @@ const UserInfoPaginationBox = ({
   }, [newUserRelatedArticleList, pageNumber]);
 
   //   현재 보이는 page 상의 모든 article의 id를 모아둔 list입니다
-  const [articleIdList, setArticleIdList] = useState<number[]>([]);
-  useEffect(() => {
-    setArticleIdList(
-      newUserRelatedArticleList
-        .filter((element) => element.page === pageNumber)[0]
-        .elements.map((element) => Number(element.key))
-    );
-  }, [newUserRelatedArticleList, setArticleIdList, pageNumber]);
-
-  console.log("userREaltedArticleList");
-  console.log(userRelatedArticleList);
-  console.log("newUserRealted");
-  console.log(newUserRelatedArticleList);
-  //   pageNumber가 늦게 update되는 문제 발생...
+  const articleIdList = newUserRelatedArticleList
+    .filter((element) => element.page === pageNumber)[0]
+    .elements.map((element) => Number(element.key));
 
   return (
     <Wrapper>
