@@ -40,7 +40,7 @@ export const aList = [
   {
     title: "세번째 게시글 입니다.",
     id: 3,
-    board: "자유게시판",
+    board: "스프링",
     comment: 5,
     author: "허유민",
     date: "2024.01.14.",
@@ -50,7 +50,7 @@ export const aList = [
   {
     title: "네번째 게시글",
     id: 4,
-    board: "자유게시판",
+    board: "장고",
     comment: 5,
     author: "허유민",
     date: "2024.01.14.",
@@ -60,7 +60,7 @@ export const aList = [
   {
     title: "다섯번째 게시글",
     id: 5,
-    board: "자유게시판",
+    board: "타입스크립트",
     comment: 5,
     author: "허유민",
     date: "2024.01.14.",

@@ -49,7 +49,7 @@ const StyledColgroup = styled.colgroup<{ $brdType: string }>`
       case "total":
         return css`
           .blank {
-            width: 88px;
+            width: 80px;
           }
           .author {
             width: 118px;
@@ -160,6 +160,7 @@ export const StyledTr = styled.tr`
           margin-right: 4px;
           line-height: 18px;
           color: #333;
+          align-items:center;
 
           &:hover {
             text-decoration: underline;
@@ -232,11 +233,13 @@ export const StyledTr = styled.tr`
     display: table-cell;
     padding: 0 7px 0 0;
     vertical-align: middle;
+
     font-size: 11px;
   }
 
   .td_article {
     padding: 4px 0 4px 7px;
+    
   }
 
   .ranking,
