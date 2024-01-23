@@ -12,6 +12,7 @@ export const AuthContext = createContext<{
   auth: null,
 });
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   const auth = useContext(AuthContext).auth;
   if (!auth) throw error("Cannot find AuthContext");

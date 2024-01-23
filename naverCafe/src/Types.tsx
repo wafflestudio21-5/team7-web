@@ -1,105 +1,20 @@
-//GET
-//(사실 클라이언트 쪽에서 처리해도 되긴 하지만, 서버에서 보내준다면 편해질 것 같습니다.)
-export type User_SideBar = {
-  name: string;
-  rank: number;
-  cafeVisitCount: number;
-  articleCount: number;
-  commentCount: number;
-  signUpDate: Date;
-  favoriteBoards: string[];
-};
 
-//GET
-export type User = {
-  id: string;
-  name: string;
-  image: string;
-  rank: number;
-  bio: string;
-  cafeVisitCount: number;
-  /* articleCount: number; */
 
-  /* string[] 배열로 한 이유는 클라이언트쪽에서 전체 article 배열을 받아서 처리하기 위함입니다. */
-  /* 만약 벡엔드에서 잘 처리가 된다면..? 그냥 Article[]과 같은 배열로 해도 괜찮을 것 같습니다. */
-  article: string[]; //작성글
-  commentedArticle: string[]; //댓글단 글
-  comment: string[]; //작성댓글
-  like: string[]; //좋아요한 글 (내가 아닌 카페 멤버 페이지에서는 보이지 않습니다.)
-};
-
-//POST
-export type UserSignUpInput = {
-  id: string;
-  password: string;
-  email: string;
-  name: string;
-  birth: string;
-  phoneNumber: string;
-};
-
-//POST
-export type UserLoginInput = {
-  id: string;
-  password: string;
-};
-
-//POST, PATCH
-export type UserProfileInput = {
-  name: string;
-  image: string;
-  bio: string;
-};
-
-//GET
-export type Comment = {
+export type Board = {
   id: number;
-  authorId: string;
-  createdAt: Date;
-  content: string;
-  reComment: Comment[];
+  name: string;
 };
 
-//POST, PATCH
-export type CommentInput = {
-  content: string;
-};
-
-//DELETE
-//query에 id
-
-//GET
 export type Article = {
   id: number;
-  authorId: number;
-  createdAt: Date;
-  viewCount: number;
-  board: string;
-
-  isAnnouncement: boolean;
   title: string;
-  content: string;
-  likedUser: string[];
-  comment: Comment[];
-};
-
-//POST, PATCH
-export type ArticleInput = {
-  board: string;
-  title: string;
-  content: string;
-  isAnnouncement: boolean;
-
-  /* tag: string; */
-};
-
-//DELETE
-//query에 id
-
-//GET
-export type Board = {
-  name: string;
-  article: Article[];
+  createdAt: string;
+  viewCnt: number;
+  likeCnt: number;
+  comment_count: number;
+  user: { id: number; username: string };
+  board: Board;
+  isNotification: boolean;
 };
 
 //GET (activity)

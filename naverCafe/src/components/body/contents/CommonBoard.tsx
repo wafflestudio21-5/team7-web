@@ -1,4 +1,4 @@
-// 전체글 게시판
+//일반 게시판 (자유 게시판과 동일한 양식)
 
 import { useEffect } from "react";
 import { useArticleList } from "../../../API/BoardAPI";
@@ -9,32 +9,34 @@ import { BoardBottomOption } from "../../../contexts/BoardStyle/BoardBottomConte
 import { usePagination } from "../../../contexts/BoardStyle/BoardBottomContext/PaginationContext";
 import {
   Board,
-  TotalBoardHeader,
+  CommonBoardHeader,
 } from "../../../contexts/BoardStyle/BoardHeaderContext";
-import { TotalBoardTopOption } from "../../../contexts/BoardStyle/BoardTopOptionContext";
+import { CommonBoardTopOption } from "../../../contexts/BoardStyle/BoardTopOptionContext";
 
-const TotalBoard = () => {
-  const { setTotalLength } = usePagination(0);
-  //const { articleList } = useArticleList(); // 전체 게시물을 조회할 수 있는 api가 있으면 좋겠는데 없네요..!
+const CommonBoard = ({ board }) => {
+  const { articleList } = useArticleList(board.id);
+  const { setTotalLength, indexOfFirstItem, indexOfLastItem,  } = usePagination(
+    board.id
+  );
+  const currentItems = articleList?.slice(indexOfFirstItem, indexOfLastItem);
 
   useEffect(() => {
     // setTotalLength(articleList ? articleList.length : 0);
     setTotalLength(aList.length * 2);
-  },[]);
+  }, []);
 
   return (
     <>
       <Board>
-        <TotalBoardHeader></TotalBoardHeader>
-        <TotalBoardTopOption></TotalBoardTopOption>
+        <CommonBoardHeader isFavorite={false}></CommonBoardHeader>
+        <CommonBoardTopOption></CommonBoardTopOption>
         <ArticleTable
-          board={boardAttribute.TotalBoard}
-          articleList={aList} //articleList
+          board={boardAttribute.CommonBoard}
+          articleList={aList} //currentItems
         ></ArticleTable>
-        <BoardBottomOption boardId={0}></BoardBottomOption>
+        <BoardBottomOption boardId={board.id}></BoardBottomOption>
       </Board>
     </>
   );
 };
-
-export default TotalBoard;
+export default CommonBoard;
