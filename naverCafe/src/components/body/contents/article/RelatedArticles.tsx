@@ -87,6 +87,9 @@ const ArticleListContainer = styled.div<{
           & > .firstButton {
             font-weight: 700;
             background-color: #e5e7ea;
+            &:hover {
+              background-color: #d8d9dc;
+            }
           }
         }
         & > .relatedArticleList:not(.first) {
@@ -104,6 +107,9 @@ const ArticleListContainer = styled.div<{
           & > .secondButton {
             font-weight: 700;
             background-color: #e5e7ea;
+            &:hover {
+              background-color: #d8d9dc;
+            }
           }
         }
         & > .relatedArticleList:not(.second) {
@@ -121,6 +127,9 @@ const ArticleListContainer = styled.div<{
           & > .thirdButton {
             font-weight: 700;
             background-color: #e5e7ea;
+            &:hover {
+              background-color: #d8d9dc;
+            }
           }
         }
         & > .relatedArticleList:not(.third) {

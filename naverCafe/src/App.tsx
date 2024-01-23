@@ -2,6 +2,8 @@ import styled from "styled-components";
 import { GlobalStyle } from "./contexts/StyleContext";
 import { Route, Routes } from "react-router-dom";
 
+import { UserContext } from "./contexts/UserContext";
+
 import Layout from "./pages/Layout";
 import SignUp from "./pages/SignUp";
 import Login from "./pages/Login";
@@ -16,6 +18,8 @@ import Writing from "./components/Writing";
 import { PaginationProvider } from "./contexts/BoardStyle/BoardBottomContext/PaginationContext";
 import { useWholeBoard } from "./API/BoardAPI";
 import Article from "./components/body/contents/article/Article";
+import UserInfo from "./components/body/contents/userInfo/UserInfo";
+import { useState } from "react";
 
 const Wrapper = styled.div`
   margin: 0 auto;
@@ -24,11 +28,21 @@ const Wrapper = styled.div`
 
 function App() {
   const { boardList } = useWholeBoard();
-
+  
+  // 자신의 정보를 담는 userInfo state를 context로서 사용하겠습니다.
+  const [myInfo, setMyInfo] = useState<{
+    userId: string;
+    username: string;
+    userNickname: string;
+  }>({
+    userId: "gryffindorGoat",
+    username: "harry potter",
+    userNickname: "해리포터",
+  });
   return (
     <Wrapper>
-      <GlobalStyle />
-      <PaginationProvider>
+      <UserContext.Provider value={myInfo}>
+          <PaginationProvider>
         <Routes>
           {/* 회원가입 및 로그인 page */}
           <Route path="/signup" element={<SignUp />} />
@@ -70,6 +84,7 @@ function App() {
           </Route>
         </Routes>
       </PaginationProvider>
+     </UserContext.Provider>
     </Wrapper>
   );
 }
