@@ -78,7 +78,7 @@ function App() {
                   <Route path="/articles/:articleId" element={<Article />} />
 
                   {/* userInfo */}
-                  <Route path="/users/1" element={<UserInfo />} />
+                  <Route path="/users/:id" element={<UserInfo />} />
                 </Route>
 
                 {/* 글쓰기 창은 아래 path로, Layout의 subRoute이므로 Header를 공유할 수 있습니다.*/}
