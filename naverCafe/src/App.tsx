@@ -80,12 +80,11 @@ function App() {
                   {/* userInfo */}
                   <Route path="/users/:id" element={<UserInfo />} />
                 </Route>
-
-                {/* 글쓰기 창은 아래 path로, Layout의 subRoute이므로 Header를 공유할 수 있습니다.*/}
-                {/* 글쓰기 창은 Footer가 없기 때문에 이렇게 만들었습니다. */}
-                {/* 글쓰기 창은 Layout의 Body(Layout 컴포넌트 상의 Outlet) 부분으로 들어가게 됩니다.*/}
-                <Route path="/write" element={<Writing />} />
               </Route>
+              {/* 글쓰기 창은 아래 path로, Layout의 subRoute이므로 Header를 공유할 수 있습니다.*/}
+              {/* 글쓰기 창은 Footer가 없기 때문에 이렇게 만들었습니다. */}
+              {/* 글쓰기 창은 Layout의 Body(Layout 컴포넌트 상의 Outlet) 부분으로 들어가게 됩니다.*/}
+              <Route path="/write" element={<Writing />} />
             </Route>
           </Routes>
         </PaginationProvider>
