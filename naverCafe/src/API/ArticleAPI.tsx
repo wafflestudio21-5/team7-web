@@ -2,10 +2,37 @@ import axios from "axios";
 import { baseURL } from "../Constants";
 
 // article
+
+// article 등록(post)
+export function postArticle(
+  title: string,
+  content: string,
+  boardId: number,
+  allowComments: boolean,
+  isNotification: boolean
+) {
+  return axios
+    .post(baseURL + "/api/v1/articles/post", {
+      title: title,
+      content: content,
+      boardId: boardId,
+      allowComments: allowComments,
+      isNotification: isNotification,
+    })
+    .then((res) => {
+      console.log(res);
+      return res;
+    })
+    .catch((err) => {
+      console.log(err);
+      return;
+    });
+}
+
 // article 조회(get)
 export function getArticle(articleId: number, username: string) {
   return axios
-    .post(baseURL + `api/v1/articles/${articleId}/?${username}`)
+    .get(baseURL + `api/v1/articles/${articleId}/?${username}`)
     .then((res) => {
       console.log(res);
       return res;
