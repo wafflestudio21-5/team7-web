@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useCafeInfo } from "../../API/CafeAPI";
 import { waffleCafe } from "../../Constants";
+import { useWholeBoard } from "../../API/BoardAPI";
 
 const Wrapper = styled.div`
   display: inline-block;
@@ -310,7 +311,7 @@ const Boards = styled.div`
         height: 12px;
       }
     }
-    & > div:nth-child(3) {
+    & > div:nth-child(n+3) {
       margin-top: 4px;
       & > img {
         background-position: -306px -42px;
@@ -346,6 +347,7 @@ const CafeSmartBot = styled.div`
 const SideBar = () => {
   const [isCafeInfoChecked, setIsCafeInfoChecked] = useState<boolean>(true);
   const { memberCount } = useCafeInfo(); //백엔드와 연결하고 난 뒤 사용하는 것이 좋을 것 같습니다.
+  const { boardList } = useWholeBoard();
   const navigate = useNavigate();
 
   return (
@@ -467,13 +469,16 @@ const SideBar = () => {
             <img src="https://cafe.pstatic.net/cafe4/hidden.gif" alt="인기글" />
             <Link to={`/popularboard`}>인기글</Link>
           </div>
-          <div>
-            <img
-              src="https://cafe.pstatic.net/cafe4/hidden.gif"
-              alt="자유게시판"
-            />
-            <Link to={`/board/1`}>스프링</Link>
-          </div>
+          {boardList.boards.map((board, index) => (
+            <div key={index}>
+              <img
+                src="https://cafe.pstatic.net/cafe4/hidden.gif"
+                alt={board.name}
+              />
+              <Link to={`/board/${board.id-1}`}>{board.name}</Link>
+            </div>
+          ))}
+
           {/* 그 외 게시판 새로 추가시 더해지는 기능이 있으면 좋겠습니다. */}
           {/* 그러러면 boards div 안에 있는 div들이 state로서 선언되면 될 것 같습니다. */}
         </div>

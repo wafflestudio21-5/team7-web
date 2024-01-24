@@ -3,8 +3,6 @@ import { usePagination } from "./PaginationContext";
 import { itemsPerPage } from "../../../Constants";
 import { useEffect } from "react";
 
-//currentPage, non-currentPage css 미구현
-
 const StyledPagination = styled.div`
   background-color: #f9f9f9;
   margin-top: 32px;

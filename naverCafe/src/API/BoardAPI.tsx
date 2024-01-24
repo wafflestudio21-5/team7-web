@@ -17,10 +17,26 @@ export function useWholeBoard() {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     refetch();
-    console.log(boardList);
   }, [refetch]);
   return { boardList, refetch };
 }
+
+export function useWholeBoard2() {
+
+  const url = "/api/v1/boards";
+  const refetch = useCallback(async () => {
+    const res = await axios.get(baseURL + url);
+    const boardList = await res.data;
+
+  }, [url]);
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
+  return { boardList, refetch };
+}
+
+
 
 export function useBoardGroup() {
   const [boardList, setBoardList] = useState<Board[] | null>(null);

@@ -28,7 +28,7 @@ const CommonBoard = ({ board }) => {
   return (
     <>
       <Board>
-        <CommonBoardHeader isFavorite={false}></CommonBoardHeader>
+        <CommonBoardHeader isFavorite={false} boardName={board.name}></CommonBoardHeader>
         <CommonBoardTopOption></CommonBoardTopOption>
         <ArticleTable
           board={boardAttribute.CommonBoard}
