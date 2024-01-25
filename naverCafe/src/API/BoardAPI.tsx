@@ -1,13 +1,15 @@
 import axios from "axios";
 import { useCallback, useState, useEffect } from "react";
 import { baseURL } from "../Constants";
-import { Article, Board } from "../Types";
+import { ArticleType, Board } from "../Types";
 
 export function useWholeBoard() {
-  const [boardList, setBoardList] = useState({"boards":[
-    { id: 1, name: "스프링" },
-    { id: 2, name: "장고" },
-  ]});
+  const [boardList, setBoardList] = useState({
+    boards: [
+      { id: 1, name: "스프링" },
+      { id: 2, name: "장고" },
+    ],
+  });
   const url = "/api/v1/boards";
   const refetch = useCallback(async () => {
     const res = await axios.get(baseURL + url);
@@ -84,7 +86,9 @@ export function useArticleList({
   boardId?: number;
   type?: string;
 }) {
-  const [articleList, setArticleList] = useState<Article[] | null>(null);
+  const [articleList, setArticleList] = useState<{
+    articles: ArticleType[];
+  } | null>(null);
 
   const url =
     type === undefined
