@@ -1,20 +1,42 @@
-
-
 export type Board = {
   id: number;
   name: string;
 };
 
-export type Article = {
+export type ArticleType = {
   id: number;
   title: string;
-  createdAt: string;
-  viewCnt: number;
-  likeCnt: number;
-  comment_count: number;
-  user: { id: number; username: string };
-  board: Board;
-  isNotification: boolean;
+  content: string;
+  nickname: string;
+  created_at: string;
+  view_cnt: number;
+  like_cnt: number;
+  like_users: {
+    nickname: string;
+    liked_at: string;
+  }[];
+  user: {
+    nickname: string;
+    username: string;
+  };
+  board: {
+    board_id: number;
+    board_name: string;
+  };
+  allow_comments: boolean;
+  is_notification: boolean;
+};
+export type CommentType = {
+  id: number;
+  content: string;
+  last_modified: string;
+  nickname: string;
+  recomments: {
+    id: number;
+    content: string;
+    last_modified: string;
+    nickname: string;
+  }[];
 };
 
 //GET (activity)
