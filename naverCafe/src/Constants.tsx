@@ -12,7 +12,6 @@ export const waffleCafe: Cafe = {
   description: "와플스튜디오 team7의 토이프로젝트 카페입니다.",
 };
 
-export const itemsPerPage = 10;
 
 //테스트용
 
@@ -160,6 +159,26 @@ export const aList = [
   {
     title: "15 게시글",
     id: 15,
+    board: "자유게시판",
+    comment: 5,
+    author: "허유민",
+    date: "2024.01.14.",
+    viewCnt: 33,
+    like: 100,
+  },
+  {
+    title: "16 게시글",
+    id: 16,
+    board: "자유게시판",
+    comment: 5,
+    author: "허유민",
+    date: "2024.01.14.",
+    viewCnt: 33,
+    like: 100,
+  },
+  {
+    title: "17 게시글",
+    id: 17,
     board: "자유게시판",
     comment: 5,
     author: "허유민",

@@ -7,7 +7,7 @@ import {
   ReactNode,
   useEffect,
 } from "react";
-import { itemsPerPage } from "../../../Constants";
+
 
 interface PaginationState {
   [boardId: number]: {
@@ -15,7 +15,7 @@ interface PaginationState {
     indexOfFirstItem: number;
     indexOfLastItem: number;
     articleLength?: number;
-  };
+    };
 }
 
 interface PaginationContextType {
@@ -25,15 +25,20 @@ interface PaginationContextType {
     currentPage: number;
     articleLength?: number;
   }) => void;
+    itemsPerPage: number;
+    setItemsPerPage: (arg: number) => void;
 }
 
 export const PaginationContext = createContext<PaginationContextType>({
   paginationState: {},
-  updatePagination: () => {},
+    updatePagination: () => { },
+    itemsPerPage: 15,
+    setItemsPerPage:()=>{}
 });
 
 export const PaginationProvider = ({ children }: { children: ReactNode }) => {
-  const [paginationState, setPaginationState] = useState<PaginationState>({});
+    const [paginationState, setPaginationState] = useState<PaginationState>({});
+    const [itemsPerPage, setItemsPerPage] = useState(15);
 
   const updatePagination = ({
     boardId,
@@ -60,7 +65,7 @@ export const PaginationProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <PaginationContext.Provider value={{ paginationState, updatePagination }}>
+    <PaginationContext.Provider value={{ paginationState, updatePagination, itemsPerPage, setItemsPerPage }}>
       {children}
     </PaginationContext.Provider>
   );
@@ -68,7 +73,7 @@ export const PaginationProvider = ({ children }: { children: ReactNode }) => {
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const usePagination = (boardId: number) => {
-  const { paginationState, updatePagination } = useContext(PaginationContext);
+  const { paginationState, updatePagination, itemsPerPage, setItemsPerPage } = useContext(PaginationContext);
   const paginationInfo = paginationState[boardId] || {};
   const { currentPage, articleLength } = paginationInfo;
 
@@ -82,5 +87,5 @@ export const usePagination = (boardId: number) => {
     updatePagination({ boardId, currentPage, articleLength });
   }, [currentPage]);
 
-  return { ...paginationInfo, setCurrentPage, setTotalLength };
+  return { ...paginationInfo, setCurrentPage, setTotalLength, setItemsPerPage, itemsPerPage, updatePagination };
 };

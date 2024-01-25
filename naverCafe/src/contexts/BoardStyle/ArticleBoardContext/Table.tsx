@@ -3,6 +3,8 @@ import { FirstCol } from "./FirstColumn";
 import { NoticeTr } from "./NoticeRow";
 import { BoardType } from "../../BoardContext/BoardAttrContext";
 import { aList } from "../../../Constants";
+import { useNoticeContext } from "../../BoardContext/NoticeContext";
+import { useState } from "react";
 
 const StyledTable = styled.table<{ $brdName: boolean }>`
   width: 100%;
@@ -160,7 +162,7 @@ export const StyledTr = styled.tr`
           margin-right: 4px;
           line-height: 18px;
           color: #333;
-          align-items:center;
+          align-items: center;
 
           &:hover {
             text-decoration: underline;
@@ -239,7 +241,6 @@ export const StyledTr = styled.tr`
 
   .td_article {
     padding: 4px 0 4px 7px;
-    
   }
 
   .ranking,
@@ -262,6 +263,9 @@ export const ArticleTable = ({
   articleList: any;
   isLike?: boolean;
 }) => {
+  const { isNoticeOff } = useNoticeContext();
+  const [isSortLike, setIsSortLike] = useState(false); //좋아요순, 최소 
+
   return (
     <StyledTable $brdName={board.firstCol === "boardName"}>
       <caption>
@@ -287,7 +291,7 @@ export const ArticleTable = ({
           {board.likeCol || isLike ? (
             <th scope="col">
               {board.likeCol === "sort" ? (
-                <span className="sort_likes">좋아요</span>
+                <span className="sort_likes" onClick={()=>setIsSortLike(!isSortLike)}>좋아요</span>
               ) : (
                 "좋아요"
               )}
@@ -296,7 +300,8 @@ export const ArticleTable = ({
         </StyledThead>
       ) : null}
       <StyledTbody>
-        {board.noticeRow
+        {/* notice의 개수는 페이지네이션 한 페이지당 글 개수에 포함 x */}
+        {board.noticeRow && !isNoticeOff
           ? aList.map((notice) => (
               <NoticeTr notice={notice} isLike={board.likeCol}></NoticeTr>
             ))
