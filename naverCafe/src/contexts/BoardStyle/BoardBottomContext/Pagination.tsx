@@ -34,7 +34,7 @@ export const Pagination = ({ boardId }: { boardId: number }) => {
 
   const handlePageNumbers = () => {
     const newPageNumbers = [];
-    for (let i = 1; i <= Math.ceil(articleLength / itemsPerPage); i++) {
+    for (let i = 1; i <= Math.ceil(articleLength! / itemsPerPage); i++) {
       newPageNumbers.push(i);
     }
     setPageNumbers(newPageNumbers);
@@ -43,7 +43,7 @@ export const Pagination = ({ boardId }: { boardId: number }) => {
 
   useEffect(() => {
     const newPageNumbers = [];
-    for (let i = 1; i <= Math.ceil(articleLength / itemsPerPage); i++) {
+    for (let i = 1; i <= Math.ceil(articleLength! / itemsPerPage); i++) {
       newPageNumbers.push(i);
     }
     setPageNumbers(newPageNumbers);

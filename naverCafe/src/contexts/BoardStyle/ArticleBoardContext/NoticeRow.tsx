@@ -1,6 +1,7 @@
 //Home: 좋아요 x, Total: 좋아요 x, Common: 좋아요 o
 
 import styled from "styled-components";
+import { ArticleType } from "../../../Types";
 
 const StyledNoticeTr = styled.tr`
   background: #f9f9f8;
@@ -101,7 +102,15 @@ const StyledNoticeTr = styled.tr`
   }
 `;
 
-export const NoticeTr = ({ notice, isLike }) => {
+export const NoticeTr = ({
+  notice,
+  isLike,
+  DateOnly,
+}: {
+  notice: ArticleType;
+  isLike: boolean;
+  DateOnly: (arg: string) => string;
+}) => {
   return (
     <StyledNoticeTr>
       <td scope="col" colSpan={2} className="td_article">
@@ -114,9 +123,10 @@ export const NoticeTr = ({ notice, isLike }) => {
           <div className="board_list">
             <div className="inner_list">
               <span className="article_title">{notice.title}</span>
+              {/* 일반 게시물과 마찬가지로 댓글 카운트 기능이 없어서ㅠㅠ */}
               <span className="comment">
                 {" ["}
-                <em>{notice.comment}</em>
+                <em>{notice.view_cnt}</em>
                 {"] "}
               </span>
             </div>
@@ -126,19 +136,19 @@ export const NoticeTr = ({ notice, isLike }) => {
       <td scope="col" className="td_author">
         <div className="ArticleBoardAuthorInfo">
           <button>
-            <span className="nickname">{notice.author}</span>
+            <span className="nickname">{notice.user.nickname}</span>
           </button>
         </div>
       </td>
       <td scope="col" className="td_date">
-        {notice.date}
+        {DateOnly(notice.created_at)}
       </td>
       <td scope="col" className="td_view">
-        {notice.viewCnt}
+        {notice.view_cnt}
       </td>
       {isLike ? (
         <td scope="col" className="td_likes">
-          {notice.like}
+          {notice.like_cnt}
         </td>
       ) : null}
     </StyledNoticeTr>

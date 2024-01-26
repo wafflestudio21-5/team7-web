@@ -230,7 +230,7 @@ const StyledUl = styled.ul<{ $isSelected: boolean; $isTerm: boolean }>`
   }
 `;
 
-const ListSearch = (boardId:number) => {
+const ListSearch = ({ boardId }: { boardId: number }) => {
   //미구현: 검색창에 넘겨주기 (term, content option 넘겨줘서 해당 게시판 전체 게시물 리스트에서 search)
 
   //기간

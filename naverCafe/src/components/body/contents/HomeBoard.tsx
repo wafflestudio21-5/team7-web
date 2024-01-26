@@ -5,6 +5,8 @@ import { ArticleTable } from "../../../contexts/BoardStyle/ArticleBoardContext/T
 import { boardAttribute } from "../../../contexts/BoardContext/BoardAttrContext";
 import { aList } from "../../../Constants";
 import { useNavigate } from "react-router-dom";
+import { useContext, useEffect } from "react";
+import { CurrentBoardContext } from "../../../contexts/BoardContext/CurrentBoardContext";
 
 const CafeIntro = styled.div`
   width: 860px;
@@ -112,7 +114,12 @@ const StyledBoardTitle = styled.div`
 // 26개까지 띄우고, 나머지 게시물은 띄우지 않습니다.
 const HomeBoard = () => {
   const navigate = useNavigate();
+  const { setCurBoardState } = useContext(CurrentBoardContext);
 
+  useEffect(() => {
+    setCurBoardState(-2);
+  }, [])
+  
   return (
     <StyledHomeBoard>
       <CafeIntro>

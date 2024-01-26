@@ -1,6 +1,6 @@
 //일반 게시판 (자유 게시판과 동일한 양식)
 
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useArticleList } from "../../../API/BoardAPI";
 import { aList } from "../../../Constants";
 import { boardAttribute } from "../../../contexts/BoardContext/BoardAttrContext";
@@ -13,29 +13,38 @@ import {
 } from "../../../contexts/BoardStyle/BoardHeaderContext";
 import { CommonBoardTopOption } from "../../../contexts/BoardStyle/BoardTopOptionContext";
 import { useNoticeContext } from "../../../contexts/BoardContext/NoticeContext";
-import { Article } from "../../../Types";
+import { ArticleType, BoardType } from "../../../Types";
+import { CurrentBoardContext } from "../../../contexts/BoardContext/CurrentBoardContext";
 
-const CommonBoard = ({ board }) => {
-  const { articleList } = useArticleList(board.id);
+const CommonBoard = ({ board }: { board: BoardType }) => {
+  const { id } = board;
+  const { setCurBoardState } = useContext(CurrentBoardContext);
+  const { articleList } = useArticleList({ boardId: id });
   const { setIsNoticeOff } = useNoticeContext();
-  const { setTotalLength, indexOfFirstItem, indexOfLastItem, setItemsPerPage, itemsPerPage } = usePagination(
-    board.id
+  const {
+    setTotalLength,
+    indexOfFirstItem,
+    indexOfLastItem,
+    setItemsPerPage,
+    itemsPerPage,
+  } = usePagination(board.id);
+  const [currentItems, setCurrentItems] = useState<{ articles: ArticleType[] }>(
+    { articles: [] }
   );
-  const [currentItems, setCurrentItems] = useState<{articles:Article[]}>({articles:[]});
-  
 
   useEffect(() => {
     // setTotalLength(articleList ? articleList.length : 0);
     setTotalLength(aList.length);
     setIsNoticeOff(false);
     setItemsPerPage(15);
+    setCurBoardState(id);
   }, [board]);
 
   useEffect(() => {
     const newItems = aList.slice(indexOfFirstItem, indexOfLastItem);
     setCurrentItems({ articles: newItems });
     console.log(newItems);
-  },[articleList, itemsPerPage, indexOfFirstItem, indexOfLastItem])
+  }, [articleList, itemsPerPage, indexOfFirstItem, indexOfLastItem]);
 
   return (
     <>

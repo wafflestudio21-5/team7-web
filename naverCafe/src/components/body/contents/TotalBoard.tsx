@@ -1,7 +1,6 @@
 // 전체글 게시판
 
-import { useEffect, useState } from "react";
-import { useArticleList } from "../../../API/BoardAPI";
+import { useContext, useEffect, useState } from "react";
 import { aList } from "../../../Constants";
 import { boardAttribute } from "../../../contexts/BoardContext/BoardAttrContext";
 import { ArticleTable } from "../../../contexts/BoardStyle/ArticleBoardContext/Table";
@@ -12,30 +11,39 @@ import {
   TotalBoardHeader,
 } from "../../../contexts/BoardStyle/BoardHeaderContext";
 import { TotalBoardTopOption } from "../../../contexts/BoardStyle/BoardTopOptionContext";
+import { ArticleType } from "../../../Types";
+import { CurrentBoardContext } from "../../../contexts/BoardContext/CurrentBoardContext";
+import { wholeArticle } from "../../../API/ArticleAPI";
 
 const TotalBoard = () => {
-  const { setTotalLength, indexOfFirstItem, indexOfLastItem, itemsPerPage,  updatePagination, currentPage} =
-    usePagination(0);
-  //const { articleList } = useArticleList(); // 전체 게시물을 조회할 수 있는 api가 있으면 좋겠는데 없네요..!
-  const [currentItems, setCurrentItems] = useState<{ articles: Article[] }>({
-    articles: [],
-  });
+  const { setCurBoardState } = useContext(CurrentBoardContext);
+  const {
+    setTotalLength,
+    indexOfFirstItem,
+    indexOfLastItem,
+    itemsPerPage,
+    updatePagination,
+    currentPage,
+  } = usePagination(0);
+  const articleList = wholeArticle(); //전체 게시물 리스트
+  const [currentItems, setCurrentItems] = useState<{ articles: ArticleType[] }>(
+    {
+      articles: [],
+    }
+  );
 
   useEffect(() => {
     // setTotalLength(articleList ? articleList.length : 0);
     setTotalLength(aList.length);
+    setCurBoardState(0);
   }, []);
 
   useEffect(() => {
     const newItems = aList.slice(indexOfFirstItem, indexOfLastItem);
     setCurrentItems({ articles: newItems });
-    updatePagination({ boardId: 0, currentPage: currentPage }); 
+    updatePagination({ boardId: 0, currentPage: currentPage });
     console.log(currentPage);
   }, [itemsPerPage]);
-
-  useEffect(() => {
-    
-  })
 
   return (
     <>

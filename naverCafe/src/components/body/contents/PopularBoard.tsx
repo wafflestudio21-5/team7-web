@@ -1,5 +1,5 @@
 // 인기글 게시판(인기글, 댓글 top, 좋아요 top, 세 가지 정렬로 이루어지는 듯 합니다.)
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   Board,
   PopularBoardHeader,
@@ -10,6 +10,7 @@ import { PopularBoardBottomOption } from "../../../contexts/BoardStyle/BoardBott
 import { ArticleTable } from "../../../contexts/BoardStyle/ArticleBoardContext/Table";
 import { aList } from "../../../Constants";
 import { boardAttribute } from "../../../contexts/BoardContext/BoardAttrContext";
+import { CurrentBoardContext } from "../../../contexts/BoardContext/CurrentBoardContext";
 
 export type Order = {
   p: string;
@@ -45,12 +46,17 @@ export const orderList: Order[] = [
 ];
 
 const PopularBoard = () => {
+  const { setCurBoardState } = useContext(CurrentBoardContext);
   const [currentOrder, setCurrentOrder] = useState<Order>(orderList[0]);
   const { articleList } = useArticleList({ type: currentOrder.query });
 
   useEffect(() => {
     console.log(currentOrder);
   }, [currentOrder]);
+
+  useEffect(() => {
+    setCurBoardState(-1);
+  },[])
   return (
     <>
       <Board>

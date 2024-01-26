@@ -83,6 +83,17 @@ export function deleteArticle(articleId: number) {
     });
 }
 
+// 전체 article 조회
+export function wholeArticle() {
+  return axios.get(baseURL + `api/v1/articles`).then((res) => {
+    console.log(res);
+    return res;
+  }).catch((err) => {
+    console.log(err);
+    return;
+  });
+}
+
 // comment
 // comment 작성
 export function postComment(

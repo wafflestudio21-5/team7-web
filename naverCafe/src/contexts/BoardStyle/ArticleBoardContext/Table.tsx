@@ -5,6 +5,7 @@ import { BoardType } from "../../BoardContext/BoardAttrContext";
 import { aList } from "../../../Constants";
 import { useNoticeContext } from "../../BoardContext/NoticeContext";
 import { useState } from "react";
+import { ArticleType } from "../../../Types";
 
 const StyledTable = styled.table<{ $brdName: boolean }>`
   width: 100%;
@@ -260,11 +261,17 @@ export const ArticleTable = ({
   isLike,
 }: {
   board: BoardType;
-  articleList: any;
+  articleList: ArticleType[];
   isLike?: boolean;
 }) => {
   const { isNoticeOff } = useNoticeContext();
-  const [isSortLike, setIsSortLike] = useState(false); //좋아요순, 최소 
+  const [isSortLike, setIsSortLike] = useState(false); //인기순 (기준이 명확하지 않아 일단 보류해두었습니다.)
+  
+  const DateOnly = (arg: string) => {
+    const dateRegex = /\d{4}-\d{2}-\d{2}/;
+    const dateNum = arg.match(dateRegex)![0];
+    return dateNum.split('-').join('.');
+  }
 
   return (
     <StyledTable $brdName={board.firstCol === "boardName"}>
@@ -291,7 +298,12 @@ export const ArticleTable = ({
           {board.likeCol || isLike ? (
             <th scope="col">
               {board.likeCol === "sort" ? (
-                <span className="sort_likes" onClick={()=>setIsSortLike(!isSortLike)}>좋아요</span>
+                <span
+                  className="sort_likes"
+                  onClick={() => setIsSortLike(!isSortLike)}
+                >
+                  좋아요
+                </span>
               ) : (
                 "좋아요"
               )}
@@ -303,10 +315,10 @@ export const ArticleTable = ({
         {/* notice의 개수는 페이지네이션 한 페이지당 글 개수에 포함 x */}
         {board.noticeRow && !isNoticeOff
           ? aList.map((notice) => (
-              <NoticeTr notice={notice} isLike={board.likeCol}></NoticeTr>
+              <NoticeTr notice={notice} isLike={board.likeCol} DateOnly={DateOnly}></NoticeTr>
             ))
           : null}
-        {articleList.map((article, index) => (
+        {articleList.map((article: ArticleType, index: number) => (
           <StyledTr key={index}>
             <td
               className={
@@ -317,7 +329,7 @@ export const ArticleTable = ({
                 {/* 아티클마다 첫번째 정보 */}
                 <FirstCol
                   firstCol={board.firstCol}
-                  board={article.board}
+                  board={article.board.board_name}
                   ranking={index}
                   articleId={article.id}
                 ></FirstCol>
@@ -329,9 +341,10 @@ export const ArticleTable = ({
                   <div className="inner_list">
                     <span className="article_title">{article.title}</span>
                     <span></span>
+                    {/* 댓글 개수를 넣어야 하는데 ArticleType에 없어서 일단 보류했습니다. */}
                     <span className="comment">
                       {" ["}
-                      <em>{article.comment}</em>
+                      <em>{article.view_cnt}</em>
                       {"] "}
                     </span>
                   </div>
@@ -341,14 +354,14 @@ export const ArticleTable = ({
             <td className="td_author">
               <div className="ArticleBoardAuthorInfo">
                 <button>
-                  <span className="nickname">{article.author}</span>
+                  <span className="nickname">{article.user.nickname}</span>
                 </button>
               </div>
             </td>
-            <td className="td_date">{article.date}</td>
-            <td className="td_view">{article.viewCnt}</td>
+            <td className="td_date">{DateOnly(article.created_at)}.</td>
+            <td className="td_view">{article.view_cnt}</td>
             {board.likeCol || isLike ? (
-              <td className="td_likes">{article.like}</td>
+              <td className="td_likes">{article.like_cnt}</td>
             ) : null}
           </StyledTr>
         ))}
