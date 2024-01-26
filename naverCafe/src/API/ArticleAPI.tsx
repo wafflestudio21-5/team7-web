@@ -28,6 +28,7 @@ export function postArticle(newArticleInfo: {
     },
   });
 }
+
 // article 수정(put)
 // 글쓰기 페이지에서 실행됨 -> useNavigate를 통해 이동
 export function editArticle(
@@ -98,3 +99,14 @@ export function deleteLike(articleId: number) {
 }
 // article 공지로 등록 -> 이 기능이 필요한가?
 // 모든 article 조회 -> 이 기능이 필요한가?
+  
+// 전체 article 조회
+export function wholeArticle() {
+  return axios.get(baseURL + `api/v1/articles`).then((res) => {
+    console.log(res);
+    return res;
+  }).catch((err) => {
+    console.log(err);
+    return;
+  });
+}

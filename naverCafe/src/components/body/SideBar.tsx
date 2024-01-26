@@ -1,8 +1,10 @@
 import styled, { css } from "styled-components";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useCafeInfo } from "../../API/CafeAPI";
 import { waffleCafe } from "../../Constants";
+import { useBoardGroup } from "../../API/BoardAPI";
+import { CurrentBoardContext } from "../../contexts/BoardContext/CurrentBoardContext";
 
 const Wrapper = styled.div`
   display: inline-block;
@@ -302,7 +304,7 @@ const Boards = styled.div`
     }
     & > div:nth-child(2) {
       padding-bottom: 6px;
-      border-bottom: 1px solid #e5e5e5;
+      //border-bottom: 1px solid #e5e5e5;
       & > img {
         background-image: url(https://ssl.pstatic.net/static/cafe/cafe_pc/svg/ico-menu-hot.svg);
         background-size: 100%;
@@ -310,7 +312,7 @@ const Boards = styled.div`
         height: 12px;
       }
     }
-    & > div:nth-child(3) {
+    & > div:nth-child(n + 3) {
       margin-top: 4px;
       & > img {
         background-position: -306px -42px;
@@ -342,10 +344,74 @@ const CafeSmartBot = styled.div`
     height: 64px;
   }
 `;
+const StyledDiv = styled.div<{ $isCurBoard: boolean }>`
+  ${(prop) => (prop.$isCurBoard ? "font-weight:bold" : "")};
+`;
+const StyledGroupTit = styled.div`
+  position: relative;
+  border-top: 2px solid #e5e5e5;
+  border-bottom: 1px solid #e5e5e5;
+
+  word-break: break-all;
+  word-wrap: break-word;
+  text-align: left;
+  margin: 0;
+  height: 36px;
+
+  h3 {
+    margin: 0;
+    padding: 0;
+    font-size: 13px;
+  }
+
+  h3 > span {
+    display: inline-block;
+    max-width: 150px;
+    padding: 12px 0 10px 0;
+    font-size: 13px;
+    line-height: 14px;
+    vertical-align: top;
+  }
+`;
+const StyledUl = styled.ul`
+  padding: 0 10px;
+  margin-top: 6px;
+  font-size: 13px;
+  line-height: 24px;
+
+  li {
+    margin-top: 2px;
+    position: relative;
+  }
+
+  li > .list {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    margin: 6px 4px 0 0;
+    border-left: 1px solid #d8d8d8;
+    border-bottom: 1px solid #d8d8d8;
+    vertical-align: top;
+    float: left;
+  }
+  li > .brdimg {
+    display: inline-block;
+    background-image: url(https://ssl.pstatic.net/static/cafe/cafe_pc/sp/sp_icon_06952b76.svg);
+    background-repeat: no-repeat;
+    vertical-align: top;
+    margin: 6px 5px 0 0;
+    background-position: -306px -42px;
+    width: 10px;
+    height: 11px;
+    float: left;
+  }
+`;
 
 const SideBar = () => {
   const [isCafeInfoChecked, setIsCafeInfoChecked] = useState<boolean>(true);
   const { memberCount } = useCafeInfo(); //백엔드와 연결하고 난 뒤 사용하는 것이 좋을 것 같습니다.
+  const { groupList } = useBoardGroup();
+  const { curBoardState, setCurBoardState } = useContext(CurrentBoardContext);
   const navigate = useNavigate();
 
   return (
@@ -456,24 +522,70 @@ const SideBar = () => {
           <div className="bookmarkedBoardList"></div>
         </div>
         <div className="boards">
-          <div>
+          <StyledDiv $isCurBoard={curBoardState === 0}>
             <img
               src="https://cafe.pstatic.net/cafe4/hidden.gif"
               alt="전체글보기"
             />
-            <Link to={`/totalboard`}>전체글보기</Link>
-          </div>
-          <div>
+            <Link
+              to={`/totalboard`}
+              onClick={() => {
+                setCurBoardState(0);
+              }}
+            >
+              전체글보기
+            </Link>
+          </StyledDiv>
+          <StyledDiv $isCurBoard={curBoardState === -1}>
             <img src="https://cafe.pstatic.net/cafe4/hidden.gif" alt="인기글" />
-            <Link to={`/popularboard`}>인기글</Link>
-          </div>
-          <div>
-            <img
-              src="https://cafe.pstatic.net/cafe4/hidden.gif"
-              alt="자유게시판"
-            />
-            <Link to={`/board/1`}>스프링</Link>
-          </div>
+            <Link
+              to={`/popularboard`}
+              onClick={() => {
+                setCurBoardState(-1);
+              }}
+            >
+              인기글
+            </Link>
+          </StyledDiv>
+          {groupList &&
+            groupList.boardGroups.map((group, index) => (
+              <>
+                <StyledGroupTit className="cafe-menu-tit" key={index}>
+                  <h3>
+                    <span>{group.name}</span>
+                  </h3>
+                </StyledGroupTit>
+                <StyledUl className="cafe-menu-list">
+                  {group.boards.map((board, index) => (
+                    <li>
+                      <img
+                        className="list"
+                        src="https://cafe.pstatic.net/cafe4/hidden.gif"
+                      ></img>
+                      <img
+                        className="brdimg"
+                        src="https://cafe.pstatic.net/cafe4/hidden.gif"
+                        alt={board.name}
+                      />
+                      <StyledDiv
+                        key={index}
+                        $isCurBoard={curBoardState === board.id}
+                      >
+                        <Link
+                          to={`/board/${board.id - 1}`}
+                          onClick={() => {
+                            setCurBoardState(board.id);
+                          }}
+                        >
+                          {board.name}
+                        </Link>
+                      </StyledDiv>
+                    </li>
+                  ))}
+                </StyledUl>
+              </>
+            ))}
+
           {/* 그 외 게시판 새로 추가시 더해지는 기능이 있으면 좋겠습니다. */}
           {/* 그러러면 boards div 안에 있는 div들이 state로서 선언되면 될 것 같습니다. */}
         </div>

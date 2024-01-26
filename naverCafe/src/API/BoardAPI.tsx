@@ -1,15 +1,12 @@
 import axios from "axios";
 import { useCallback, useState, useEffect } from "react";
 import { baseURL } from "../Constants";
-import { ArticleType, Board } from "../Types";
+import { ArticleType, BoardType, GroupType } from "../Types";
 
 export function useWholeBoard() {
-  const [boardList, setBoardList] = useState({
-    boards: [
-      { id: 1, name: "스프링" },
-      { id: 2, name: "장고" },
-    ],
-  });
+  const [boardList, setBoardList] = useState<{ boards: BoardType[] } | null>(
+    null
+  );
   const url = "/api/v1/boards";
   const refetch = useCallback(async () => {
     const res = await axios.get(baseURL + url);
@@ -19,13 +16,14 @@ export function useWholeBoard() {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     refetch();
-    console.log(boardList);
   }, [refetch]);
   return { boardList, refetch };
 }
 
 export function useBoardGroup() {
-  const [boardList, setBoardList] = useState<Board[] | null>(null);
+  const [groupList, setBoardList] = useState<{ boardGroups: GroupType[] } | null>(
+    null
+  );
   const url = "/api/v1/boards-in-group";
   const refetch = useCallback(async () => {
     const res = await axios.get(baseURL + url);
@@ -36,7 +34,7 @@ export function useBoardGroup() {
   useEffect(() => {
     refetch();
   }, [refetch]);
-  return { boardList, refetch };
+  return { groupList, refetch };
 }
 
 // export function useLikeBoard(userId: string, boardId: number) {
@@ -49,7 +47,7 @@ export function useBoardGroup() {
 // }
 
 export function useGetLikeBoard(userId: string) {
-  const [boardList, setBoardList] = useState<Board[] | null>(null);
+  const [boardList, setBoardList] = useState<BoardType[] | null>(null);
   const url = "/api/v1/boards/likes";
   const refetch = useCallback(async () => {
     const res = await axios.get(baseURL + url);
@@ -63,6 +61,8 @@ export function useGetLikeBoard(userId: string) {
   return { boardList, refetch };
 }
 
+
+//게시판별 게시물 리스트 및 인기게시판 게시물 리스트
 export function useArticleList({
   boardId,
   type,

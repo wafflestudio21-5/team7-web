@@ -1,9 +1,6 @@
 import styled from "styled-components";
 import { usePagination } from "./PaginationContext";
-import { itemsPerPage } from "../../../Constants";
-import { useEffect } from "react";
-
-//currentPage, non-currentPage css 미구현
+import { useEffect, useState } from "react";
 
 const StyledPagination = styled.div`
   background-color: #f9f9f9;
@@ -31,13 +28,27 @@ const StyledButton = styled.button<{ $on: boolean }>`
 `;
 
 export const Pagination = ({ boardId }: { boardId: number }) => {
-  const { currentPage, articleLength, setCurrentPage } = usePagination(boardId);
+  const { currentPage, articleLength, setCurrentPage, itemsPerPage } =
+    usePagination(boardId);
+  const [pageNumbers, setPageNumbers] = useState<number[]>([]);
 
-  const pageNumbers: number[] = [];
+  const handlePageNumbers = () => {
+    const newPageNumbers = [];
+    for (let i = 1; i <= Math.ceil(articleLength! / itemsPerPage); i++) {
+      newPageNumbers.push(i);
+    }
+    setPageNumbers(newPageNumbers);
+    console.log(pageNumbers);
+  };
 
-  for (let i = 1; i <= Math.ceil(articleLength! / itemsPerPage); i++) {
-    pageNumbers.push(i);
-  }
+  useEffect(() => {
+    const newPageNumbers = [];
+    for (let i = 1; i <= Math.ceil(articleLength! / itemsPerPage); i++) {
+      newPageNumbers.push(i);
+    }
+    setPageNumbers(newPageNumbers);
+    console.log(pageNumbers);
+  }, [currentPage, articleLength, itemsPerPage]);
 
   return (
     <StyledPagination>
@@ -47,6 +58,8 @@ export const Pagination = ({ boardId }: { boardId: number }) => {
           $on={number === currentPage}
           onClick={() => {
             setCurrentPage(number);
+            handlePageNumbers();
+            console.log(number);
           }}
         >
           {number}

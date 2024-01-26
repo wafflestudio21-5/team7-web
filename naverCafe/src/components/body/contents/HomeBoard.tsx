@@ -4,6 +4,9 @@ import { StyledHomeBoard } from "../../../contexts/BoardStyle/BoardHeaderContext
 import { ArticleTable } from "../../../contexts/BoardStyle/ArticleBoardContext/Table";
 import { boardAttribute } from "../../../contexts/BoardContext/BoardAttrContext";
 import { aList } from "../../../Constants";
+import { useNavigate } from "react-router-dom";
+import { useContext, useEffect } from "react";
+import { CurrentBoardContext } from "../../../contexts/BoardContext/CurrentBoardContext";
 
 const CafeIntro = styled.div`
   width: 860px;
@@ -78,6 +81,11 @@ const StyledBoardTitle = styled.div`
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+
+      &:hover {
+        text-decoration: underline;
+        cursor: pointer;
+      }
     }
     span {
       padding-top: 2px;
@@ -105,6 +113,13 @@ const StyledBoardTitle = styled.div`
 
 // 26개까지 띄우고, 나머지 게시물은 띄우지 않습니다.
 const HomeBoard = () => {
+  const navigate = useNavigate();
+  const { setCurBoardState } = useContext(CurrentBoardContext);
+
+  useEffect(() => {
+    setCurBoardState(-2);
+  }, [])
+  
   return (
     <StyledHomeBoard>
       <CafeIntro>
@@ -142,8 +157,8 @@ const HomeBoard = () => {
       <StyledHomeArticle>
         <StyledBoardTitle>
           <div className="list-tit">
-            <h3>전체글보기</h3>
-            <span>더보기</span>
+            <h3 onClick={() => navigate("/totalboard")}>전체글보기</h3>
+            <span onClick={() => navigate("/totalboard")}>더보기</span>
           </div>
         </StyledBoardTitle>
         <ArticleTable

@@ -5,6 +5,7 @@ import {
   orderList,
 } from "../../../components/body/contents/PopularBoard";
 import { Pagination } from "./Pagination";
+import { useEffect, useState } from "react";
 
 //TotalBoard: 페이지 넘버(페이지네이션) / 검색창 (기간 | 기준 | 검색창 | 검색버튼)
 //CommonBoard: 페이지 넘버(페이지네이션) / 검색창 (기간 | 기준 | 검색창 | 검색버튼)
@@ -51,7 +52,7 @@ const StyledPostBtn = styled.div`
 const PostBtn = () => {
   return (
     <StyledPostBtn>
-      <Link to={""} className="write">
+      <Link to={"/write"} className="write">
         글쓰기
       </Link>
     </StyledPostBtn>
@@ -145,15 +146,185 @@ const StyledListSearch = styled.div`
   }
 `;
 
-const ListSearch = () => {
+const StyledSelectDiv = styled.div<{ $isSelected: boolean }>`
+  .text::after {
+    content: "";
+    display: inline-block;
+    background-image: url(https://ssl.pstatic.net/static/cafe/cafe_pc/sp/sp_icon_06952b76.svg);
+    background-repeat: no-repeat;
+    vertical-align: top;
+    background-position: ${(prop) =>
+      prop.$isSelected ? "-25px -250px" : "-229px -185px"};
+    width: 12px;
+    height: 5px;
+    position: absolute;
+    top: 15px;
+    right: 12px;
+  }
+`;
+
+const StyledUl = styled.ul<{ $isSelected: boolean; $isTerm: boolean }>`
+  display: ${(prop) => (prop.$isSelected ? "block" : "none")};
+  overflow-y: auto;
+  position: absolute;
+  top: 34px;
+  left: -1px;
+  width: ${(prop) => (prop.$isTerm ? "290px" : "100%")};
+  max-height: 295px;
+  border: solid 1px #ddd;
+  background-color: #fff;
+  z-index: 12;
+
+  li > p:hover {
+    text-decoration: underline;
+    background-color: #e2faea;
+    color: #03c75a;
+  }
+
+  li > p {
+    display: block;
+    height: 36px;
+    padding: 0 12px;
+    line-height: 36px;
+    color: #333;
+    white-space: nowrap;
+  }
+
+  li > .date_enter {
+    padding: 14px;
+    border-top: 1px solid #ddd;
+    background-color: #fff;
+    height: 45.5px;
+
+    .tit {
+      display: block;
+      padding-bottom: 6px;
+      color: #333;
+      height: 15.5px;
+    }
+
+    input {
+      width: 100px;
+      height: 24px;
+      padding: 0 12px;
+      box-sizing: border-box;
+      border: solid 1px #ddd;
+      line-height: 13px;
+      color: #333;
+      margin-right: 4px;
+    }
+
+    .btn_set {
+      width: 52px;
+      padding: 3px 0 4px;
+      background-color: #a4abb9;
+      border: 1px solid #9599a6;
+      font-size: 14px;
+      line-height: 14px;
+      color: #fff;
+      vertical-align: top;
+    }
+  }
+  .date_input_area {
+    height: 74.5px;
+  }
+`;
+
+const ListSearch = ({ boardId }: { boardId: number }) => {
+  //미구현: 검색창에 넘겨주기 (term, content option 넘겨줘서 해당 게시판 전체 게시물 리스트에서 search)
+
+  //기간
+  const TermOption = ["전체기간", "1일", "1주", "1개월", "6개월", "1년"];
+  const [isTermSelected, setIsTermSelected] = useState(false);
+  const [termOp, setTermOp] = useState(0); //TermOption의 인덱스를 저장
+
+  const handleTermOp = (arg: number) => {
+    setTermOp(arg);
+    setIsTermSelected(!isTermSelected);
+  };
+
+  //제목, 내용
+  const ContentOption = ["제목만", "글작성자", "댓글내용", "댓글작성자"];
+  const [isContentSelected, setIsContentSelected] = useState(false);
+  const [contentOp, setContentOp] = useState(0); //TermOption의 인덱스를 저장
+
+  const handleContentOp = (arg: number) => {
+    setContentOp(arg);
+    setIsContentSelected(!isContentSelected);
+  };
+
+  //게시판이 바뀔 때마다 초기화
+  useEffect(() => {
+    setTermOp(0);
+    setContentOp(0);
+  }, [boardId]);
+
   return (
     <StyledListSearch>
-      <div className="select_component">
-        <p className="text">전체기간</p>
-      </div>
-      <div className="select_component">
-        <p className="text">제목만</p>
-      </div>
+      <StyledSelectDiv
+        className="select_component"
+        $isSelected={isTermSelected}
+      >
+        <p
+          className="text"
+          onClick={() => {
+            setIsTermSelected(!isTermSelected);
+            setIsContentSelected(false);
+          }}
+        >
+          {TermOption[termOp]}
+        </p>
+        <StyledUl
+          className="select_list"
+          $isSelected={isTermSelected}
+          $isTerm={true}
+        >
+          {TermOption.map((option, index) => (
+            <li key={index}>
+              <p onClick={() => handleTermOp(index)}>{option}</p>
+            </li>
+          ))}
+          <li className="date_input_area">
+            <div className="date_enter">
+              <span className="tit">기간 입력</span>
+              <input
+                type="text"
+                className="input_1"
+                maxLength={10}
+                value="2017-12-28"
+              />
+              <input
+                type="text"
+                className="input_2"
+                maxLength={10}
+                value="2018-01-03"
+              />
+              <button className="btn_set">설정</button>
+            </div>
+          </li>
+        </StyledUl>
+      </StyledSelectDiv>
+      <StyledSelectDiv
+        className="select_component"
+        $isSelected={isContentSelected}
+      >
+        <p
+          className="text"
+          onClick={() => {
+            setIsContentSelected(!isContentSelected);
+            setIsTermSelected(false);
+          }}
+        >
+          {ContentOption[contentOp]}
+        </p>
+        <StyledUl $isSelected={isContentSelected} $isTerm={false}>
+          {ContentOption.map((option, index) => (
+            <li key={index}>
+              <p onClick={() => handleContentOp(index)}>{option}</p>
+            </li>
+          ))}
+        </StyledUl>
+      </StyledSelectDiv>
       <div className="input_search_area">
         <div className="input_component">
           <input type="text" placeholder="검색어를 입력해주세요"></input>
@@ -168,8 +339,8 @@ export const BoardBottomOption = ({ boardId }: { boardId: number }) => {
   return (
     <StyledBoardBottomOption>
       <PostBtn></PostBtn>
-      <Pagination boardId={boardId}></Pagination>
-      <ListSearch></ListSearch>
+      <Pagination boardId={boardId} />
+      <ListSearch boardId={boardId}></ListSearch>
     </StyledBoardBottomOption>
   );
 };
@@ -275,6 +446,16 @@ const StyledPopularBoardBottomOption = styled.div`
       }
     }
 
+    svg {
+      display: inline-block;
+      width: 5px;
+      height: 8px;
+      margin-left: 3px;
+      background-image: url("https://ssl.pstatic.net/static/cafe/cafe_pc/svg/ico-detail-arrow-right.svg");
+      background-size: 100%;
+      background-repeat: no-repeat;
+    }
+
     &:hover {
       text-decoration: underline;
       cursor: pointer;
@@ -320,6 +501,9 @@ export const PopularBoardBottomOption = ({
         <span className="txt">
           우리 카페의 <strong>{currentOrder.strong}</strong> 지금 확인해보세요!
         </span>
+        <svg>
+          <use xlinkHref="#ico_link_arrow" aria-hidden="true"></use>
+        </svg>
       </div>
     </StyledPopularBoardBottomOption>
   );

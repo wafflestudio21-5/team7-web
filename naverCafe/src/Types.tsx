@@ -1,6 +1,12 @@
-export type Board = {
+export type BoardType = {
   id: number;
   name: string;
+};
+
+export type GroupType = {
+  id: number;
+  name: string;
+  boards: BoardType[];
 };
 
 export type ArticleType = {
@@ -26,6 +32,7 @@ export type ArticleType = {
   allow_comments: boolean;
   is_notification: boolean;
 };
+
 export type CommentType = {
   id: number;
   content: string;

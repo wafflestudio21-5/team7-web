@@ -98,12 +98,12 @@ export const PopularBoardHeader = () => {
   );
 };
 
-export const CommonBoardHeader = ({ isFavorite }: { isFavorite: boolean }) => {
+export const CommonBoardHeader = ({ isFavorite, boardName }: { isFavorite: boolean, boardName:string }) => {
   return (
     <StyledCommonBoardHeader $isFavorite={isFavorite}>
       <div className="title-area">
         <div className="info_tit">
-          <h3 className="sub-tit-color">자유게시판</h3>
+          <h3 className="sub-tit-color">{boardName}</h3>
           <button className="bookmark"></button>
         </div>
       </div>
