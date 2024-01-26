@@ -37,7 +37,12 @@ const TotalBoard = () => {
     // setTotalLength(articleList ? articleList.length : 0);
     setTotalLength(aList.length);
     setCurBoardState(0);
+    const newItems = aList.slice(indexOfFirstItem, indexOfLastItem);
+    setCurrentItems({ articles: newItems });
+    updatePagination({ boardId: 0, currentPage: currentPage });
+    console.log(currentPage);
     console.log(articleLength);
+    console.log(indexOfFirstItem, indexOfLastItem, currentItems);
   }, []);
 
   useEffect(() => {

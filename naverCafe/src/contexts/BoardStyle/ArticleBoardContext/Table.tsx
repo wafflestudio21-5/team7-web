@@ -4,7 +4,7 @@ import { NoticeTr } from "./NoticeRow";
 import { BoardType } from "../../BoardContext/BoardAttrContext";
 import { aList } from "../../../Constants";
 import { useNoticeContext } from "../../BoardContext/NoticeContext";
-import { useContext, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { ArticleType } from "../../../Types";
 import { ViewOptionContext } from "../../BoardContext/ViewOptionContext";
 import { useNavigate } from "react-router-dom";
@@ -191,6 +191,37 @@ export const StyledTr = styled.tr`
   }
 
   .td_author {
+    .popup {
+      margin-left: 35px;
+      display: table-cell;
+      position: absolute;
+      z-index: 100;
+      border: solid 1px #ddd;
+      background-color: #fff;
+
+      width: 100px;
+      box-shadow: 3px 3px 6px 0 rgba(0, 0, 0, 0.2);
+
+      text-align: left;
+      padding: 8px;
+
+      button {
+        all:unset;
+        display: inline-block;
+        padding: 2px 8px;
+        margin: 0;
+        color: #000;
+        font-size: 14px;
+        text-align: right;
+      }
+      &:hover {
+        background-color: #e2faea;
+        button {
+          color: #03c75a;
+        }
+      }
+    }
+
     .ArticleBoardAuthorInfo {
       position: relative;
 
@@ -464,13 +495,17 @@ const CardViewUl = ({
   articleList: ArticleType[];
   DateOnly: (arg: string) => string;
   isTotalBoard: boolean;
-  }) => {
+}) => {
   const navigate = useNavigate();
   return (
     <StyledCardUl>
       {articleList.map((article, index) => (
         <StyledCardLi key={index}>
-          {isTotalBoard ? <p onClick={()=>navigate(`/board/${article.board.board_id-1}`)}>{article.board.board_name}</p> : null}
+          {isTotalBoard ? (
+            <p onClick={() => navigate(`/board/${article.board.board_id - 1}`)}>
+              {article.board.board_name}
+            </p>
+          ) : null}
           <div className="card_area">
             <div className="con">
               <div className="con_top">
@@ -485,14 +520,14 @@ const CardViewUl = ({
               </div>
               <div className="con_bottom">
                 <div className="user_info">
-                  <div className="pers_nick_area">{article.nickname}</div>
+                  <div className="pers_nick_area">{article.author.nickname}</div>
                   <div className="date_num">
-                    <span className="date">{DateOnly(article.created_at)}</span>
-                    <span className="num">조회 {article.view_cnt}</span>
+                    <span className="date">{DateOnly(article.createdAt)}</span>
+                    <span className="num">조회 {article.viewCount}</span>
                     <div className="like_area">
                       <div className="comment_area">
                         <span className="comment_ico">댓글</span>
-                        <em className="num">{article.view_cnt}</em>
+                        <em className="num">{article.commentCount}</em>
                       </div>
                       <div className="like">
                         <span className="like_btn">
@@ -501,7 +536,7 @@ const CardViewUl = ({
                             alt="좋아요"
                           ></img>
                         </span>
-                        <em className="like_cnt">{article.like_cnt}</em>
+                        <em className="like_cnt">{article.likeCount}</em>
                       </div>
                     </div>
                   </div>
@@ -525,6 +560,7 @@ export const ArticleTable = ({
   isLike?: boolean;
 }) => {
   const { isNoticeOff } = useNoticeContext();
+  const [isNickClicked, setIsNickClicked] = useState(false);
   const [isSortLike, setIsSortLike] = useState(false); //인기순 (기준이 명확하지 않아 일단 보류해두었습니다.)
   const { viewOp } = useContext(ViewOptionContext);
 
@@ -533,6 +569,15 @@ export const ArticleTable = ({
     const dateRegex = /\d{4}-\d{2}-\d{2}/;
     const dateNum = arg.match(dateRegex)![0];
     return dateNum.split("-").join(".");
+  };
+
+  const buttonRef = useRef(null);
+  //const {}
+
+  const handleModal = () => {
+    if (buttonRef.current) {
+
+    }
   };
 
   return (
@@ -617,7 +662,7 @@ export const ArticleTable = ({
                       {/* 댓글 개수를 넣어야 하는데 ArticleType에 없어서 일단 보류했습니다. */}
                       <span className="comment">
                         {" ["}
-                        <em>{article.view_cnt}</em>
+                        <em>{article.viewCount}</em>
                         {"] "}
                       </span>
                     </div>
@@ -626,15 +671,18 @@ export const ArticleTable = ({
               </td>
               <td className="td_author">
                 <div className="ArticleBoardAuthorInfo">
-                  <button>
-                    <span className="nickname">{article.user.nickname}</span>
+                  <button onClick={()=>handleModal} ref={buttonRef}>
+                    <span className="nickname">{article.author.nickname}</span>
                   </button>
                 </div>
+                <div className="popup">
+                  <button>게시글보기</button>
+                </div>
               </td>
-              <td className="td_date">{DateOnly(article.created_at)}.</td>
-              <td className="td_view">{article.view_cnt}</td>
+              <td className="td_date">{DateOnly(article.createdAt)}.</td>
+              <td className="td_view">{article.viewCount}</td>
               {board.likeCol || isLike ? (
-                <td className="td_likes">{article.like_cnt}</td>
+                <td className="td_likes">{article.likeCount}</td>
               ) : null}
             </StyledTr>
           ))
