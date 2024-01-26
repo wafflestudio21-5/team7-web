@@ -134,7 +134,7 @@ const Inner = styled.div`
   position: relative;
   z-index: 1;
   /* z-index를 1로 설정 */
-  & > .loginButton {
+  /* & > .loginButton {
     width: 402px;
     height: 52px;
     background-color: #03c75a;
@@ -148,10 +148,10 @@ const Inner = styled.div`
     font-weight: 700;
     line-height: 24px;
     cursor: pointer;
-  }
+  } */
 `;
 const IDLogin = styled.div<{
-  $userIdLength: number;
+  $userNameLength: number;
   $userPasswordLength: number;
   $isLoginMaintained: boolean;
 }>`
@@ -199,7 +199,7 @@ const IDLogin = styled.div<{
     }
     & > .deleteLogo {
       display: ${(props) =>
-        props.$userIdLength !== 0 ? "inline-block" : "none"};
+        props.$userNameLength !== 0 ? "inline-block" : "none"};
     }
   }
   & > .password {
@@ -285,7 +285,24 @@ const IDLogin = styled.div<{
     color: #ff003e;
     text-align: left;
   }
+  & > .loginButton {
+    width: 402px;
+    height: 52px;
+    background-color: #03c75a;
+    margin-top: 16px;
+    padding: 13px 0;
+    color: white;
+    border: solid 1px rgba(0, 0, 0, 0.15);
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 24px;
+    cursor: pointer;
+  }
 `;
+const SocialLogin = styled.div``;
+
 const Find = styled.div`
   margin-top: 20px;
   & > ul {
@@ -313,7 +330,7 @@ const Find = styled.div`
 `;
 
 const Login = () => {
-  const [userId, setUserId] = useState<string>("");
+  const [userName, setUserName] = useState<string>("");
   const [userPassword, setUserPassword] = useState<string>("");
   const [isIDLoginSelected, setIsIDLoginSelected] = useState<boolean>(true);
   const [isLoginMaintained, setIsLoginMaintained] = useState<boolean>(false);
@@ -326,7 +343,7 @@ const Login = () => {
 
   const handleLogin = () => {
     setIsErrorOnBoth(false);
-    if (userId.length == 0) {
+    if (userName.length == 0) {
       setIsErrorOnId(true);
       return;
     } else {
@@ -343,10 +360,13 @@ const Login = () => {
   };
 
   const login = () => {
-    console.log({});
+    console.log({
+      username: userName,
+      password: userPassword,
+    });
     return axios
-      .post(baseURL + "", {
-        id: userId,
+      .post(baseURL + "/api/v1/login", {
+        username: userName,
         password: userPassword,
       })
       .then((res) => {
@@ -378,68 +398,79 @@ const Login = () => {
           </li>
         </ul>
         <Inner>
-          <IDLogin
-            $userIdLength={userId.length}
-            $userPasswordLength={userPassword.length}
-            $isLoginMaintained={isLoginMaintained}
-          >
-            <div className="id">
-              <span className="idLogo" />
-              <input
-                type="text"
-                placeholder="아이디"
-                value={userId}
-                onChange={(e) => setUserId(e.target.value)}
-              />
-              <span className="deleteLogo" onClick={() => setUserId("")} />
-            </div>
-            <div className="password">
-              <span className="passwordLogo" />
-              <input
-                type="password"
-                placeholder="비밀번호"
-                value={userPassword}
-                onChange={(e) => setUserPassword(e.target.value)}
-              />
-              <span
-                className="deleteLogo"
-                onClick={() => setUserPassword("")}
-              />
-            </div>
-            <div className="loginSetting">
-              <div className="maintainLogin">
-                <label
-                  htmlFor=""
-                  onClick={() => setIsLoginMaintained(!isLoginMaintained)}
-                >
-                  로그인 상태 유지
-                </label>
+          {isIDLoginSelected ? (
+            <IDLogin
+              $userNameLength={userName.length}
+              $userPasswordLength={userPassword.length}
+              $isLoginMaintained={isLoginMaintained}
+            >
+              <div className="id">
+                <span className="idLogo" />
+                <input
+                  type="text"
+                  placeholder="아이디"
+                  value={userName}
+                  onChange={(e) => setUserName(e.target.value)}
+                />
+                <span className="deleteLogo" onClick={() => setUserName("")} />
               </div>
-              <div className="IPSecurity">
-                <label htmlFor="">IP 보안</label>
+              <div className="password">
+                <span className="passwordLogo" />
+                <input
+                  type="password"
+                  placeholder="비밀번호"
+                  value={userPassword}
+                  onChange={(e) => setUserPassword(e.target.value)}
+                />
+                <span
+                  className="deleteLogo"
+                  onClick={() => setUserPassword("")}
+                />
               </div>
-            </div>
-            <div className="errorMessage">
-              {isErrorOnId ? <span>아이디를 입력해 주세요.</span> : <></>}
-              {isErrorOnPassword ? (
-                <span>비밀번호를 입력해 주세요.</span>
-              ) : (
-                <></>
-              )}
-              {isErrorOnBoth ? (
-                <span>
-                  아이디(로그인 전용 아이디) 또는 비밀번호를 잘못 입력했습니다.
-                  <br />
-                  입력하신 내용을 다시 확인해주세요.
-                </span>
-              ) : (
-                <></>
-              )}
-            </div>
-          </IDLogin>
-          <button className="loginButton" onClick={() => handleLogin()}>
-            로그인
-          </button>
+              <div className="loginSetting">
+                <div className="maintainLogin">
+                  <label
+                    htmlFor=""
+                    onClick={() => setIsLoginMaintained(!isLoginMaintained)}
+                  >
+                    로그인 상태 유지
+                  </label>
+                </div>
+                <div className="IPSecurity">
+                  <label htmlFor="">IP 보안</label>
+                </div>
+              </div>
+              <div className="errorMessage">
+                {isErrorOnId ? <span>아이디를 입력해 주세요.</span> : <></>}
+                {isErrorOnPassword ? (
+                  <span>비밀번호를 입력해 주세요.</span>
+                ) : (
+                  <></>
+                )}
+                {isErrorOnBoth ? (
+                  <span>
+                    아이디(로그인 전용 아이디) 또는 비밀번호를 잘못
+                    입력했습니다.
+                    <br />
+                    입력하신 내용을 다시 확인해주세요.
+                  </span>
+                ) : (
+                  <></>
+                )}
+              </div>
+              <button className="loginButton" onClick={() => handleLogin()}>
+                로그인
+              </button>
+            </IDLogin>
+          ) : (
+            <SocialLogin>
+              <button>
+                <a href="https://nid.naver.com/oauth2.0/authorize?client_id=OemkbWdkEHFr93oA3sxR&redirect_uri=http://localhost:8080/api/v1/auth/socialSignin/naver&response_type=code&state=STATE_STRING">
+                  Naver 아이디로 로그인
+                </a>
+              </button>
+            </SocialLogin>
+          )}
         </Inner>
         <Find>
           <ul>
@@ -450,7 +481,7 @@ const Login = () => {
               <Link to={"/"}>아이디 찾기</Link>
             </li>
             <li>
-              <Link to={"/"}>회원가입</Link>
+              <Link to={"/signup"}>회원가입</Link>
             </li>
           </ul>
         </Find>

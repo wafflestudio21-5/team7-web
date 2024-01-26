@@ -9,8 +9,14 @@ import shareIcon from "../../../../assets/article-shareIcon.svg";
 import writeArticleIcon from "../../../../assets/article-writeArticleIcon.svg";
 import upTriangle from "../../../../assets/article-upTriangleIcon.svg";
 import ShareModal from "./ShareModal";
-import { clickLike } from "../../../../API/ArticleAPI";
-import { cancelLike } from "../../../../API/ArticleAPI";
+import {
+  addLike,
+  deleteArticle,
+  deleteLike,
+  useArticle,
+} from "../../../../API/ArticleAPI";
+import { useComments } from "../../../../API/CommentAPI";
+import { useNavigate } from "react-router-dom";
 
 const Wrapper = styled.div`
   /* class가 auth에 포함되어 있을 떄 article의 author와 현재 로그인 상의 user의 id를 비교 */
@@ -302,80 +308,48 @@ const AdvertArea = styled.div`
 `;
 
 // 로컬에서 테스트하기 위한 데이터입니다.
-const exampleArticle = {
-  id: 1,
-  title: "안녕하세요",
-  content: "이것은 내용입니다.",
-  created_at: "2024-01-14T12:00:00",
-  view_cnt: 23,
-  like_cnt: 1,
-  user: {
-    username: "조현우",
-    user_id: "subakbro123",
-  },
-  board: {
-    board_id: 3,
-    board_name: "자유게시판",
-  },
-  allow_comments: true,
-  is_notification: false,
-};
-const exampleComment = {
-  comments: [
-    {
-      id: 1,
-      content: "안녕하세요 반갑습니다.",
-      created_at: "2024-01-14T12:30:45",
-      username: "dodo",
-      reComments: [
-        {
-          id: 101,
-          content: "댓글 달아주셔서 감사합니다.",
-          created_at: "2024-01-14T12:35:00",
-          username: "subakbro123",
-        },
-      ],
-    },
-    {
-      id: 2,
-      content: "잘 부탁드립니다.",
-      created_at: "2024-01-14T12:45:55",
-      username: "testAccount",
-      reComments: [],
-    },
-  ],
-};
-// type ArticleData = {
-//   id: number;
-//   title: string;
-//   content: string;
-//   created_at: string;
-//   view_cnt: number;
-//   like_cnt: number;
+// const exampleArticle = {
+//   id: 1,
+//   title: "안녕하세요",
+//   content: "이것은 내용입니다.",
+//   created_at: "2024-01-14T12:00:00",
+//   view_cnt: 23,
+//   like_cnt: 1,
 //   user: {
-//     username: string;
-//     user_id: string;
-//   };
+//     username: "조현우",
+//     user_id: "subakbro123",
+//   },
 //   board: {
-//     board_id: number;
-//     board_name: string;
-//   };
-//   allow_comments: boolean;
-//   is_notification: boolean;
+//     board_id: 3,
+//     board_name: "자유게시판",
+//   },
+//   allow_comments: true,
+//   is_notification: false,
 // };
-// type CommentsData = {
-//   comments: {
-//     id: number;
-//     content: string;
-//     created_at: string;
-//     username: string;
-//     reComments: {
-//       id: number;
-//       content: string;
-//       created_at: string;
-//       username: string;
-//     }[];
-//   }[];
+// const exampleComment = {
+//   comments: [
+//     {
+//       id: 1,
+//       content: "안녕하세요 반갑습니다.",
+//       created_at: "2024-01-14T12:30:45",
+//       username: "dodo",
+//       reComments: [
+//         {
+//           id: 101,
+//           content: "댓글 달아주셔서 감사합니다.",
+//           created_at: "2024-01-14T12:35:00",
+//           username: "subakbro123",
+//         },
+//       ],
+//     },
+//     {
+//       id: 2,
+//       content: "잘 부탁드립니다.",
+//       created_at: "2024-01-14T12:45:55",
+//       username: "testAccount",
+//       reComments: [],
+//     },
+//   ],
 // };
 const Article = () => {
   const { articleId } = useParams();
@@ -383,6 +357,9 @@ const Article = () => {
   // Article 컴포넌트 내부에서 서버에서 받아오는 articleData, commentData를 정의하고 사용하겠습니다.
   // const [articleData, setArticleData] = useState<ArticleData | null>(null);
   // const [commentData, setCommentData] = useState<CommentsData | null>(null);
+  const navigate = useNavigate();
+  const { article, refetchArticle } = useArticle(Number(articleId));
+  const { comments } = useComments(Number(articleId));
 
   // TOP 버튼을 눌렀을 때 위로 스크롤합니다.
   const TopButtonsRef = useRef<HTMLDivElement>(null);
@@ -416,26 +393,30 @@ const Article = () => {
     if (isArticleLiked) {
       // 이미 좋아요 -> 좋아요 취소 인 경우
       setIsArticleLiked(false);
-      await cancelLike(Number(articleId));
-      // 추가로 좋아요 -1
+      await addLike(Number(articleId));
+      // 추가로 좋아요 -1 -> article의 refetch로서..
+      await refetchArticle();
     } else {
       // 새롭게 좋아요를 누르는 경우
       setIsArticleLiked(true);
-      await clickLike(Number(articleId));
-      // 추가로 좋아요 +1
+      await deleteLike(Number(articleId));
+      // 추가로 좋아요 +1 -> article의 refetch로서 전체 데이터 업데이트
+      await refetchArticle();
     }
   };
 
   // comment 개수 세기
   const commentCount = useMemo(() => {
-    let count = exampleComment.comments.length;
-    for (let i = 0; i < exampleComment.comments.length; i++) {
-      if (exampleComment.comments[i].reComments !== undefined) {
-        count += exampleComment.comments[i].reComments.length;
+    if (comments) {
+      let count = comments.comments.length;
+      for (let i = 0; i < comments.comments.length; i++) {
+        if (comments.comments[i].recomments !== undefined) {
+          count += comments.comments[i].recomments.length;
+        }
       }
+      return count;
     }
-    return count;
-  }, []);
+  }, [comments]);
 
   return (
     <Wrapper>
@@ -445,7 +426,6 @@ const Article = () => {
             <Link to={"/write"}>수정</Link>
           </button>
           <button className="delete auth">
-            {" "}
             <Link to={"/"}>삭제</Link>
           </button>
         </div>
@@ -458,16 +438,16 @@ const Article = () => {
             <Link to={"/"}>다음글</Link>
           </button>
           <button className="ArticleList">
-            <Link to={"/"}>목록</Link>
+            <Link to={`/board/${article?.board.board_id}`}>목록</Link>
           </button>
         </div>
       </ArticleTopButtons>
       <ArticleBox>
         <ArticleHeader>
           <div className="board">
-            <Link to={"/"}>{exampleArticle.board.board_name}</Link>
+            <Link to={"/"}>{article?.board.board_name}</Link>
           </div>
-          <h3 className="title">{exampleArticle.title}</h3>
+          <h3 className="title">{article?.title}</h3>
           <div className="info">
             <div className="left">
               <div className="thumbArea">
@@ -481,17 +461,15 @@ const Article = () => {
               </div>
               <div className="authorArea">
                 <div className="authorName">
-                  <Link to={"/"}>{exampleArticle.user.username}</Link>
+                  <Link to={"/"}>{article?.user.username}</Link>
                 </div>
                 <div className="articleInfo">
                   <span className="createdAt">
-                    {exampleArticle.created_at
+                    {article?.created_at
                       .replace(/-/g, ".")
                       .replace(/T\d\d:/, ". ")}
                   </span>
-                  <span className="viewCount">
-                    조회 {exampleArticle.view_cnt}
-                  </span>
+                  <span className="viewCount">조회 {article?.view_cnt}</span>
                 </div>
               </div>
             </div>
@@ -513,7 +491,7 @@ const Article = () => {
             </div>
           </div>
         </ArticleHeader>
-        <ArticleBody>{exampleArticle.content}</ArticleBody>
+        <ArticleBody>{article?.content}</ArticleBody>
         <ArticleFooter>
           <div className="aboutAuthor">
             <Link to={"/"}>
@@ -523,7 +501,7 @@ const Article = () => {
               />
               {/* 프로필 사진에 대해 서버에서 이미지를 가져오는 것인가? */}
               <span>
-                <strong>{exampleArticle.user.username}</strong>
+                <strong>{article?.user.username}</strong>
                 님의 게시글 더보기
               </span>
             </Link>
@@ -540,7 +518,7 @@ const Article = () => {
                   alt="좋아요 아이콘"
                 />
                 <span>
-                  좋아요 <strong>{exampleArticle.like_cnt}</strong>
+                  좋아요 <strong>{article?.like_cnt}</strong>
                 </span>
               </button>
               <button className="comments">
@@ -577,9 +555,18 @@ const Article = () => {
             <img src={writeArticleIcon} alt="글쓰기 아이콘" />
             <span>글쓰기</span>
           </button>
-          <button className="reArticle">답글</button>
+          {/* <button className="reArticle">답글</button> */}
+          {/* 답글 기능은 없는 거 같아 일단 제외하겠습니다. */}
           <button className="edit auth">수정</button>
-          <button className="delete auth">삭제</button>
+          <button
+            className="delete auth"
+            onClick={() => {
+              deleteArticle(Number(articleId));
+              navigate("/");
+            }}
+          >
+            삭제
+          </button>
         </div>
         <div className="right">
           <button className="articleList">목록</button>
@@ -590,7 +577,10 @@ const Article = () => {
         </div>
       </ArticleBottomButtons>
       <AdvertArea />
-      <RelatedArticles articleId={articleId} />
+      <RelatedArticles
+        articleId={articleId}
+        boardId={article?.board.board_id}
+      />
     </Wrapper>
   );
 };

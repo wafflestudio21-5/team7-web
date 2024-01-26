@@ -79,13 +79,19 @@ interface PropsReComment {
   reComment: {
     id: number;
     content: string;
-    created_at: string;
-    username: string;
+    last_modified: string;
+    nickname: string;
   };
   articleId: string | undefined;
+  refetchComments: () => Promise<void>;
 }
 
-const ReComment = ({ commentId, reComment, articleId }: PropsReComment) => {
+const ReComment = ({
+  commentId,
+  reComment,
+  articleId,
+  refetchComments,
+}: PropsReComment) => {
   const [isCommentWriterOpen, setIsCommentWriterOpen] =
     useState<boolean>(false);
   const [isMenuModalOpen, setIsMenuModalOpen] = useState<boolean>(false);
@@ -103,6 +109,7 @@ const ReComment = ({ commentId, reComment, articleId }: PropsReComment) => {
             inputValue: reComment.content,
           }}
           setIsEditMode={setIsEditMode}
+          refetchComments={refetchComments}
         />
       </Wrapper>
     );
@@ -120,13 +127,15 @@ const ReComment = ({ commentId, reComment, articleId }: PropsReComment) => {
             <div className="commentBox">
               <div className="authorNickname">
                 <Link to={"/"}>
-                  <em>{reComment.username}</em>
+                  <em>{reComment.nickname}</em>
                 </Link>
               </div>
               <div className="content">{reComment.content}</div>
               <div className="commentInfo">
                 <span>
-                  {reComment.created_at.replace(/-/g, ".").replace(/T/, ". ")}
+                  {reComment.last_modified
+                    .replace(/-/g, ".")
+                    .replace(/T/, ". ")}
                 </span>
                 <span>
                   <button
@@ -159,6 +168,7 @@ const ReComment = ({ commentId, reComment, articleId }: PropsReComment) => {
                 type: "reComment",
                 commentId: commentId,
               }}
+              refetchComments={refetchComments}
             />
           ) : null}
         </div>
