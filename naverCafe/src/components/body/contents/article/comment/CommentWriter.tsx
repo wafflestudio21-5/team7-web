@@ -4,10 +4,10 @@ import { useState, useRef, useEffect } from "react";
 import {
   editComment,
   editReComment,
-  getComments,
   postComment,
   postReComment,
-} from "../../../../../API/ArticleAPI";
+} from "../../../../../API/CommentAPI";
+import { useUserContext } from "../../../../../contexts/UserContext";
 
 const Wrapper = styled.div<{
   $commentLength: number;
@@ -89,24 +89,24 @@ const Wrapper = styled.div<{
 `;
 
 // 로컬에서 테스트를 위한 데이터입니다.
-const exampleArticle = {
-  id: 1,
-  title: "안녕하세요",
-  content: "이것은 내용입니다.",
-  created_at: "2024-01-14T12:00:00",
-  view_cnt: 23,
-  like_cnt: 1,
-  user: {
-    username: "조현우",
-    user_id: "subakbro123",
-  },
-  board: {
-    board_id: 3,
-    board_name: "자유게시판",
-  },
-  allow_comments: true,
-  is_notification: false,
-};
+// const exampleArticle = {
+//   id: 1,
+//   title: "안녕하세요",
+//   content: "이것은 내용입니다.",
+//   created_at: "2024-01-14T12:00:00",
+//   view_cnt: 23,
+//   like_cnt: 1,
+//   user: {
+//     username: "조현우",
+//     user_id: "subakbro123",
+//   },
+//   board: {
+//     board_id: 3,
+//     board_name: "자유게시판",
+//   },
+//   allow_comments: true,
+//   is_notification: false,
+// };
 
 interface PropsCommentWriter {
   articleId: string | undefined;
@@ -118,6 +118,7 @@ interface PropsCommentWriter {
     inputValue?: string;
   };
   setIsEditMode?: (value: boolean) => void;
+  refetchComments: () => Promise<void>;
 }
 
 const CommentWriter = ({
@@ -125,9 +126,11 @@ const CommentWriter = ({
   setIsCommentWriterOpen,
   info,
   setIsEditMode,
+  refetchComments,
 }: PropsCommentWriter) => {
   const [commentInput, setCommentInput] = useState<string>("");
   const commentTextarea = useRef<HTMLTextAreaElement | null>(null);
+  const myInfo = useUserContext();
 
   const handleCommentTextareaHeight = () => {
     if (commentTextarea.current !== null) {
@@ -141,8 +144,8 @@ const CommentWriter = ({
     if (commentInput.length === 0) {
       return alert("내용을 입력해주세요");
     } else {
-      await postComment(Number(articleId), "userId", commentInput);
-      await getComments(Number(articleId));
+      await postComment(Number(articleId), commentInput);
+      await refetchComments();
       setCommentInput("");
     }
   };
@@ -152,13 +155,8 @@ const CommentWriter = ({
     } else {
       // context 작업 필요("userId"에는 userId 가 들어가야함)
       if (info.commentId) {
-        await postReComment(
-          Number(articleId),
-          info.commentId,
-          "userId",
-          commentInput
-        );
-        await getComments(Number(articleId));
+        await postReComment(Number(articleId), info.commentId, commentInput);
+        await refetchComments();
         setCommentInput("");
       }
     }
@@ -168,13 +166,8 @@ const CommentWriter = ({
       return alert("내용을 입력해주세요");
     } else {
       if (info.commentId) {
-        await editComment(
-          Number(articleId),
-          info.commentId,
-          "userId",
-          commentInput
-        );
-        await getComments(Number(articleId));
+        await editComment(Number(articleId), info.commentId, commentInput);
+        await refetchComments();
       }
     }
   };
@@ -187,10 +180,9 @@ const CommentWriter = ({
           Number(articleId),
           info.commentId,
           info.reCommentId,
-          "userId",
           commentInput
         );
-        await getComments(Number(articleId));
+        await refetchComments();
       }
     }
   };
@@ -203,7 +195,7 @@ const CommentWriter = ({
   return (
     <Wrapper $commentLength={commentInput.length} $type={info.type}>
       <div className="CommentWriter">
-        <div className="writerName">{exampleArticle.user.username}</div>
+        <div className="writerName">{myInfo.userNickname}</div>
         <textarea
           ref={commentTextarea}
           placeholder="댓글을 남겨보세요"

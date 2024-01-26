@@ -364,10 +364,10 @@ type FinalError = {
 };
 
 const SignUp = () => {
-  const [userId, setUserId] = useState<string>("");
+  const [userName, setUserName] = useState<string>("");
   const [userPassword, setUserPassword] = useState<string>("");
   const [userEmail, setUserEmail] = useState<string>("");
-  const [userName, setUserName] = useState<string>("");
+  const [name, setName] = useState<string>("");
   const [userBirth, setUserBirth] = useState<string>("");
   const [userPhoneNumber, setUserPhoneNumber] = useState<string>("");
 
@@ -517,19 +517,11 @@ const SignUp = () => {
     useState<boolean>(true);
 
   const createAccount = () => {
-    console.log({
-      userId: userId,
-      userPassword: userPassword,
-      userEmail: userEmail,
-      userName: userName,
-      userBirth: userBirth,
-      userPhoneNumber: userPhoneNumber,
-    });
     return axios
       .post("http://localhost:8080/api/v1/signup", {
-        userId: userId,
         username: userName,
         password: userPassword,
+        name: name,
         email: userEmail,
         birthDate: userBirth,
         phoneNumber: userPhoneNumber,
@@ -546,7 +538,7 @@ const SignUp = () => {
   //handleCreateAccount에서 전체 input 필드에 대한 유효성 검사를 한번에 진행하는 함수입니다.
   const validateAll = () => {
     return {
-      id: checkError("id", userId, errorIdMessage, correctId) || undefined,
+      id: checkError("id", userName, errorIdMessage, correctId) || undefined,
       password:
         checkError(
           "password",
@@ -558,8 +550,7 @@ const SignUp = () => {
         checkError("email", userEmail, errorEmailMessage, correctEmail) ||
         undefined,
       name:
-        checkError("name", userName, errorNameMessage, correctName) ||
-        undefined,
+        checkError("name", name, errorNameMessage, correctName) || undefined,
       birth:
         checkError("birth", userBirth, errorBirthMessage, correctBirth) ||
         undefined,
@@ -601,15 +592,15 @@ const SignUp = () => {
             className="id"
             $error={error.id ? true : false}
             $correctActive={infoOnClick.id}
-            $length={userId.length}
+            $length={userName.length}
           >
             <span className="idLogo" />
             <input
               type="text"
               name="id"
               placeholder="아이디"
-              value={userId}
-              onChange={(e) => setUserId(e.target.value)}
+              value={userName}
+              onChange={(e) => setUserName(e.target.value)}
               onBlur={(e) => {
                 handleValidation(e);
                 setInfoOnClick((prev) => ({ ...prev, [e.target.name]: false }));
@@ -690,15 +681,15 @@ const SignUp = () => {
             className="name"
             $error={error.name ? true : false}
             $correctActive={infoOnClick.name}
-            $length={userName.length}
+            $length={name.length}
           >
             <span className="nameLogo" />
             <input
               type="text"
               name="name"
               placeholder="이름"
-              value={userName}
-              onChange={(e) => setUserName(e.target.value)}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               onBlur={(e) => {
                 handleValidation(e);
                 setInfoOnClick((prev) => ({ ...prev, [e.target.name]: false }));

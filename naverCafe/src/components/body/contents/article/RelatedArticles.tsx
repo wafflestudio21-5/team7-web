@@ -2,6 +2,7 @@ import styled, { css } from "styled-components";
 import { Link } from "react-router-dom";
 import { useMemo, useState } from "react";
 import newArticleIcon from "../../../../assets/relatedArticle-newArticleIcon.svg";
+import { useArticleList } from "../../../../API/BoardAPI";
 
 const Wrapper = styled.div`
   position: relative;
@@ -143,213 +144,216 @@ const ArticleListContainer = styled.div<{
 `;
 
 // 로컬에서 테스트를 위한 데이터입니다.
-const exampleArticleList = {
-  articles: [
-    {
-      id: 1,
-      title: "와플 카페 waffle cafe 카페를 시작합니다.",
-      createdAt: "2024-01-12T12:34:56",
-      viewCnt: 100,
-      likeCnt: 5,
-      comment_count: 10,
-      user: {
-        id: 1,
-        nickname: "허유민",
-      },
-      board: {
-        board_id: 1,
-        board_name: "Free",
-      },
-      allowComments: true,
-      isNotification: false,
-    },
-    {
-      id: 2,
-      title: "출석",
-      createdAt: "2024-01-13T01:30:01",
-      viewCnt: 21,
-      likeCnt: 1,
-      comment_count: 0,
-      user: {
-        id: 2,
-        nickname: "황두현",
-      },
-      board: {
-        board_id: 1,
-        board_name: "Free",
-      },
-      allowComments: true,
-      isNotification: false,
-    },
-    {
-      id: 3,
-      title: "안녕하세요",
-      createdAt: "2024-01-14T23:19:40",
-      viewCnt: 10,
-      likeCnt: 3,
-      comment_count: 2,
-      user: {
-        id: 3,
-        nickname: "조현우",
-      },
-      board: {
-        board_id: 1,
-        board_name: "Free",
-      },
-      allowComments: true,
-      isNotification: false,
-    },
-    {
-      id: 4,
-      title: "잘 부탁드립니다.ㅎㅎ 개발 열심히 해봐요!",
-      createdAt: "2024-01-14T23:50:59",
-      viewCnt: 9,
-      likeCnt: 2,
-      comment_count: 1,
-      user: {
-        id: 2,
-        nickname: "황두현",
-      },
-      board: {
-        board_id: 1,
-        board_name: "Free",
-      },
-      allowComments: true,
-      isNotification: false,
-    },
-    {
-      id: 5,
-      title: "React useRef 관련 질문이 있습니다.",
-      createdAt: "2024-01-15T07:12:34",
-      viewCnt: 3,
-      likeCnt: 1,
-      comment_count: 9,
-      user: {
-        id: 4,
-        nickname: "빠니보틀",
-      },
-      board: {
-        board_id: 1,
-        board_name: "Free",
-      },
-      allowComments: true,
-      isNotification: false,
-    },
-    {
-      id: 6,
-      title: "프런트 백 모두 파이팅입니다!",
-      createdAt: "2024-01-17T09:07:40",
-      viewCnt: 2,
-      likeCnt: 0,
-      comment_count: 0,
-      user: {
-        id: 3,
-        nickname: "조현우",
-      },
-      board: {
-        board_id: 1,
-        board_name: "Free",
-      },
-      allowComments: true,
-      isNotification: false,
-    },
-    {
-      id: 7,
-      title: "페이지네이션 알고리즘 헷갈리네용",
-      createdAt: "2024-01-17T10:17:34",
-      viewCnt: 3,
-      likeCnt: 9,
-      comment_count: 1,
-      user: {
-        id: 3,
-        nickname: "조현우",
-      },
-      board: {
-        board_id: 1,
-        board_name: "Free",
-      },
-      allowComments: true,
-      isNotification: false,
-    },
-    {
-      id: 8,
-      title: "누구냐 넌",
-      createdAt: "2024-01-17T19:19:10",
-      viewCnt: 4,
-      likeCnt: 2,
-      comment_count: 0,
-      user: {
-        id: 3,
-        nickname: "조현우",
-      },
-      board: {
-        board_id: 1,
-        board_name: "Free",
-      },
-      allowComments: true,
-      isNotification: false,
-    },
-    {
-      id: 9,
-      title: "와플 맛있습니다.",
-      createdAt: "2024-01-17T20:25:11",
-      viewCnt: 10,
-      likeCnt: 3,
-      comment_count: 1,
-      user: {
-        id: 3,
-        nickname: "조현우",
-      },
-      board: {
-        board_id: 1,
-        board_name: "Free",
-      },
-      allowComments: true,
-      isNotification: false,
-    },
-    {
-      id: 10,
-      title: "이것은 테스트입니다.",
-      createdAt: "2024-01-17T22:22:01",
-      viewCnt: 2,
-      likeCnt: 0,
-      comment_count: 3,
-      user: {
-        id: 3,
-        nickname: "조현우",
-      },
-      board: {
-        board_id: 1,
-        board_name: "Free",
-      },
-      allowComments: true,
-      isNotification: false,
-    },
-    {
-      id: 11,
-      title: "이것도 테스트입니다.",
-      createdAt: "2024-01-17T23:23:31",
-      viewCnt: 2,
-      likeCnt: 1,
-      comment_count: 3,
-      user: {
-        id: 3,
-        nickname: "조현우",
-      },
-      board: {
-        board_id: 1,
-        board_name: "Free",
-      },
-      allowComments: true,
-      isNotification: false,
-    },
-  ],
-};
+// const exampleArticleList = {
+//   articles: [
+//     {
+//       id: 1,
+//       title: "와플 카페 waffle cafe 카페를 시작합니다.",
+//       createdAt: "2024-01-12T12:34:56",
+//       viewCnt: 100,
+//       likeCnt: 5,
+//       comment_count: 10,
+//       user: {
+//         id: 1,
+//         nickname: "허유민",
+//       },
+//       board: {
+//         board_id: 1,
+//         board_name: "Free",
+//       },
+//       allowComments: true,
+//       isNotification: false,
+//     },
+//     {
+//       id: 2,
+//       title: "출석",
+//       createdAt: "2024-01-13T01:30:01",
+//       viewCnt: 21,
+//       likeCnt: 1,
+//       comment_count: 0,
+//       user: {
+//         id: 2,
+//         nickname: "황두현",
+//       },
+//       board: {
+//         board_id: 1,
+//         board_name: "Free",
+//       },
+//       allowComments: true,
+//       isNotification: false,
+//     },
+//     {
+//       id: 3,
+//       title: "안녕하세요",
+//       createdAt: "2024-01-14T23:19:40",
+//       viewCnt: 10,
+//       likeCnt: 3,
+//       comment_count: 2,
+//       user: {
+//         id: 3,
+//         nickname: "조현우",
+//       },
+//       board: {
+//         board_id: 1,
+//         board_name: "Free",
+//       },
+//       allowComments: true,
+//       isNotification: false,
+//     },
+//     {
+//       id: 4,
+//       title: "잘 부탁드립니다.ㅎㅎ 개발 열심히 해봐요!",
+//       createdAt: "2024-01-14T23:50:59",
+//       viewCnt: 9,
+//       likeCnt: 2,
+//       comment_count: 1,
+//       user: {
+//         id: 2,
+//         nickname: "황두현",
+//       },
+//       board: {
+//         board_id: 1,
+//         board_name: "Free",
+//       },
+//       allowComments: true,
+//       isNotification: false,
+//     },
+//     {
+//       id: 5,
+//       title: "React useRef 관련 질문이 있습니다.",
+//       createdAt: "2024-01-15T07:12:34",
+//       viewCnt: 3,
+//       likeCnt: 1,
+//       comment_count: 9,
+//       user: {
+//         id: 4,
+//         nickname: "빠니보틀",
+//       },
+//       board: {
+//         board_id: 1,
+//         board_name: "Free",
+//       },
+//       allowComments: true,
+//       isNotification: false,
+//     },
+//     {
+//       id: 6,
+//       title: "프런트 백 모두 파이팅입니다!",
+//       createdAt: "2024-01-17T09:07:40",
+//       viewCnt: 2,
+//       likeCnt: 0,
+//       comment_count: 0,
+//       user: {
+//         id: 3,
+//         nickname: "조현우",
+//       },
+//       board: {
+//         board_id: 1,
+//         board_name: "Free",
+//       },
+//       allowComments: true,
+//       isNotification: false,
+//     },
+//     {
+//       id: 7,
+//       title: "페이지네이션 알고리즘 헷갈리네용",
+//       createdAt: "2024-01-17T10:17:34",
+//       viewCnt: 3,
+//       likeCnt: 9,
+//       comment_count: 1,
+//       user: {
+//         id: 3,
+//         nickname: "조현우",
+//       },
+//       board: {
+//         board_id: 1,
+//         board_name: "Free",
+//       },
+//       allowComments: true,
+//       isNotification: false,
+//     },
+//     {
+//       id: 8,
+//       title: "누구냐 넌",
+//       createdAt: "2024-01-17T19:19:10",
+//       viewCnt: 4,
+//       likeCnt: 2,
+//       comment_count: 0,
+//       user: {
+//         id: 3,
+//         nickname: "조현우",
+//       },
+//       board: {
+//         board_id: 1,
+//         board_name: "Free",
+//       },
+//       allowComments: true,
+//       isNotification: false,
+//     },
+//     {
+//       id: 9,
+//       title: "와플 맛있습니다.",
+//       createdAt: "2024-01-17T20:25:11",
+//       viewCnt: 10,
+//       likeCnt: 3,
+//       comment_count: 1,
+//       user: {
+//         id: 3,
+//         nickname: "조현우",
+//       },
+//       board: {
+//         board_id: 1,
+//         board_name: "Free",
+//       },
+//       allowComments: true,
+//       isNotification: false,
+//     },
+//     {
+//       id: 10,
+//       title: "이것은 테스트입니다.",
+//       createdAt: "2024-01-17T22:22:01",
+//       viewCnt: 2,
+//       likeCnt: 0,
+//       comment_count: 3,
+//       user: {
+//         id: 3,
+//         nickname: "조현우",
+//       },
+//       board: {
+//         board_id: 1,
+//         board_name: "Free",
+//       },
+//       allowComments: true,
+//       isNotification: false,
+//     },
+//     {
+//       id: 11,
+//       title: "이것도 테스트입니다.",
+//       createdAt: "2024-01-17T23:23:31",
+//       viewCnt: 2,
+//       likeCnt: 1,
+//       comment_count: 3,
+//       user: {
+//         id: 3,
+//         nickname: "조현우",
+//       },
+//       board: {
+//         board_id: 1,
+//         board_name: "Free",
+//       },
+//       allowComments: true,
+//       isNotification: false,
+//     },
+//   ],
+// };
 
 interface PropsRelatedArticles {
   articleId: string | undefined;
+  boardId: number | undefined;
 }
-const RelatedArticles = ({ articleId }: PropsRelatedArticles) => {
+const RelatedArticles = ({ articleId, boardId }: PropsRelatedArticles) => {
+  const { articleList } = useArticleList({ boardId: boardId });
+
   const [onActiveButtonNumber, setOnActiveButtonNumber] = useState<
     number | null
   >(1);
@@ -371,7 +375,7 @@ const RelatedArticles = ({ articleId }: PropsRelatedArticles) => {
   };
 
   const relatedArticleList = useMemo(() => {
-    return exampleArticleList.articles.map((article) => (
+    return articleList?.articles.map((article) => (
       <Article
         $isArticleFocused={Number(articleId) === article.id ? true : false}
         key={article.id}
@@ -383,14 +387,15 @@ const RelatedArticles = ({ articleId }: PropsRelatedArticles) => {
           <div className="title">
             {article.title}
             <span className="commentCount">
-              {article.comment_count !== 0 ? ` [${article.comment_count}]` : ""}
+              {/* {article. !== 0 ? ` [${article.comment_count}]` : ""} */}
+              {/* article 데이터 내부에 comment count도 있어야겠음! */}
             </span>
             <span
               className={
-                isNewArticle(article.createdAt) ? "newArticle" : "oldArticle"
+                isNewArticle(article.created_at) ? "newArticle" : "oldArticle"
               }
             >
-              {isNewArticle(article.createdAt) ? (
+              {isNewArticle(article.created_at) ? (
                 <img src={newArticleIcon} alt="새로운 게시물" />
               ) : (
                 ""
@@ -401,122 +406,126 @@ const RelatedArticles = ({ articleId }: PropsRelatedArticles) => {
         <div className="right">
           <div className="authorNickname">{article.user.nickname}</div>
           <div className="createdAt">
-            {article.createdAt
+            {article.created_at
               .replace(/-/g, ". ")
               .replace(/T\d\d:\d\d:\d\d/, ".")}
           </div>
         </div>
       </Article>
     ));
-  }, [articleId]);
+  }, [articleId, articleList]);
   const handleRelatedArticleList = () => {
     // 최종적으로 리턴할 article 배열이 담긴 JSX.Element 입니다.
     const newRelatedArticles = (upperLimitIndex: number) => {
-      if (upperLimitIndex >= 10) {
-        return (
-          <ArticleListContainer $articleListOnActive={onActiveButtonNumber}>
-            <ul className="relatedArticleList third">
-              {relatedArticleList
-                .slice(
-                  upperLimitIndex - 14 < 0 ? 0 : upperLimitIndex - 14,
-                  upperLimitIndex - 9
-                )
-                .reverse()}
-            </ul>
-            <ul className="relatedArticleList second">
-              {relatedArticleList
-                .slice(upperLimitIndex - 9, upperLimitIndex - 4)
-                .reverse()}
-            </ul>
-            <ul className="relatedArticleList first">
-              {relatedArticleList
-                .slice(upperLimitIndex - 4, upperLimitIndex + 1)
-                .reverse()}
-            </ul>
-            <div className="buttons">
-              <button
-                className="firstButton"
-                onClick={() => setOnActiveButtonNumber(1)}
-              >
-                1
-              </button>
-              <button
-                className="secondButton"
-                onClick={() => setOnActiveButtonNumber(2)}
-              >
-                2
-              </button>
-              <button
-                className="thirdButton"
-                onClick={() => setOnActiveButtonNumber(3)}
-              >
-                3
-              </button>
-            </div>
-          </ArticleListContainer>
-        );
-      } else if (5 <= upperLimitIndex && upperLimitIndex < 10) {
-        return (
-          <ArticleListContainer $articleListOnActive={onActiveButtonNumber}>
-            <ul className="relatedArticleList second">
-              {relatedArticleList.slice(0, upperLimitIndex - 4).reverse()}
-            </ul>
-            <ul className="relatedArticleList first">
-              {relatedArticleList
-                .slice(upperLimitIndex - 4, upperLimitIndex + 1)
-                .reverse()}
-            </ul>
-            <div className="buttons">
-              <button
-                className="firstButton"
-                onClick={() => setOnActiveButtonNumber(1)}
-              >
-                1
-              </button>
-              <button
-                className="secondButton"
-                onClick={() => setOnActiveButtonNumber(2)}
-              >
-                2
-              </button>
-            </div>
-          </ArticleListContainer>
-        );
-      } else {
-        return (
-          <ArticleListContainer $articleListOnActive={onActiveButtonNumber}>
-            <ul className="relatedArticleList first">
-              {relatedArticleList
-                .slice(
-                  upperLimitIndex - 4 < 0 ? 0 : upperLimitIndex - 4,
-                  upperLimitIndex === 2
-                    ? 5
-                    : upperLimitIndex === 3
-                    ? 5
-                    : upperLimitIndex + 1
-                )
-                .reverse()}
-            </ul>
-          </ArticleListContainer>
-        );
+      if (relatedArticleList) {
+        if (upperLimitIndex >= 10) {
+          return (
+            <ArticleListContainer $articleListOnActive={onActiveButtonNumber}>
+              <ul className="relatedArticleList third">
+                {relatedArticleList
+                  .slice(
+                    upperLimitIndex - 14 < 0 ? 0 : upperLimitIndex - 14,
+                    upperLimitIndex - 9
+                  )
+                  .reverse()}
+              </ul>
+              <ul className="relatedArticleList second">
+                {relatedArticleList
+                  .slice(upperLimitIndex - 9, upperLimitIndex - 4)
+                  .reverse()}
+              </ul>
+              <ul className="relatedArticleList first">
+                {relatedArticleList
+                  .slice(upperLimitIndex - 4, upperLimitIndex + 1)
+                  .reverse()}
+              </ul>
+              <div className="buttons">
+                <button
+                  className="firstButton"
+                  onClick={() => setOnActiveButtonNumber(1)}
+                >
+                  1
+                </button>
+                <button
+                  className="secondButton"
+                  onClick={() => setOnActiveButtonNumber(2)}
+                >
+                  2
+                </button>
+                <button
+                  className="thirdButton"
+                  onClick={() => setOnActiveButtonNumber(3)}
+                >
+                  3
+                </button>
+              </div>
+            </ArticleListContainer>
+          );
+        } else if (5 <= upperLimitIndex && upperLimitIndex < 10) {
+          return (
+            <ArticleListContainer $articleListOnActive={onActiveButtonNumber}>
+              <ul className="relatedArticleList second">
+                {relatedArticleList.slice(0, upperLimitIndex - 4).reverse()}
+              </ul>
+              <ul className="relatedArticleList first">
+                {relatedArticleList
+                  .slice(upperLimitIndex - 4, upperLimitIndex + 1)
+                  .reverse()}
+              </ul>
+              <div className="buttons">
+                <button
+                  className="firstButton"
+                  onClick={() => setOnActiveButtonNumber(1)}
+                >
+                  1
+                </button>
+                <button
+                  className="secondButton"
+                  onClick={() => setOnActiveButtonNumber(2)}
+                >
+                  2
+                </button>
+              </div>
+            </ArticleListContainer>
+          );
+        } else {
+          return (
+            <ArticleListContainer $articleListOnActive={onActiveButtonNumber}>
+              <ul className="relatedArticleList first">
+                {relatedArticleList
+                  .slice(
+                    upperLimitIndex - 4 < 0 ? 0 : upperLimitIndex - 4,
+                    upperLimitIndex === 2
+                      ? 5
+                      : upperLimitIndex === 3
+                      ? 5
+                      : upperLimitIndex + 1
+                  )
+                  .reverse()}
+              </ul>
+            </ArticleListContainer>
+          );
+        }
       }
     };
     if (articleId) {
       // 현재 보고 있는 article이 전체 article list에서 몇번째 index에 있는지 조사합니다.
-      const articleIndex = exampleArticleList.articles.findIndex(
+      const articleIndex = articleList?.articles.findIndex(
         (article) => article.id === Number(articleId)
       );
-      // 보여줄 related article index의 '상한'(더욱 최신글)을 조사하고, 이에 따라 pagination button 개수와 보여줄 article을 정합니다.
-      if (exampleArticleList.articles[articleIndex + 2] !== undefined) {
-        return newRelatedArticles(articleIndex + 2);
-      } else if (exampleArticleList.articles[articleIndex + 1] !== undefined) {
-        return newRelatedArticles(articleIndex + 1);
+      if (articleIndex) {
+        if (articleList?.articles[articleIndex + 2] !== undefined) {
+          return newRelatedArticles(articleIndex + 2);
+        } else if (articleList?.articles[articleIndex + 1] !== undefined) {
+          return newRelatedArticles(articleIndex + 1);
+        } else {
+          return newRelatedArticles(articleIndex);
+        }
       } else {
-        return newRelatedArticles(articleIndex);
+        return null;
       }
-    } else {
-      return null;
     }
+    // 보여줄 related article index의 '상한'(더욱 최신글)을 조사하고, 이에 따라 pagination button 개수와 보여줄 article을 정합니다.
   };
 
   return (
