@@ -351,6 +351,7 @@ const AdvertArea = styled.div`
 //     },
 //   ],
 // };
+
 const Article = () => {
   const { articleId } = useParams();
   const [isArticleLiked, setIsArticleLiked] = useState<boolean>(false);
@@ -360,6 +361,7 @@ const Article = () => {
   const navigate = useNavigate();
   const { article, refetchArticle } = useArticle(Number(articleId));
   const { comments } = useComments(Number(articleId));
+  console.log(article);
 
   // TOP 버튼을 눌렀을 때 위로 스크롤합니다.
   const TopButtonsRef = useRef<HTMLDivElement>(null);
@@ -418,170 +420,178 @@ const Article = () => {
     }
   }, [comments]);
 
-  return (
-    <Wrapper>
-      <ArticleTopButtons ref={TopButtonsRef}>
-        <div className="left">
-          <button className="edit auth">
-            <Link to={"/write"}>수정</Link>
-          </button>
-          <button className="delete auth">
-            <Link to={"/"}>삭제</Link>
-          </button>
-        </div>
-        <div className="right">
-          <button className="prevArticle">
-            {" "}
-            <Link to={"/"}>이전글</Link>
-          </button>
-          <button className="nextArticle">
-            <Link to={"/"}>다음글</Link>
-          </button>
-          <button className="ArticleList">
-            <Link to={`/board/${article?.board.board_id}`}>목록</Link>
-          </button>
-        </div>
-      </ArticleTopButtons>
-      <ArticleBox>
-        <ArticleHeader>
-          <div className="board">
-            <Link to={"/"}>{article?.board.board_name}</Link>
+  if (article) {
+    return (
+      <Wrapper>
+        <ArticleTopButtons ref={TopButtonsRef}>
+          <div className="left">
+            <button className="edit auth">
+              <Link to={"/write"}>수정</Link>
+            </button>
+            <button className="delete auth">
+              <Link to={"/"}>삭제</Link>
+            </button>
           </div>
-          <h3 className="title">{article?.title}</h3>
-          <div className="info">
-            <div className="left">
-              <div className="thumbArea">
-                <Link to={"/"}>
-                  <img
-                    src="https://ssl.pstatic.net/static/cafe/cafe_pc/default/cafe_profile_77.png?type=c77_77"
-                    alt="작성자 프로필 사진"
-                  />
-                  {/* 프로필 사진에 대해 서버에서 이미지를 가져오는 것인가? */}
-                </Link>
-              </div>
-              <div className="authorArea">
-                <div className="authorName">
-                  <Link to={"/"}>{article?.user.username}</Link>
+          <div className="right">
+            <button className="prevArticle">
+              {" "}
+              <Link to={"/"}>이전글</Link>
+            </button>
+            <button className="nextArticle">
+              <Link to={"/"}>다음글</Link>
+            </button>
+            <button className="ArticleList">
+              <Link to={`/board/${article?.article.board.id}`}>목록</Link>
+            </button>
+          </div>
+        </ArticleTopButtons>
+        <ArticleBox>
+          <ArticleHeader>
+            <div className="board">
+              <Link to={`/board/${article?.article.board.id}`}>
+                {article?.article.board.name}
+              </Link>
+            </div>
+            <h3 className="title">{article?.article.title}</h3>
+            <div className="info">
+              <div className="left">
+                <div className="thumbArea">
+                  <Link to={"/"}>
+                    <img
+                      src="https://ssl.pstatic.net/static/cafe/cafe_pc/default/cafe_profile_77.png?type=c77_77"
+                      alt="작성자 프로필 사진"
+                    />
+                    {/* 프로필 사진에 대해 서버에서 이미지를 가져오는 것인가? */}
+                  </Link>
                 </div>
-                <div className="articleInfo">
-                  <span className="createdAt">
-                    {article?.created_at
-                      .replace(/-/g, ".")
-                      .replace(/T\d\d:/, ". ")}
+                <div className="authorArea">
+                  <div className="authorName">
+                    <Link to={`/users/${article?.article.author.id}`}>
+                      {article?.article.author.nickname}
+                    </Link>
+                  </div>
+                  <div className="articleInfo">
+                    <span className="createdAt">
+                      {article?.article.createdAt
+                        .replace(/-/g, ".")
+                        .replace(/T\d\d:/, ". ")}
+                    </span>
+                    <span className="viewCount">
+                      조회 {article?.article.viewCount}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div className="right">
+                <button className="comments" onClick={() => scrollToComments()}>
+                  <img src={commentIcon} alt="댓글 아이콘" />
+                  <span>
+                    댓글 <strong>{commentCount}</strong>
                   </span>
-                  <span className="viewCount">조회 {article?.view_cnt}</span>
-                </div>
+                </button>
+                <button
+                  className="copyURL"
+                  onClick={() => handleCopyPathToClipBoard(location.pathname)}
+                >
+                  URL 복사
+                </button>
+                {/* <button className="menu" /> */}
+                {/* 메뉴 버튼도 있지만, 구현 기능이 포함되어 있지 않기 때문에 (지금 상황에선) 뺐습니다. */}
               </div>
             </div>
-            <div className="right">
-              <button className="comments" onClick={() => scrollToComments()}>
-                <img src={commentIcon} alt="댓글 아이콘" />
-                <span>
-                  댓글 <strong>{commentCount}</strong>
-                </span>
-              </button>
-              <button
-                className="copyURL"
-                onClick={() => handleCopyPathToClipBoard(location.pathname)}
-              >
-                URL 복사
-              </button>
-              {/* <button className="menu" /> */}
-              {/* 메뉴 버튼도 있지만, 구현 기능이 포함되어 있지 않기 때문에 (지금 상황에선) 뺐습니다. */}
-            </div>
-          </div>
-        </ArticleHeader>
-        <ArticleBody>{article?.content}</ArticleBody>
-        <ArticleFooter>
-          <div className="aboutAuthor">
-            <Link to={"/"}>
-              <img
-                src="https://ssl.pstatic.net/static/cafe/cafe_pc/default/cafe_profile_77.png?type=c77_77"
-                alt="작성자 프로필 사진"
-              />
-              {/* 프로필 사진에 대해 서버에서 이미지를 가져오는 것인가? */}
-              <span>
-                <strong>{article?.user.username}</strong>
-                님의 게시글 더보기
-              </span>
-            </Link>
-          </div>
-          <div className="articleInfo">
-            <div className="left">
-              <button className="likes" onClick={() => handleLikes()}>
+          </ArticleHeader>
+          <ArticleBody>{article?.article.content}</ArticleBody>
+          <ArticleFooter>
+            <div className="aboutAuthor">
+              <Link to={"/"}>
                 <img
-                  src={
-                    isArticleLiked
-                      ? "https://ca-fe.pstatic.net/web-section/static/img/ico-post-like-on-f-53535.svg?7eb6be9a4989d32af686acf09a07747d="
-                      : "https://ca-fe.pstatic.net/web-section/static/img/ico-post-like-f-53535.svg?a37a11006a542ce9949c0dd6779345b8="
-                  }
-                  alt="좋아요 아이콘"
+                  src="https://ssl.pstatic.net/static/cafe/cafe_pc/default/cafe_profile_77.png?type=c77_77"
+                  alt="작성자 프로필 사진"
                 />
+                {/* 프로필 사진에 대해 서버에서 이미지를 가져오는 것인가? */}
                 <span>
-                  좋아요 <strong>{article?.like_cnt}</strong>
+                  <strong>{article?.article.author.nickname}</strong>
+                  님의 게시글 더보기
                 </span>
-              </button>
-              <button className="comments">
-                <img src={commentIcon} alt="댓글 아이콘" />
-                <span>
-                  댓글 <strong>{commentCount}</strong>
-                </span>
-              </button>
+              </Link>
             </div>
-            <div className="right">
-              <button
-                className="share"
-                onClick={() => setIsShareModalOpen(!isShareModalOpen)}
-              >
-                <img src={shareIcon} alt="공유 아이콘" />
-                <span>공유</span>
-              </button>
-              {isShareModalOpen ? (
-                <ShareModal
-                  setIsShareModalOpen={setIsShareModalOpen}
-                  handleCopyPathToClipBoard={handleCopyPathToClipBoard}
-                />
-              ) : null}
+            <div className="articleInfo">
+              <div className="left">
+                <button className="likes" onClick={() => handleLikes()}>
+                  <img
+                    src={
+                      isArticleLiked
+                        ? "https://ca-fe.pstatic.net/web-section/static/img/ico-post-like-on-f-53535.svg?7eb6be9a4989d32af686acf09a07747d="
+                        : "https://ca-fe.pstatic.net/web-section/static/img/ico-post-like-f-53535.svg?a37a11006a542ce9949c0dd6779345b8="
+                    }
+                    alt="좋아요 아이콘"
+                  />
+                  <span>
+                    좋아요 <strong>{article?.article.likeCount}</strong>
+                  </span>
+                </button>
+                <button className="comments">
+                  <img src={commentIcon} alt="댓글 아이콘" />
+                  <span>
+                    댓글 <strong>{commentCount}</strong>
+                  </span>
+                </button>
+              </div>
+              <div className="right">
+                <button
+                  className="share"
+                  onClick={() => setIsShareModalOpen(!isShareModalOpen)}
+                >
+                  <img src={shareIcon} alt="공유 아이콘" />
+                  <span>공유</span>
+                </button>
+                {isShareModalOpen ? (
+                  <ShareModal
+                    setIsShareModalOpen={setIsShareModalOpen}
+                    handleCopyPathToClipBoard={handleCopyPathToClipBoard}
+                  />
+                ) : null}
+              </div>
             </div>
+          </ArticleFooter>
+          <div className="comments" ref={CommentsRef}>
+            <CommentBox articleId={articleId} />
           </div>
-        </ArticleFooter>
-        <div className="comments" ref={CommentsRef}>
-          <CommentBox articleId={articleId} />
-        </div>
-      </ArticleBox>
-      <ArticleBottomButtons>
-        <div className="left">
-          <button className="writeArticle">
-            <img src={writeArticleIcon} alt="글쓰기 아이콘" />
-            <span>글쓰기</span>
-          </button>
-          {/* <button className="reArticle">답글</button> */}
-          {/* 답글 기능은 없는 거 같아 일단 제외하겠습니다. */}
-          <button className="edit auth">수정</button>
-          <button
-            className="delete auth"
-            onClick={() => {
-              deleteArticle(Number(articleId));
-              navigate("/");
-            }}
-          >
-            삭제
-          </button>
-        </div>
-        <div className="right">
-          <button className="articleList">목록</button>
-          <button className="scrollTop" onClick={() => scrollToTop()}>
-            <img src={upTriangle} alt="위로 가기" />
-            <span>TOP</span>
-          </button>
-        </div>
-      </ArticleBottomButtons>
-      <AdvertArea />
-      <RelatedArticles
-        articleId={articleId}
-        boardId={article?.board.board_id}
-      />
-    </Wrapper>
-  );
+        </ArticleBox>
+        <ArticleBottomButtons>
+          <div className="left">
+            <button className="writeArticle">
+              <img src={writeArticleIcon} alt="글쓰기 아이콘" />
+              <span>글쓰기</span>
+            </button>
+            {/* <button className="reArticle">답글</button> */}
+            {/* 답글 기능은 없는 거 같아 일단 제외하겠습니다. */}
+            <button className="edit auth">수정</button>
+            <button
+              className="delete auth"
+              onClick={() => {
+                deleteArticle(Number(articleId));
+                navigate("/");
+              }}
+            >
+              삭제
+            </button>
+          </div>
+          <div className="right">
+            <button className="articleList">목록</button>
+            <button className="scrollTop" onClick={() => scrollToTop()}>
+              <img src={upTriangle} alt="위로 가기" />
+              <span>TOP</span>
+            </button>
+          </div>
+        </ArticleBottomButtons>
+        <AdvertArea />
+        <RelatedArticles
+          articleId={articleId}
+          boardId={article?.article.board.id}
+        />
+      </Wrapper>
+    );
+  }
 };
 export default Article;
