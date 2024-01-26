@@ -1,8 +1,9 @@
 import { styled, css } from "styled-components";
 import { Order, orderList } from "../../components/body/contents/PopularBoard";
 import { useNoticeContext } from "../BoardContext/NoticeContext";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState, useContext } from "react";
 import { usePagination } from "./BoardBottomContext/PaginationContext";
+import { ViewOptionContext } from "../BoardContext/ViewOptionContext";
 
 //CommonBoard: - | 공지 숨기기 | 게시글 보기 형식 | 게시글 표시 개수
 const StyledBoardTopOption = styled.div`
@@ -237,8 +238,8 @@ const SortArea = ({ boardId }: { boardId: number }) => {
 
   //게시물 유형별 정렬
   //미구현: 클릭시 실제 view 변경
-  const ViewOption = ["sort_card", "sort_album", "sort_list"];
-  const [viewOp, setViewOp] = useState(2); //ViewOption의 인덱스를 저장
+
+  const { ViewOption, viewOp, setViewOp } = useContext(ViewOptionContext);
 
   const handleViewOp = (arg: number) => {
     setViewOp(arg);
@@ -294,12 +295,16 @@ export const CommonBoardTopOption = ({ boardId }: { boardId: number }) => {
   );
 };
 
-export const TotalBoardTopOption = () => {
+export const TotalBoardTopOption = ({
+  articleLength,
+}: {
+  articleLength: number | undefined;
+}) => {
   //articleLength를 prop으로 받으면 됩니다.
   return (
     <StyledTotalBoardTopOption>
       <span className="total">
-        <em>9</em>개의 글
+        <em>{articleLength}</em>개의 글
       </span>
       <SortArea boardId={0}></SortArea>
     </StyledTotalBoardTopOption>
@@ -511,39 +516,41 @@ export const PopularBoardTopOption = ({
         currentOrder={currentOrder}
         setCurrentOrder={setCurrentOrder}
       ></TabButton>
-     {!(currentOrder.type === "인기순") ? <div className="sort_area">
-        <StyledFormSelectDiv
-          className="form_select_box"
-          $isSelected={isSortSelected}
-        >
-          <button
-            onClick={() => {
-              setIsSortSelected(!isSortSelected);
-            }}
-          >
-            {SortOption[selectedOp]}
-            <svg></svg>
-          </button>
-          <StyledOptionList
-            className="select_option"
+      {!(currentOrder.type === "인기순") ? (
+        <div className="sort_area">
+          <StyledFormSelectDiv
+            className="form_select_box"
             $isSelected={isSortSelected}
           >
-            <ul className="option_list">
-              {SortOption.map((option, index) => (
-                <li className="item" key={index}>
-                  <button
-                    type="button"
-                    className="option"
-                    onClick={() => handleSelectOp(index)}
-                  >
-                    <span className="option_text">{option}</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </StyledOptionList>
-        </StyledFormSelectDiv>
-      </div> : null}
+            <button
+              onClick={() => {
+                setIsSortSelected(!isSortSelected);
+              }}
+            >
+              {SortOption[selectedOp]}
+              <svg></svg>
+            </button>
+            <StyledOptionList
+              className="select_option"
+              $isSelected={isSortSelected}
+            >
+              <ul className="option_list">
+                {SortOption.map((option, index) => (
+                  <li className="item" key={index}>
+                    <button
+                      type="button"
+                      className="option"
+                      onClick={() => handleSelectOp(index)}
+                    >
+                      <span className="option_text">{option}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </StyledOptionList>
+          </StyledFormSelectDiv>
+        </div>
+      ) : null}
     </StyledPopularBoardTopOption>
   );
 };

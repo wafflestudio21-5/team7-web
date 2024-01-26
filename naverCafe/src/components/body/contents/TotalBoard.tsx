@@ -18,6 +18,7 @@ import { wholeArticle } from "../../../API/ArticleAPI";
 const TotalBoard = () => {
   const { setCurBoardState } = useContext(CurrentBoardContext);
   const {
+    articleLength,
     setTotalLength,
     indexOfFirstItem,
     indexOfLastItem,
@@ -36,6 +37,7 @@ const TotalBoard = () => {
     // setTotalLength(articleList ? articleList.length : 0);
     setTotalLength(aList.length);
     setCurBoardState(0);
+    console.log(articleLength);
   }, []);
 
   useEffect(() => {
@@ -49,8 +51,9 @@ const TotalBoard = () => {
     <>
       <Board>
         <TotalBoardHeader></TotalBoardHeader>
-        <TotalBoardTopOption></TotalBoardTopOption>
-        {/* articleList.legnth 전달 */}
+        <TotalBoardTopOption
+          articleLength={articleLength}
+        ></TotalBoardTopOption>
         <ArticleTable
           board={boardAttribute.TotalBoard}
           articleList={currentItems.articles} //articleList
