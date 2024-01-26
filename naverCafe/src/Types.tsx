@@ -13,24 +13,27 @@ export type ArticleType = {
   id: number;
   title: string;
   content: string;
-  nickname: string;
-  created_at: string;
-  view_cnt: number;
-  like_cnt: number;
-  like_users: {
+  createdAt: string;
+  viewCount: number;
+  likeCount: number;
+  commentCount: number;
+  author: {
+    id: number;
     nickname: string;
-    liked_at: string;
-  }[];
-  user: {
-    nickname: string;
-    username: string;
+    registerDate: string;
+    email: string;
+    rank: string;
+    visitCount: number;
+    articlesCount: number;
+    commentsCount: number;
+    accessToken: string;
   };
   board: {
     board_id: number;
     board_name: string;
   };
-  allow_comments: boolean;
-  is_notification: boolean;
+  allowComments: boolean;
+  isNotification: boolean;
 };
 
 export type CommentType = {

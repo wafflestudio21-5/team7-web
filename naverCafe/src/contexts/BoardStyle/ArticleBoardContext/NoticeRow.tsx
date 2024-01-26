@@ -123,10 +123,9 @@ export const NoticeTr = ({
           <div className="board_list">
             <div className="inner_list">
               <span className="article_title">{notice.title}</span>
-              {/* 일반 게시물과 마찬가지로 댓글 카운트 기능이 없어서ㅠㅠ */}
               <span className="comment">
                 {" ["}
-                <em>{notice.view_cnt}</em>
+                <em>{notice.commentCount}</em>
                 {"] "}
               </span>
             </div>
@@ -136,19 +135,19 @@ export const NoticeTr = ({
       <td scope="col" className="td_author">
         <div className="ArticleBoardAuthorInfo">
           <button>
-            <span className="nickname">{notice.user.nickname}</span>
+            <span className="nickname">{notice.author.nickname}</span>
           </button>
         </div>
       </td>
       <td scope="col" className="td_date">
-        {DateOnly(notice.created_at)}
+        {DateOnly(notice.createdAt)}
       </td>
       <td scope="col" className="td_view">
-        {notice.view_cnt}
+        {notice.viewCount}
       </td>
       {isLike ? (
         <td scope="col" className="td_likes">
-          {notice.like_cnt}
+          {notice.likeCount}
         </td>
       ) : null}
     </StyledNoticeTr>
