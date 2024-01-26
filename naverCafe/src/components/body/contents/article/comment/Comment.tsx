@@ -7,6 +7,8 @@ import menuDotsIcon from "../../../../../assets/comments-menuDots.svg";
 import CommentWriter from "./CommentWriter";
 import CommentMenuModal from "./CommentMenuModal";
 
+import { CommentType } from "../../../../../Types";
+
 const Wrapper = styled.li`
   /* width: 100%; */
   padding: 12px 23px 0 0;
@@ -77,21 +79,11 @@ const Wrapper = styled.li`
 `;
 
 interface PropsComment {
-  comment: {
-    id: number;
-    content: string;
-    created_at: string;
-    username: string;
-    reComments: {
-      id: number;
-      content: string;
-      created_at: string;
-      username: string;
-    }[];
-  };
+  comment: CommentType;
   articleId: string | undefined;
+  refetchComments: () => Promise<void>;
 }
-const Comment = ({ comment, articleId }: PropsComment) => {
+const Comment = ({ comment, articleId, refetchComments }: PropsComment) => {
   const [isCommentWriterOpen, setIsCommentWriterOpen] =
     useState<boolean>(false);
   const [isMenuModalOpen, setIsMenuModalOpen] = useState<boolean>(false);
@@ -110,6 +102,7 @@ const Comment = ({ comment, articleId }: PropsComment) => {
             inputValue: comment.content,
           }}
           setIsEditMode={setIsEditMode}
+          refetchComments={refetchComments}
         />
       </Wrapper>
     );
@@ -127,13 +120,13 @@ const Comment = ({ comment, articleId }: PropsComment) => {
             <div className="commentBox">
               <div className="authorNickname">
                 <Link to={"/"}>
-                  <em>{comment.username}</em>
+                  <em>{comment.nickname}</em>
                 </Link>
               </div>
               <div className="content">{comment.content}</div>
               <div className="commentInfo">
                 <span>
-                  {comment.created_at.replace(/-/g, ".").replace(/T/, ". ")}
+                  {comment.last_modified.replace(/-/g, ".").replace(/T/, ". ")}
                 </span>
                 <span>
                   <button
@@ -166,6 +159,7 @@ const Comment = ({ comment, articleId }: PropsComment) => {
                 type: "reComment",
                 commentId: comment.id,
               }}
+              refetchComments={refetchComments}
             />
           ) : null}
         </div>
