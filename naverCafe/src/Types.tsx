@@ -29,8 +29,8 @@ export type ArticleType = {
     accessToken: string;
   };
   board: {
-    board_id: number;
-    board_name: string;
+    id: number;
+    name: string;
   };
   allowComments: boolean;
   isNotification: boolean;
@@ -39,12 +39,12 @@ export type ArticleType = {
 export type CommentType = {
   id: number;
   content: string;
-  last_modified: string;
+  lastModified: string;
   nickname: string;
   recomments: {
     id: number;
     content: string;
-    last_modified: string;
+    lastModified: string;
     nickname: string;
   }[];
 };

@@ -47,21 +47,26 @@ const Writing = () => {
     } else if (inputContent === "") {
       alert("내용을 입력해주세요.");
     } else {
-      await postArticle(
-        inputTitle,
-        inputContent,
-        1,
+      await postArticle({
+        title: inputTitle,
+        content: inputContent,
+        boardId: 1,
         // board id는 어떻게 처리되는지 모르겠어서 일단 이렇게 두었습니다.
-        isCommentAllowed,
-        isAnnouncement
-      ).then((res) => {
+        allowComments: isCommentAllowed,
+        isNotification: isAnnouncement,
+      }).then((res) => {
         if (res !== undefined) {
           navigate(`/articles/${res.data.id}`);
         }
       });
     }
   };
-
+  const stringToHTML = function (str) {
+    const dom = document.createElement("div");
+    dom.innerHTML = str;
+    return dom;
+  };
+  console.log(stringToHTML(inputContent).innerText);
   return (
     <Wrapper>
       <WritingHeader handleWritePost={handleWritePost} />

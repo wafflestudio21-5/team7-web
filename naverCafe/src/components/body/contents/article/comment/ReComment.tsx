@@ -79,7 +79,7 @@ interface PropsReComment {
   reComment: {
     id: number;
     content: string;
-    last_modified: string;
+    lastModified: string;
     nickname: string;
   };
   articleId: string | undefined;
@@ -133,9 +133,7 @@ const ReComment = ({
               <div className="content">{reComment.content}</div>
               <div className="commentInfo">
                 <span>
-                  {reComment.last_modified
-                    .replace(/-/g, ".")
-                    .replace(/T/, ". ")}
+                  {reComment.lastModified.replace(/-/g, ".").replace(/T/, ". ")}
                 </span>
                 <span>
                   <button

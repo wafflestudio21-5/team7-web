@@ -2,7 +2,7 @@ import styled from "styled-components";
 import { GlobalStyle } from "./contexts/StyleContext";
 import { Route, Routes } from "react-router-dom";
 
-import { UserContext } from "./contexts/UserContext";
+import { AuthContext } from "./contexts/AuthContext";
 
 import Layout from "./pages/Layout";
 import SignUp from "./pages/SignUp";
@@ -23,7 +23,10 @@ import { useState } from "react";
 import { NoticeContextProvider } from "./contexts/BoardContext/NoticeContext";
 import { CurrentBoardStateProvider } from "./contexts/BoardContext/CurrentBoardContext";
 import { ViewOptionStateProvider } from "./contexts/BoardContext/ViewOptionContext";
-import { NickModalContext, NickModalContextProvider } from "./contexts/BoardContext/nickNameModalContext";
+import {
+  NickModalContext,
+  NickModalContextProvider,
+} from "./contexts/BoardContext/nickNameModalContext";
 
 const Wrapper = styled.div`
   margin: 0 auto;
@@ -33,19 +36,20 @@ const Wrapper = styled.div`
 function App() {
   const { boardList } = useWholeBoard();
 
-  // 자신의 정보를 담는 userInfo state를 context로서 사용하겠습니다.
-  const [myInfo, setMyInfo] = useState<{
-    userId: string;
-    username: string;
-    userNickname: string;
-  }>({
-    userId: "gryffindorGoat",
-    username: "harry potter",
-    userNickname: "해리포터",
-  });
+  // myUsername은 login할 때의 username입니다. login시 바뀝니다.
+  // -> 지금은 login 시 바뀌지만, 자신의 정보를 얻어오는 api가 추가된다면, 그 api에서 받아온 response를 기반으로 바꿀 생각입니다.
+  // 자신의 정보를 얻어오는 api에는 (아마도) id, username, name, nickname 정보를 받을 수 있을 텐데, 그 api가 완성되면 이 세 가지 정보를 담은 객체를 context value로 전달하도록 수정할 것 같습니다.
+  const [myUsername, setMyUsername] = useState<string>("");
+
+  // accessToken은 말 그대로 access token입니다. login 시 할당됩니다.
+  // 현재 로그인되어있는지 여부는 (myUsername !== "") 으로 알아보는 것으로 하겠습니다.
+  const [accessToken, setAccessToken] = useState<string>("");
+  console.log("myUsername:" + myUsername);
   return (
     <Wrapper>
-      <UserContext.Provider value={myInfo}>
+      <AuthContext.Provider
+        value={{ myUsername: myUsername, accessToken: accessToken }}
+      >
         <GlobalStyle />
         <PaginationProvider>
           <NoticeContextProvider>
@@ -55,7 +59,15 @@ function App() {
                   <Routes>
                     {/* 회원가입 및 로그인 page */}
                     <Route path="/signup" element={<SignUp />} />
-                    <Route path="/login" element={<Login />} />
+                    <Route
+                      path="/login"
+                      element={
+                        <Login
+                          setMyUsername={setMyUsername}
+                          setAccessToken={setAccessToken}
+                        />
+                      }
+                    />
 
                     {/* main page 구성 */}
                     {/* Layout은 header와 body로 나뉘어져 있습니다. */}
@@ -107,7 +119,7 @@ function App() {
             </CurrentBoardStateProvider>
           </NoticeContextProvider>
         </PaginationProvider>
-      </UserContext.Provider>
+      </AuthContext.Provider>
     </Wrapper>
   );
 }

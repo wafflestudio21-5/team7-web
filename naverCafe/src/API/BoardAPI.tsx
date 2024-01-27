@@ -21,9 +21,9 @@ export function useWholeBoard() {
 }
 
 export function useBoardGroup() {
-  const [groupList, setBoardList] = useState<{ boardGroups: GroupType[] } | null>(
-    null
-  );
+  const [groupList, setBoardList] = useState<{
+    boardGroups: GroupType[];
+  } | null>(null);
   const url = "/api/v1/boards-in-group";
   const refetch = useCallback(async () => {
     const res = await axios.get(baseURL + url);
@@ -61,7 +61,6 @@ export function useGetLikeBoard(userId: string) {
   return { boardList, refetch };
 }
 
-
 //게시판별 게시물 리스트 및 인기게시판 게시물 리스트
 export function useArticleList({
   boardId,
@@ -71,7 +70,7 @@ export function useArticleList({
   type?: string;
 }) {
   const [articleList, setArticleList] = useState<{
-    articles: ArticleType[];
+    articleBrief: ArticleType[];
   } | null>(null);
 
   const url =

@@ -353,7 +353,7 @@ interface PropsRelatedArticles {
 }
 const RelatedArticles = ({ articleId, boardId }: PropsRelatedArticles) => {
   const { articleList } = useArticleList({ boardId: boardId });
-
+  console.log(articleList);
   const [onActiveButtonNumber, setOnActiveButtonNumber] = useState<
     number | null
   >(1);
@@ -375,7 +375,7 @@ const RelatedArticles = ({ articleId, boardId }: PropsRelatedArticles) => {
   };
 
   const relatedArticleList = useMemo(() => {
-    return articleList?.articles.map((article) => (
+    return articleList?.articleBrief.map((article) => (
       <Article
         $isArticleFocused={Number(articleId) === article.id ? true : false}
         key={article.id}
@@ -392,10 +392,10 @@ const RelatedArticles = ({ articleId, boardId }: PropsRelatedArticles) => {
             </span>
             <span
               className={
-                isNewArticle(article.created_at) ? "newArticle" : "oldArticle"
+                isNewArticle(article.createdAt) ? "newArticle" : "oldArticle"
               }
             >
-              {isNewArticle(article.created_at) ? (
+              {isNewArticle(article.createdAt) ? (
                 <img src={newArticleIcon} alt="새로운 게시물" />
               ) : (
                 ""
@@ -404,9 +404,9 @@ const RelatedArticles = ({ articleId, boardId }: PropsRelatedArticles) => {
           </div>
         </Link>
         <div className="right">
-          <div className="authorNickname">{article.user.nickname}</div>
+          <div className="authorNickname">{article.author.nickname}</div>
           <div className="createdAt">
-            {article.created_at
+            {article.createdAt
               .replace(/-/g, ". ")
               .replace(/T\d\d:\d\d:\d\d/, ".")}
           </div>
@@ -510,13 +510,13 @@ const RelatedArticles = ({ articleId, boardId }: PropsRelatedArticles) => {
     };
     if (articleId) {
       // 현재 보고 있는 article이 전체 article list에서 몇번째 index에 있는지 조사합니다.
-      const articleIndex = articleList?.articles.findIndex(
+      const articleIndex = articleList?.articleBrief.findIndex(
         (article) => article.id === Number(articleId)
       );
       if (articleIndex) {
-        if (articleList?.articles[articleIndex + 2] !== undefined) {
+        if (articleList?.articleBrief[articleIndex + 2] !== undefined) {
           return newRelatedArticles(articleIndex + 2);
-        } else if (articleList?.articles[articleIndex + 1] !== undefined) {
+        } else if (articleList?.articleBrief[articleIndex + 1] !== undefined) {
           return newRelatedArticles(articleIndex + 1);
         } else {
           return newRelatedArticles(articleIndex);

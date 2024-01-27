@@ -1,9 +1,8 @@
 import styled, { css } from "styled-components";
 import { Link } from "react-router-dom";
 import { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { baseURL } from "../Constants";
+import { login } from "../API/UserAPI";
 
 const Wrapper = styled.div`
   width: 458px;
@@ -151,8 +150,8 @@ const Inner = styled.div`
   } */
 `;
 const IDLogin = styled.div<{
-  $userNameLength: number;
-  $userPasswordLength: number;
+  $inputUsernameLength: number;
+  $inputPasswordLength: number;
   $isLoginMaintained: boolean;
 }>`
   & > .id,
@@ -199,7 +198,7 @@ const IDLogin = styled.div<{
     }
     & > .deleteLogo {
       display: ${(props) =>
-        props.$userNameLength !== 0 ? "inline-block" : "none"};
+        props.$inputUsernameLength !== 0 ? "inline-block" : "none"};
     }
   }
   & > .password {
@@ -216,7 +215,7 @@ const IDLogin = styled.div<{
     }
     & > .deleteLogo {
       display: ${(props) =>
-        props.$userPasswordLength !== 0 ? "inline-block" : "none"};
+        props.$inputPasswordLength !== 0 ? "inline-block" : "none"};
     }
   }
   .deleteLogo {
@@ -328,10 +327,13 @@ const Find = styled.div`
     }
   }
 `;
-
-const Login = () => {
-  const [userName, setUserName] = useState<string>("");
-  const [userPassword, setUserPassword] = useState<string>("");
+interface PropsLogin {
+  setMyUsername: (value: string) => void;
+  setAccessToken: (value: string) => void;
+}
+const Login = ({ setMyUsername, setAccessToken }: PropsLogin) => {
+  const [inputUsername, setInputUsername] = useState<string>("");
+  const [inputPassword, setInputPassword] = useState<string>("");
   const [isIDLoginSelected, setIsIDLoginSelected] = useState<boolean>(true);
   const [isLoginMaintained, setIsLoginMaintained] = useState<boolean>(false);
 
@@ -341,43 +343,34 @@ const Login = () => {
 
   const navigate = useNavigate();
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     setIsErrorOnBoth(false);
-    if (userName.length == 0) {
+    if (inputUsername.length == 0) {
       setIsErrorOnId(true);
       return;
     } else {
       setIsErrorOnId(false);
     }
-    if (userPassword.length === 0) {
+    if (inputPassword.length === 0) {
       setIsErrorOnPassword(true);
       return;
     } else {
       setIsErrorOnPassword(false);
     }
-    login();
-    return;
-  };
-
-  const login = () => {
-    console.log({
-      username: userName,
-      password: userPassword,
-    });
-    return axios
-      .post(baseURL + "/api/v1/login", {
-        username: userName,
-        password: userPassword,
-      })
+    await login({ username: inputUsername, password: inputPassword })
       .then((res) => {
         console.log(res);
+        setMyUsername(inputUsername);
+        setAccessToken(res.data.accessToken);
+        // 테스트를 위해 안정화될때까진 localStorage 이용하겠습니다.
+        window.localStorage.setItem("accessToken", res.data.accessToken);
         navigate("/");
-        return res;
       })
       .catch((err) => {
         console.log(err);
         setIsErrorOnBoth(true);
       });
+    return;
   };
 
   return (
@@ -400,8 +393,8 @@ const Login = () => {
         <Inner>
           {isIDLoginSelected ? (
             <IDLogin
-              $userNameLength={userName.length}
-              $userPasswordLength={userPassword.length}
+              $inputUsernameLength={inputUsername.length}
+              $inputPasswordLength={inputPassword.length}
               $isLoginMaintained={isLoginMaintained}
             >
               <div className="id">
@@ -409,22 +402,25 @@ const Login = () => {
                 <input
                   type="text"
                   placeholder="아이디"
-                  value={userName}
-                  onChange={(e) => setUserName(e.target.value)}
+                  value={inputUsername}
+                  onChange={(e) => setInputUsername(e.target.value)}
                 />
-                <span className="deleteLogo" onClick={() => setUserName("")} />
+                <span
+                  className="deleteLogo"
+                  onClick={() => setInputUsername("")}
+                />
               </div>
               <div className="password">
                 <span className="passwordLogo" />
                 <input
                   type="password"
                   placeholder="비밀번호"
-                  value={userPassword}
-                  onChange={(e) => setUserPassword(e.target.value)}
+                  value={inputPassword}
+                  onChange={(e) => setInputPassword(e.target.value)}
                 />
                 <span
                   className="deleteLogo"
-                  onClick={() => setUserPassword("")}
+                  onClick={() => setInputPassword("")}
                 />
               </div>
               <div className="loginSetting">
