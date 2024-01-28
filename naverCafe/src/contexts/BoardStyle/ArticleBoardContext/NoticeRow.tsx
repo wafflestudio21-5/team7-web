@@ -140,7 +140,7 @@ export const NoticeTr = ({
         </div>
       </td>
       <td scope="col" className="td_date">
-        {DateOnly(notice.createdAt)}
+        {DateOnly(notice.createdAt)}.
       </td>
       <td scope="col" className="td_view">
         {notice.viewCount}

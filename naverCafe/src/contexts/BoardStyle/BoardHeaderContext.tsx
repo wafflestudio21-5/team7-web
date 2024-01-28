@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { styled } from "styled-components";
 
 export const Board = styled.div`
@@ -99,12 +100,14 @@ export const PopularBoardHeader = () => {
 };
 
 export const CommonBoardHeader = ({ isFavorite, boardName }: { isFavorite: boolean, boardName:string }) => {
+  const [fav, setFav] = useState(isFavorite);
+  
   return (
-    <StyledCommonBoardHeader $isFavorite={isFavorite}>
+    <StyledCommonBoardHeader $isFavorite={fav}>
       <div className="title-area">
         <div className="info_tit">
           <h3 className="sub-tit-color">{boardName}</h3>
-          <button className="bookmark"></button>
+          <button onClick={()=>setFav(!fav)} className="bookmark"></button>
         </div>
       </div>
     </StyledCommonBoardHeader>

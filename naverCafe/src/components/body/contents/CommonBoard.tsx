@@ -1,7 +1,11 @@
 //일반 게시판 (자유 게시판과 동일한 양식)
 
 import { useContext, useEffect, useState } from "react";
-import { useArticleList } from "../../../API/BoardAPI";
+import {
+  useArticleList,
+  useGetLikeBoard,
+  useWholeBoard,
+} from "../../../API/BoardAPI";
 import { aList } from "../../../Constants";
 import { boardAttribute } from "../../../contexts/BoardContext/BoardAttrContext";
 import { ArticleTable } from "../../../contexts/BoardStyle/ArticleBoardContext/Table";
@@ -16,6 +20,23 @@ import { useNoticeContext } from "../../../contexts/BoardContext/NoticeContext";
 import { ArticleType, BoardType } from "../../../Types";
 import { CurrentBoardContext } from "../../../contexts/BoardContext/CurrentBoardContext";
 
+
+//처음 즐겨찾기 설정된 게시판 리스트를 받는 함수
+const useInitalFavList = () => {
+  const { favList } = useGetLikeBoard();
+  const { boardList } = useWholeBoard();
+  const boolFavList: boolean[] = [];
+
+  for (let i = 1; i <= boardList!.boards.length; i++) {
+    for (let j = 1; j <= favList!.boards.length; j++) {
+      const isFav = boardList!.boards[i] === favList!.boards[j];
+      boolFavList.push(isFav);
+    }
+  }
+
+  return boolFavList;
+};
+
 const CommonBoard = ({ board }: { board: BoardType }) => {
   const { id } = board;
   const { setCurBoardState } = useContext(CurrentBoardContext);
@@ -27,10 +48,12 @@ const CommonBoard = ({ board }: { board: BoardType }) => {
     indexOfLastItem,
     setItemsPerPage,
     itemsPerPage,
-  } = usePagination(board.id);
+  } = usePagination(id);
   const [currentItems, setCurrentItems] = useState<{ articles: ArticleType[] }>(
     { articles: [] }
   );
+
+  //isfavorite을 api로 받아오면 됨
 
   useEffect(() => {
     // setTotalLength(articleList ? articleList.length : 0);

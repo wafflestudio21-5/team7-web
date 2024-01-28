@@ -29,8 +29,8 @@ export type ArticleType = {
     accessToken: string;
   };
   board: {
-    board_id: number;
-    board_name: string;
+    id: number;
+    name: string;
   };
   allowComments: boolean;
   isNotification: boolean;

@@ -4,7 +4,7 @@ import { NoticeTr } from "./NoticeRow";
 import { BoardType } from "../../BoardContext/BoardAttrContext";
 import { aList } from "../../../Constants";
 import { useNoticeContext } from "../../BoardContext/NoticeContext";
-import { useContext, useRef, useState } from "react";
+import { useContext, useState } from "react";
 import { ArticleType } from "../../../Types";
 import { ViewOptionContext } from "../../BoardContext/ViewOptionContext";
 import { useNavigate } from "react-router-dom";
@@ -502,8 +502,8 @@ const CardViewUl = ({
       {articleList.map((article, index) => (
         <StyledCardLi key={index}>
           {isTotalBoard ? (
-            <p onClick={() => navigate(`/board/${article.board.board_id - 1}`)}>
-              {article.board.board_name}
+            <p onClick={() => navigate(`/board/${article.board.id - 1}`)}>
+              {article.board.name}
             </p>
           ) : null}
           <div className="card_area">
@@ -520,7 +520,14 @@ const CardViewUl = ({
               </div>
               <div className="con_bottom">
                 <div className="user_info">
-                  <div className="pers_nick_area">{article.author.nickname}</div>
+                  <div
+                    className="pers_nick_area"
+                    onClick={() =>
+                      navigate(`/users/${article.author.id}`)
+                    }
+                  >
+                    {article.author.nickname}
+                  </div>
                   <div className="date_num">
                     <span className="date">{DateOnly(article.createdAt)}</span>
                     <span className="num">조회 {article.viewCount}</span>
@@ -558,9 +565,9 @@ export const ArticleTable = ({
   board: BoardType;
   articleList: ArticleType[];
   isLike?: boolean;
-}) => {
+  }) => {
+  const navigate = useNavigate();
   const { isNoticeOff } = useNoticeContext();
-  const [isNickClicked, setIsNickClicked] = useState(false);
   const [isSortLike, setIsSortLike] = useState(false); //인기순 (기준이 명확하지 않아 일단 보류해두었습니다.)
   const { viewOp } = useContext(ViewOptionContext);
 
@@ -569,15 +576,6 @@ export const ArticleTable = ({
     const dateRegex = /\d{4}-\d{2}-\d{2}/;
     const dateNum = arg.match(dateRegex)![0];
     return dateNum.split("-").join(".");
-  };
-
-  const buttonRef = useRef(null);
-  //const {}
-
-  const handleModal = () => {
-    if (buttonRef.current) {
-
-    }
   };
 
   return (
@@ -647,7 +645,7 @@ export const ArticleTable = ({
                   {/* 아티클마다 첫번째 정보 */}
                   <FirstCol
                     firstCol={board.firstCol}
-                    board={article.board.board_name}
+                    board={article.board}
                     ranking={index}
                     articleId={article.id}
                   ></FirstCol>
@@ -659,10 +657,10 @@ export const ArticleTable = ({
                     <div className="inner_list">
                       <span className="article_title">{article.title}</span>
                       <span></span>
-                      {/* 댓글 개수를 넣어야 하는데 ArticleType에 없어서 일단 보류했습니다. */}
+                      
                       <span className="comment">
                         {" ["}
-                        <em>{article.viewCount}</em>
+                        <em>{article.commentCount}</em>
                         {"] "}
                       </span>
                     </div>
@@ -671,13 +669,13 @@ export const ArticleTable = ({
               </td>
               <td className="td_author">
                 <div className="ArticleBoardAuthorInfo">
-                  <button onClick={()=>handleModal} ref={buttonRef}>
-                    <span className="nickname">{article.author.nickname}</span>
+                  <button >
+                    <span className="nickname" onClick={()=>navigate(`/users/${article.author.id}`)}>{article.author.nickname}</span>
                   </button>
                 </div>
-                <div className="popup">
+                {/* <div className="popup">
                   <button>게시글보기</button>
-                </div>
+                </div> */}
               </td>
               <td className="td_date">{DateOnly(article.createdAt)}.</td>
               <td className="td_view">{article.viewCount}</td>

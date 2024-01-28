@@ -41,7 +41,7 @@ export const aList: ArticleType[] = [
       commentsCount: 6,
       accessToken: "yumin22224",
     },
-    board: { board_id: 3, board_name: "MySQL" },
+    board: { id: 3, name: "MySQL" },
     allowComments: true,
     isNotification: true,
   },{
@@ -63,7 +63,7 @@ export const aList: ArticleType[] = [
       commentsCount: 6,
       accessToken: "yumin22224",
     },
-    board: { board_id: 2, board_name: "장고" },
+    board: { id: 2, name: "장고" },
     allowComments: true,
     isNotification: false,
   },{
@@ -85,7 +85,7 @@ export const aList: ArticleType[] = [
       commentsCount: 6,
       accessToken: "yumin22224",
     },
-    board: { board_id: 1, board_name: "스프링" },
+    board: { id: 1, name: "스프링" },
     allowComments: true,
     isNotification: false,
   }

@@ -395,7 +395,7 @@ const StyledUl = styled.ul`
     float: left;
   }
   li > .brdimg {
-    display: inline-block;
+        display: inline-block;
     background-image: url(https://ssl.pstatic.net/static/cafe/cafe_pc/sp/sp_icon_06952b76.svg);
     background-repeat: no-repeat;
     vertical-align: top;

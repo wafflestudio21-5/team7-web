@@ -37,28 +37,35 @@ export function useBoardGroup() {
   return { groupList, refetch };
 }
 
+
+//게시판 즐겨찾기
 // export function useLikeBoard(userId: string, boardId: number) {
 //     const url = "/api/v1/boards/" + { boardId } + "/like";
 //     axios.post
 // }
 
+//게시판 즐겨찾기 취소
 // export function useUnlikeBoard(userId: string, boardId: number) {
 //   const url = "/apli/v1/boards/" + { boardId } + "/unlike";
 // }
 
-export function useGetLikeBoard(userId: string) {
-  const [boardList, setBoardList] = useState<BoardType[] | null>(null);
+
+
+//게시판 즐겨찾기 모두 조회
+//초기 fav 리스트
+export function useGetLikeBoard() {
+  const [favList, setFavList] = useState<{boards:BoardType[]}|null>(null);
   const url = "/api/v1/boards/likes";
   const refetch = useCallback(async () => {
     const res = await axios.get(baseURL + url);
     const data = await res.data;
-    setBoardList(data);
+    setFavList(data);
   }, [url]);
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     refetch();
   }, [refetch]);
-  return { boardList, refetch };
+  return { favList, refetch };
 }
 
 
@@ -89,3 +96,6 @@ export function useArticleList({
   }, [refetch]);
   return { articleList, refetch };
 }
+
+
+//공지글 가져오기 (전체)
