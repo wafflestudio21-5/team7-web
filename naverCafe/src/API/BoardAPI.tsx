@@ -64,24 +64,58 @@ export function useGetLikeBoard(userId: string) {
 //게시판별 게시물 리스트 및 인기게시판 게시물 리스트
 export function useArticleList({
   boardId,
-  type,
+  size,
+  page,
+  sort,
 }: {
-  boardId?: number;
-  type?: string;
+  boardId: number;
+  size?: number;
+  page?: number;
+  sort?: string;
 }) {
   const [articleList, setArticleList] = useState<{
-    articleBrief: ArticleType[];
+    articleBrief: {
+      content: ArticleType[];
+      empty: boolean;
+      first: true;
+      last: false;
+      number: number;
+      numberOfElements: number;
+      pageable: {
+        offset: number;
+        pageNumber: number;
+        pageSize: number;
+        paged: boolean;
+        sort: {
+          empty: boolean;
+          sorted: boolean;
+          unsorted: boolean;
+        };
+        unpaged: boolean;
+      };
+      size: number;
+      sort: {
+        empty: boolean;
+        sorted: boolean;
+        unsorted: boolean;
+      };
+      totalElements: number;
+      totalPages: number;
+    };
   } | null>(null);
 
-  const url =
-    type === undefined
-      ? `/api/v1/boards/${boardId}/articles`
-      : `/api/v1/articles/hot?sortBy=${type}`;
+  const url = `/api/v1/boards/${boardId}/articles`;
   const refetch = useCallback(async () => {
-    const res = await axios.get(baseURL + url);
+    const res = await axios.get(baseURL + url, {
+      params: {
+        size: size ? size : "",
+        page: page ? page : "",
+        sort: sort ? sort : "",
+      },
+    });
     const data = await res.data;
     setArticleList(data);
-  }, [url]);
+  }, [url, size, page, sort]);
 
   useEffect(() => {
     refetch();
