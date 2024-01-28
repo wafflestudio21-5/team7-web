@@ -9,12 +9,8 @@ export function signup(userInfo: {
   birthDate: string;
   phoneNumber: string;
 }) {
-  return axios.post(baseURL + "/api/v1/signup", {
-    userInfo,
-  });
+  return axios.post(baseURL + "/api/v1/signup", userInfo);
 }
 export function login(userInfo: { username: string; password: string }) {
-  return axios.post(baseURL + "/api/v1/signin", {
-    userInfo,
-  });
+  return axios.post(baseURL + "/api/v1/signin", userInfo);
 }

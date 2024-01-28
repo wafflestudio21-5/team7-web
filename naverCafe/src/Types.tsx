@@ -26,25 +26,25 @@ export type ArticleType = {
     visitCount: number;
     articlesCount: number;
     commentsCount: number;
-    accessToken: string;
+    accessToken?: string;
   };
   board: {
     id: number;
     name: string;
   };
-  allowComments: boolean;
+  allowComments?: boolean;
   isNotification: boolean;
 };
 
 export type CommentType = {
   id: number;
   content: string;
-  last_modified: string;
+  lastModified: string;
   nickname: string;
   recomments: {
     id: number;
     content: string;
-    last_modified: string;
+    lastModified: string;
     nickname: string;
   }[];
 };

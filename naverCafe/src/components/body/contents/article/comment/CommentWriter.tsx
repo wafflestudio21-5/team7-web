@@ -7,7 +7,7 @@ import {
   postComment,
   postReComment,
 } from "../../../../../API/CommentAPI";
-import { useUserContext } from "../../../../../contexts/UserContext";
+import { useAuthContext } from "../../../../../contexts/AuthContext";
 
 const Wrapper = styled.div<{
   $commentLength: number;
@@ -130,7 +130,7 @@ const CommentWriter = ({
 }: PropsCommentWriter) => {
   const [commentInput, setCommentInput] = useState<string>("");
   const commentTextarea = useRef<HTMLTextAreaElement | null>(null);
-  const myInfo = useUserContext();
+  const { myUsername } = useAuthContext();
 
   const handleCommentTextareaHeight = () => {
     if (commentTextarea.current !== null) {
@@ -195,7 +195,7 @@ const CommentWriter = ({
   return (
     <Wrapper $commentLength={commentInput.length} $type={info.type}>
       <div className="CommentWriter">
-        <div className="writerName">{myInfo.userNickname}</div>
+        <div className="writerName">{myUsername}</div>
         <textarea
           ref={commentTextarea}
           placeholder="댓글을 남겨보세요"

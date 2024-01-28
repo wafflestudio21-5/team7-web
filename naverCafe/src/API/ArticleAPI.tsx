@@ -61,9 +61,12 @@ export function deleteArticle(articleId: number) {
 }
 // article 조회(get)
 // article의 좋아요, 댓글 등이 바뀌었을 때 refetch 할 수 있어야 하므로, state로 받는 데이터 관리하고, refetch 함수 정의하겠습니다.
-// username을 쿼리로 전달해야하는가?(api 명세에서는 그렇게 되어 있음)
+// username을 쿼리로 전달해야하는가?(api 명세에서는 그렇게 되어 있음) -> 인증 기반이면 필요없을듯
 export function useArticle(articleId: number) {
-  const [article, setArticle] = useState<ArticleType | null>(null);
+  const [article, setArticle] = useState<{
+    article: ArticleType;
+    isLiked: boolean;
+  } | null>(null);
   const url = `/api/v1/articles/${articleId}`;
   const refetchArticle = useCallback(async () => {
     const res = await axios.get(baseURL + url, {
@@ -99,14 +102,17 @@ export function deleteLike(articleId: number) {
 }
 // article 공지로 등록 -> 이 기능이 필요한가?
 // 모든 article 조회 -> 이 기능이 필요한가?
-  
+
 // 전체 article 조회
 export function wholeArticle() {
-  return axios.get(baseURL + `api/v1/articles`).then((res) => {
-    console.log(res);
-    return res;
-  }).catch((err) => {
-    console.log(err);
-    return;
-  });
+  return axios
+    .get(baseURL + `api/v1/articles`)
+    .then((res) => {
+      console.log(res);
+      return res;
+    })
+    .catch((err) => {
+      console.log(err);
+      return;
+    });
 }

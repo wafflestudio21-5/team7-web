@@ -21,9 +21,9 @@ export function useWholeBoard() {
 }
 
 export function useBoardGroup() {
-  const [groupList, setBoardList] = useState<{ boardGroups: GroupType[] } | null>(
-    null
-  );
+  const [groupList, setBoardList] = useState<{
+    boardGroups: GroupType[];
+  } | null>(null);
   const url = "/api/v1/boards-in-group";
   const refetch = useCallback(async () => {
     const res = await axios.get(baseURL + url);
@@ -68,28 +68,61 @@ export function useGetLikeBoard() {
   return { favList, refetch };
 }
 
-
 //게시판별 게시물 리스트 및 인기게시판 게시물 리스트
 export function useArticleList({
   boardId,
-  type,
+  size,
+  page,
+  sort,
 }: {
-  boardId?: number;
-  type?: string;
+  boardId: number;
+  size?: number;
+  page?: number;
+  sort?: string;
 }) {
   const [articleList, setArticleList] = useState<{
-    articles: ArticleType[];
+    articleBrief: {
+      content: ArticleType[];
+      empty: boolean;
+      first: true;
+      last: false;
+      number: number;
+      numberOfElements: number;
+      pageable: {
+        offset: number;
+        pageNumber: number;
+        pageSize: number;
+        paged: boolean;
+        sort: {
+          empty: boolean;
+          sorted: boolean;
+          unsorted: boolean;
+        };
+        unpaged: boolean;
+      };
+      size: number;
+      sort: {
+        empty: boolean;
+        sorted: boolean;
+        unsorted: boolean;
+      };
+      totalElements: number;
+      totalPages: number;
+    };
   } | null>(null);
 
-  const url =
-    type === undefined
-      ? `/api/v1/boards/${boardId}/articles`
-      : `/api/v1/articles/hot?sortBy=${type}`;
+  const url = `/api/v1/boards/${boardId}/articles`;
   const refetch = useCallback(async () => {
-    const res = await axios.get(baseURL + url);
+    const res = await axios.get(baseURL + url, {
+      params: {
+        size: size ? size : "",
+        page: page ? page : "",
+        sort: sort ? sort : "",
+      },
+    });
     const data = await res.data;
     setArticleList(data);
-  }, [url]);
+  }, [url, size, page, sort]);
 
   useEffect(() => {
     refetch();

@@ -126,7 +126,7 @@ const Comment = ({ comment, articleId, refetchComments }: PropsComment) => {
               <div className="content">{comment.content}</div>
               <div className="commentInfo">
                 <span>
-                  {comment.last_modified.replace(/-/g, ".").replace(/T/, ". ")}
+                  {comment.lastModified.replace(/-/g, ".").replace(/T/, ". ")}
                 </span>
                 <span>
                   <button
