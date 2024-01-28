@@ -3,14 +3,22 @@ import styled from "styled-components";
 import Comment from "./Comment";
 import CommentWriter from "./CommentWriter";
 import ReComment from "./ReComment";
-import { useComments } from "../../../../../API/CommentAPI";
+import { CommentType } from "../../../../../Types";
 
 const Wrapper = styled.div`
+  position: relative;
   & > h3 {
     text-align: left;
     margin: 0 0 11px;
     padding: 16px 0 0;
     font-size: 17px;
+  }
+  & > .commentList {
+    display: inline-block;
+    width: 858px;
+    box-sizing: border-box;
+    position: relative;
+    left: -29px;
   }
 `;
 
@@ -42,13 +50,17 @@ const Wrapper = styled.div`
 // };
 
 interface PropsCommentList {
-  articleId: string | undefined;
+  articleId: string;
+  comments: CommentType[];
+  refetchComments: () => Promise<void>;
 }
 
-const CommentBox = ({ articleId }: PropsCommentList) => {
-  const { comments, refetchComments } = useComments(Number(articleId));
-
-  const commentList = comments?.comments.map((comment) => {
+const CommentBox = ({
+  articleId,
+  comments,
+  refetchComments,
+}: PropsCommentList) => {
+  const commentList = comments.map((comment) => {
     return (
       <ul key={comment.id}>
         <Comment

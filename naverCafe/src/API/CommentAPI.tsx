@@ -5,16 +5,26 @@ import { CommentType } from "../Types";
 // comment
 
 // comment 작성(post)
-export function postComment(articleId: number, content: string) {
-  // const params = { content: content };
+export function postComment({
+  articleId,
+  content,
+  isSecret,
+}: {
+  articleId: number;
+  content: string;
+  isSecret: boolean;
+}) {
   return axios.post(
-    baseURL + `/api/v1/articles/${articleId}/comments?content=${content}`,
-    // {
-    //   params: params,
-    // },
+    baseURL + `/api/v1/articles/${articleId}/comments`,
+    // axios post는 url-body-추가(header 등) 순서로 보낸다... body가 없다면 빈 객체를 넣어야한다...
+    {},
     {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+      params: {
+        content: content,
+        isSecret: isSecret,
       },
     }
   );
@@ -44,19 +54,27 @@ export function editComment(
   commentId: number,
   content: string
 ) {
-  const params = { content: content };
   return axios.put(
     baseURL + `/api/v1/articles/${articleId}/comments/${commentId}`,
-    { params: params },
+    {},
     {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+      params: {
+        content: content,
       },
     }
   );
 }
 // comment 삭제(delete)
-export function deleteComment(articleId: number, commentId: number) {
+export function deleteComment({
+  articleId,
+  commentId,
+}: {
+  articleId: number;
+  commentId: number;
+}) {
   return axios.delete(
     baseURL + `/api/v1/articles/${articleId}/comments/${commentId}`,
     {
@@ -67,51 +85,71 @@ export function deleteComment(articleId: number, commentId: number) {
   );
 }
 // reComment 작성(post)
-export function postReComment(
-  articleId: number,
-  commentId: number,
-  content: string
-) {
-  const params = { content: content };
+export function postReComment({
+  articleId,
+  commentId,
+  content,
+  isSecret,
+}: {
+  articleId: number;
+  commentId: number;
+  content: string;
+  isSecret: boolean;
+}) {
   return axios.post(
     baseURL + `/api/v1/articles/${articleId}/comments/${commentId}/recomments`,
-    { params: params },
+    {},
     {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+      params: {
+        content: content,
+        isSecret: isSecret,
       },
     }
   );
 }
 // reComment를 조회 -> (get 요청)하는 기능이 왜 필요한지 모르겠습니다.
 // reComment 수정
-export function editReComment(
-  articleId: number,
-  commentId: number,
-  recommentId: number,
-  content: string
-) {
-  const params = { content: content };
+export function editReComment({
+  articleId,
+  commentId,
+  reCommentId,
+  content,
+}: {
+  articleId: number;
+  commentId: number;
+  reCommentId: number;
+  content: string;
+}) {
   return axios.put(
     baseURL +
-      `/api/v1/articles/${articleId}/comments/${commentId}/recomments/${recommentId}`,
-    { params: params },
+      `/api/v1/articles/${articleId}/comments/${commentId}/recomments/${reCommentId}`,
+    {},
     {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+      params: {
+        content: content,
       },
     }
   );
 }
 // reComment 삭제
-export function deleteReComment(
-  articleId: number,
-  commentId: number,
-  recommentId: number
-) {
+export function deleteReComment({
+  articleId,
+  commentId,
+  reCommentId,
+}: {
+  articleId: number;
+  commentId: number;
+  reCommentId: number;
+}) {
   return axios.delete(
     baseURL +
-      `/api/v1/articles/${articleId}/comments/${commentId}/recomments/${recommentId}`,
+      `/api/v1/articles/${articleId}/comments/${commentId}/recomments/${reCommentId}`,
     {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("accessToken")}`,

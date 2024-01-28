@@ -1,4 +1,6 @@
 import styled from "styled-components";
+import { useEffect, useRef, useState } from "react";
+import { deleteComment, deleteReComment } from "../../../../../API/CommentAPI";
 
 const Wrapper = styled.div`
   display: inline-block;
@@ -28,24 +30,107 @@ const Wrapper = styled.div`
 interface PropsCommentMenuModal {
   setIsEditMode: (value: boolean) => void;
   setIsMenuModalOpen: (value: boolean) => void;
+  articleId: string;
+  type: "comment" | "reComment";
+  commentId?: number;
+  reCommentId?: number;
+  refetchComments: () => Promise<void>;
+  isMyComment: boolean;
 }
 const CommentMenuModal = ({
   setIsEditMode,
   setIsMenuModalOpen,
+  articleId,
+  type,
+  commentId,
+  reCommentId,
+  refetchComments,
+  isMyComment,
 }: PropsCommentMenuModal) => {
-  return (
-    <Wrapper>
-      <button
-        className="editComment"
-        onClick={() => {
-          setIsEditMode(true);
-          setIsMenuModalOpen(false);
-        }}
-      >
-        수정
-      </button>
-      <button className="deleteComment">삭제</button>
-    </Wrapper>
-  );
+  const [isBackgroundClicked, setIsBackgroundClicked] =
+    useState<boolean>(false);
+
+  // 외부 클릭시 모달 닫기
+  const ModalRef = useRef<HTMLDivElement | null>(null);
+
+  const handleClickOutside = (e: MouseEvent) => {
+    if (ModalRef.current) {
+      if (e.target instanceof Node) {
+        if (!ModalRef.current.contains(e.target)) {
+          console.log("back clicked");
+          setIsBackgroundClicked(true);
+        } else {
+          console.log("back not clicked");
+          setIsBackgroundClicked(false);
+        }
+      }
+    }
+  };
+  useEffect(() => {
+    if (!isBackgroundClicked) {
+      console.log("added");
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      console.log("removed");
+      document.removeEventListener("mousedown", handleClickOutside);
+      setIsMenuModalOpen(false);
+    }
+    return () => {
+      console.log("clean up removed");
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isBackgroundClicked, setIsMenuModalOpen]);
+
+  // comment/reComment 삭제
+  const handleDelete = async () => {
+    if (type === "comment" && commentId) {
+      setIsMenuModalOpen(false);
+
+      await deleteComment({
+        articleId: Number(articleId),
+        commentId: commentId,
+      });
+      await refetchComments();
+    } else if (type === "reComment" && commentId && reCommentId) {
+      alert("댓글을 삭제하시겠습니까");
+      setIsMenuModalOpen(false);
+      await deleteReComment({
+        articleId: Number(articleId),
+        commentId: commentId,
+        reCommentId: reCommentId,
+      });
+      await refetchComments();
+    }
+  };
+  if (isMyComment) {
+    return (
+      <Wrapper ref={ModalRef}>
+        <button
+          className="editComment"
+          onClick={() => {
+            setIsEditMode(true);
+            setIsMenuModalOpen(false);
+          }}
+        >
+          수정
+        </button>
+        <button className="deleteComment" onClick={() => handleDelete()}>
+          삭제
+        </button>
+      </Wrapper>
+    );
+  } else {
+    return (
+      <Wrapper ref={ModalRef}>
+        <button
+          onClick={() => {
+            setIsMenuModalOpen(false);
+          }}
+        >
+          댓글 쓰기
+        </button>
+      </Wrapper>
+    );
+  }
 };
 export default CommentMenuModal;

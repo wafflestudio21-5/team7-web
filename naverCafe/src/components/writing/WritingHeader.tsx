@@ -59,8 +59,21 @@ const Wrapper = styled.div`
 `;
 interface PropsWritingHeader {
   handleWritePost: () => Promise<void>;
+  handleEditArticle: () => Promise<void>;
+  isEditMode: boolean;
 }
-const WritingHeader = ({ handleWritePost }: PropsWritingHeader) => {
+const WritingHeader = ({
+  handleWritePost,
+  handleEditArticle,
+  isEditMode,
+}: PropsWritingHeader) => {
+  const handleOnClickButton = () => {
+    if (isEditMode) {
+      handleEditArticle();
+    } else {
+      handleWritePost();
+    }
+  };
   return (
     <Wrapper>
       <ul className="specialMenu">
@@ -73,7 +86,13 @@ const WritingHeader = ({ handleWritePost }: PropsWritingHeader) => {
       </ul>
       <div className="header">
         <h2>카페 글쓰기</h2>
-        <button onClick={() => handleWritePost()}>등록</button>
+        <button
+          onClick={() => {
+            handleOnClickButton();
+          }}
+        >
+          {isEditMode ? "수정" : "등록"}
+        </button>
       </div>
     </Wrapper>
   );
