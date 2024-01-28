@@ -26,13 +26,13 @@ export type ArticleType = {
     visitCount: number;
     articlesCount: number;
     commentsCount: number;
-    accessToken: string;
+    accessToken?: string;
   };
   board: {
     id: number;
     name: string;
   };
-  allowComments: boolean;
+  allowComments?: boolean;
   isNotification: boolean;
 };
 
