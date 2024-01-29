@@ -1,5 +1,5 @@
 import styled, { css } from "styled-components";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getCafeInfo } from "../../API/CafeAPI";
 import { waffleCafe } from "../../Constants";

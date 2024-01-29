@@ -1,13 +1,16 @@
 import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 import WritingContent from "./writing/WritingContent";
 import WritingHeader from "./writing/WritingHeader";
 import WritingSideBar from "./writing/WritingSideBar";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-import { postArticle } from "../API/ArticleAPI";
+import { editArticle, postArticle } from "../API/ArticleAPI";
+
+import QueryString from "qs";
+import { useWholeBoard } from "../API/BoardAPI";
 
 const Wrapper = styled.div`
   display: grid;
@@ -29,7 +32,7 @@ const Wrapper = styled.div`
 `;
 
 const Writing = () => {
-  const [isAnnouncement, setIsAnnouncement] = useState<boolean>(false);
+  const [isNotification, setIsNotification] = useState<boolean>(false);
   const [isCommentAllowed, setIsCommentAllowed] = useState<boolean>(true);
   const [openSetting, setOpenSetting] = useState<string>("전체공개");
   const [inputBoard, setInputBoard] =
@@ -38,6 +41,23 @@ const Writing = () => {
   const [inputContent, setInputContent] = useState("");
 
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const { boardList } = useWholeBoard();
+
+  const isEditMode = Boolean(QueryString.parse(location.search)["?editMode"]);
+  // 만약 글을 수정하는 상태이면(params로 editMode=true) 데이터 미리 채워두기
+  useEffect(() => {
+    if (isEditMode) {
+      const { title, content, board, allowComments, isNotification } =
+        location.state;
+      setInputTitle(title);
+      setInputContent(content);
+      setInputBoard(board.name);
+      setIsCommentAllowed(allowComments);
+      setIsNotification(isNotification);
+    }
+  }, [location, isEditMode]);
 
   const handleWritePost = async () => {
     if (inputBoard === "게시판을 선택해주세요.") {
@@ -47,29 +67,62 @@ const Writing = () => {
     } else if (inputContent === "") {
       alert("내용을 입력해주세요.");
     } else {
-      await postArticle({
-        title: inputTitle,
-        content: inputContent,
-        boardId: 1,
-        // board id는 어떻게 처리되는지 모르겠어서 일단 이렇게 두었습니다.
-        allowComments: isCommentAllowed,
-        isNotification: isAnnouncement,
-      }).then((res) => {
-        if (res !== undefined) {
-          navigate(`/articles/${res.data.id}`);
-        }
-      });
+      if (boardList !== null) {
+        const boardId = boardList.boards.filter(
+          (board) => board.name === inputBoard
+        )[0].id;
+        await postArticle({
+          title: inputTitle,
+          content: inputContent,
+          boardId: boardId,
+          allowComments: isCommentAllowed,
+          isNotification: isNotification,
+        })
+          .then((res) => {
+            if (res !== undefined) {
+              navigate(`/articles/${res.data.id}`);
+            }
+          })
+          .catch((err) => console.error(err));
+      }
     }
   };
-  const stringToHTML = function (str) {
-    const dom = document.createElement("div");
-    dom.innerHTML = str;
-    return dom;
+  const handleEditArticle = async () => {
+    if (inputBoard === "게시판을 선택해주세요.") {
+      alert("게시판을 선택해주세요.");
+    } else if (inputTitle === "") {
+      alert("제목을 입력해주세요.");
+    } else if (inputContent === "") {
+      alert("내용을 입력해주세요.");
+    } else {
+      if (boardList) {
+        const boardId = boardList.boards.filter(
+          (board) => board.name === inputBoard
+        )[0].id;
+        const articleId = Number(location.state["articleId"]);
+        await editArticle(articleId, {
+          title: inputTitle,
+          content: inputContent,
+          boardId: boardId,
+          allowComments: isCommentAllowed,
+          isNotification: isNotification,
+        })
+          .then((res) => {
+            if (res !== undefined) {
+              navigate(`/articles/${res.data.id}`);
+            }
+          })
+          .catch((err) => console.error(err));
+      }
+    }
   };
-  console.log(stringToHTML(inputContent).innerText);
   return (
     <Wrapper>
-      <WritingHeader handleWritePost={handleWritePost} />
+      <WritingHeader
+        handleWritePost={handleWritePost}
+        handleEditArticle={handleEditArticle}
+        isEditMode={isEditMode}
+      />
       <WritingContent
         inputBoard={inputBoard}
         setInputBoard={setInputBoard}
@@ -77,10 +130,11 @@ const Writing = () => {
         setInputTitle={setInputTitle}
         inputContent={inputContent}
         setInputContent={setInputContent}
+        boardList={boardList}
       />
       <WritingSideBar
-        isAnnouncement={isAnnouncement}
-        setIsAnnouncement={setIsAnnouncement}
+        isNotification={isNotification}
+        setIsNotification={setIsNotification}
         openSetting={openSetting}
         setOpenSetting={setOpenSetting}
         isCommentAllowed={isCommentAllowed}

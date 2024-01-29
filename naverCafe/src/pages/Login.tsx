@@ -327,11 +327,7 @@ const Find = styled.div`
     }
   }
 `;
-interface PropsLogin {
-  setMyUsername: (value: string) => void;
-  setAccessToken: (value: string) => void;
-}
-const Login = ({ setMyUsername, setAccessToken }: PropsLogin) => {
+const Login = () => {
   const [inputUsername, setInputUsername] = useState<string>("");
   const [inputPassword, setInputPassword] = useState<string>("");
   const [isIDLoginSelected, setIsIDLoginSelected] = useState<boolean>(true);
@@ -358,19 +354,16 @@ const Login = ({ setMyUsername, setAccessToken }: PropsLogin) => {
       setIsErrorOnPassword(false);
     }
     await login({ username: inputUsername, password: inputPassword })
-      .then((res) => {
+      .then(async (res) => {
         console.log(res);
-        setMyUsername(inputUsername);
-        setAccessToken(res.data.accessToken);
-        // 테스트를 위해 안정화될때까진 localStorage 이용하겠습니다.
         window.localStorage.setItem("accessToken", res.data.accessToken);
+        console.log(res.data.accessToken);
         navigate("/");
       })
       .catch((err) => {
         console.log(err);
         setIsErrorOnBoth(true);
       });
-    return;
   };
 
   return (
