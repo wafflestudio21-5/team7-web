@@ -7,7 +7,7 @@ import {
   postComment,
   postReComment,
 } from "../../../../../API/CommentAPI";
-import { useAuthContext } from "../../../../../contexts/AuthContext";
+import { useMyProfile } from "../../../../../API/UserAPI";
 
 const Wrapper = styled.div<{
   $commentLength: number;
@@ -130,7 +130,7 @@ const CommentWriter = ({
 }: PropsCommentWriter) => {
   const [commentInput, setCommentInput] = useState<string>("");
   const commentTextarea = useRef<HTMLTextAreaElement | null>(null);
-  const { myUsername } = useAuthContext();
+  const { myProfile } = useMyProfile();
 
   const handleCommentTextareaHeight = () => {
     if (commentTextarea.current !== null) {
@@ -144,7 +144,11 @@ const CommentWriter = ({
     if (commentInput.length === 0) {
       return alert("내용을 입력해주세요");
     } else {
-      await postComment(Number(articleId), commentInput);
+      await postComment({
+        articleId: Number(articleId),
+        content: commentInput,
+        isSecret: false,
+      });
       await refetchComments();
       setCommentInput("");
     }
@@ -154,9 +158,15 @@ const CommentWriter = ({
       return alert("내용을 입력해주세요");
     } else {
       // context 작업 필요("userId"에는 userId 가 들어가야함)
-      if (info.commentId) {
-        await postReComment(Number(articleId), info.commentId, commentInput);
+      if (info.commentId && setIsCommentWriterOpen) {
+        await postReComment({
+          articleId: Number(articleId),
+          commentId: info.commentId,
+          content: commentInput,
+          isSecret: false,
+        });
         await refetchComments();
+        setIsCommentWriterOpen(false);
         setCommentInput("");
       }
     }
@@ -165,9 +175,11 @@ const CommentWriter = ({
     if (commentInput.length === 0) {
       return alert("내용을 입력해주세요");
     } else {
-      if (info.commentId) {
+      if (info.commentId && setIsEditMode) {
         await editComment(Number(articleId), info.commentId, commentInput);
         await refetchComments();
+        setIsEditMode(false);
+        setCommentInput("");
       }
     }
   };
@@ -175,14 +187,16 @@ const CommentWriter = ({
     if (commentInput.length === 0) {
       return alert("내용을 입력해주세요");
     } else {
-      if (info.commentId && info.reCommentId) {
-        await editReComment(
-          Number(articleId),
-          info.commentId,
-          info.reCommentId,
-          commentInput
-        );
+      if (info.commentId && info.reCommentId && setIsEditMode) {
+        await editReComment({
+          articleId: Number(articleId),
+          commentId: info.commentId,
+          reCommentId: info.reCommentId,
+          content: commentInput,
+        });
         await refetchComments();
+        setIsEditMode(false);
+        setCommentInput("");
       }
     }
   };
@@ -191,11 +205,10 @@ const CommentWriter = ({
       setCommentInput(info.inputValue);
     }
   }, []);
-
   return (
     <Wrapper $commentLength={commentInput.length} $type={info.type}>
       <div className="CommentWriter">
-        <div className="writerName">{myUsername}</div>
+        <div className="writerName">{myProfile?.nickname}</div>
         <textarea
           ref={commentTextarea}
           placeholder="댓글을 남겨보세요"

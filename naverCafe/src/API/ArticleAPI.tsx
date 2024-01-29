@@ -41,7 +41,7 @@ export function editArticle(
     isNotification: boolean;
   }
 ) {
-  return axios.post(
+  return axios.put(
     baseURL + `/api/v1/articles/${articleId}/modify`,
     newArticleInfo,
     {
@@ -86,11 +86,15 @@ export function useArticle(articleId: number) {
 
 // article 좋아요 추가
 export function addLike(articleId: number) {
-  return axios.post(baseURL + `/api/v1/articles/${articleId}/like`, {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-    },
-  });
+  return axios.post(
+    baseURL + `/api/v1/articles/${articleId}/like`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+    }
+  );
 }
 // article 좋아요 취소
 export function deleteLike(articleId: number) {

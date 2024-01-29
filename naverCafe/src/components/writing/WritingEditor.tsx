@@ -64,11 +64,11 @@ interface PropsWritingEditor {
   setInputContent: (value: string) => void;
 }
 const WritingEditor = ({
-  // inputContent,
+  inputContent,
   setInputContent,
 }: PropsWritingEditor) => {
   // content는 html 태그들로 이루어진 string으로 저장이 되는데, 이를 실제로 읽을 때는 dangerouslySetInnerHTML 을 사용해야지 해킹에서 벗어날 수 있다고 하네요
-
+  console.log(inputContent);
   return (
     <Wrapper>
       <ReactQuill
@@ -76,6 +76,7 @@ const WritingEditor = ({
         modules={modules}
         formats={formats}
         theme="snow"
+        value={inputContent}
         onChange={setInputContent}
       />
     </Wrapper>

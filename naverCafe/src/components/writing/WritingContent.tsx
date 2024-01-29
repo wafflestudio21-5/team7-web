@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import WritingEditor from "./WritingEditor";
 import { useMemo, useState } from "react";
+import { BoardList } from "../../Constants";
 
 const Wrapper = styled.div``;
 const EditorHeader = styled.div`
@@ -118,28 +119,6 @@ const EditorHeader = styled.div`
 `;
 const EditorBox = styled.div``;
 
-const exampleBoardList = [
-  {
-    id: 1,
-    boardname: "자유게시판",
-  },
-  {
-    id: 2,
-    boardname: "React",
-  },
-  {
-    id: 3,
-    boardname: "TypeScript",
-  },
-  {
-    id: 4,
-    boardname: "Spring",
-  },
-  {
-    id: 5,
-    boardname: "Django",
-  },
-];
 interface PropsWritingContent {
   inputBoard: string;
   setInputBoard: (value: string) => void;
@@ -147,6 +126,12 @@ interface PropsWritingContent {
   setInputTitle: (value: string) => void;
   inputContent: string;
   setInputContent: (value: string) => void;
+  boardList: {
+    boards: {
+      id: number;
+      name: string;
+    }[];
+  } | null;
 }
 const WritingContent = ({
   inputBoard,
@@ -155,26 +140,28 @@ const WritingContent = ({
   setInputTitle,
   inputContent,
   setInputContent,
+  boardList,
 }: PropsWritingContent) => {
   const [isInputBoardClicked, setIsInputBoardClicked] =
     useState<boolean>(false);
+  console.log(BoardList());
 
-  const boardList = useMemo(() => {
-    return exampleBoardList.map((board) => {
+  const newBoardList = useMemo(() => {
+    return boardList?.boards.map((board) => {
       return (
         <li
           key={board.id}
-          className={board.boardname === inputBoard ? "board active" : "board"}
+          className={board.name === inputBoard ? "board active" : "board"}
           onClick={() => {
             setIsInputBoardClicked(false);
-            setInputBoard(board.boardname);
+            setInputBoard(board.name);
           }}
         >
-          {board.boardname}
+          {board.name}
         </li>
       );
     });
-  }, [inputBoard, setInputBoard]);
+  }, [inputBoard, setInputBoard, boardList]);
 
   return (
     <Wrapper>
@@ -188,7 +175,7 @@ const WritingContent = ({
               {inputBoard}
             </button>
             {isInputBoardClicked ? (
-              <ul className="boardList">{boardList}</ul>
+              <ul className="boardList">{newBoardList}</ul>
             ) : null}
           </div>
           <div className="selectHead">

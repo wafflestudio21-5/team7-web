@@ -127,16 +127,16 @@ const Wrapper = styled.div`
 `;
 
 interface PropsWritingSideBar {
-  isAnnouncement: boolean;
-  setIsAnnouncement: (value: boolean) => void;
+  isNotification: boolean;
+  setIsNotification: (value: boolean) => void;
   openSetting: string;
   setOpenSetting: (value: string) => void;
   isCommentAllowed: boolean;
   setIsCommentAllowed: (value: boolean) => void;
 }
 const WritingSideBar = ({
-  isAnnouncement,
-  setIsAnnouncement,
+  isNotification,
+  setIsNotification,
   openSetting,
   setOpenSetting,
   isCommentAllowed,
@@ -150,8 +150,8 @@ const WritingSideBar = ({
         <div className="announceSetting">
           {/* rank n 이상일 경우에만 뜨도록 조정*/}
           <label
-            className={isAnnouncement ? "announcement" : "notAnnouncement"}
-            onClick={() => setIsAnnouncement(!isAnnouncement)}
+            className={isNotification ? "announcement" : "notAnnouncement"}
+            onClick={() => setIsNotification(!isNotification)}
           >
             공지로 등록
           </label>

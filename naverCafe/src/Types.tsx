@@ -9,6 +9,20 @@ export type GroupType = {
   boards: BoardType[];
 };
 
+export type BriefMyInfo = {
+  nickname: string;
+  rank: string;
+  visit_count: number;
+  my_article_count: number;
+  my_comment_count: number;
+  register_date: string;
+  image?: string;
+};
+export type myProfile = {
+  nickname: string;
+  introduction: string;
+  image: string;
+};
 export type ArticleType = {
   id: number;
   title: string;
@@ -46,7 +60,9 @@ export type CommentType = {
     content: string;
     lastModified: string;
     nickname: string;
+    isSecret: boolean;
   }[];
+  isSecret: boolean;
 };
 
 //GET (activity)

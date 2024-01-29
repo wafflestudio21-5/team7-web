@@ -1,4 +1,5 @@
 //baseURL 및 기타 상수
+import { useMemo } from "react";
 import { useWholeBoard } from "./API/BoardAPI";
 import { ArticleType, type Cafe } from "./Types";
 
@@ -15,6 +16,7 @@ export const waffleCafe: Cafe = {
 
 //게시판은 거의 상수처럼 사용되기 때문에 추가했습니다.
 export const BoardList = () => {
+  console.log("boardList rendered");
   const { boardList } = useWholeBoard();
   return boardList;
 };
@@ -29,7 +31,7 @@ export const aList: ArticleType[] = [
     createdAt: "2024-01-12T12:00:00Z",
     viewCount: 33,
     likeCount: 3,
-    commentCount:4,
+    commentCount: 4,
     author: {
       id: 1,
       nickname: "허유민",
@@ -44,14 +46,15 @@ export const aList: ArticleType[] = [
     board: { board_id: 3, board_name: "MySQL" },
     allowComments: true,
     isNotification: true,
-  },{
+  },
+  {
     title: "두번째 글입니다~~",
     id: 2,
     content: "두번째 글의 내용입니다...",
     createdAt: "2024-01-12T12:00:00Z",
     viewCount: 33,
     likeCount: 3,
-    commentCount:4,
+    commentCount: 4,
     author: {
       id: 1,
       nickname: "허유민",
@@ -66,14 +69,15 @@ export const aList: ArticleType[] = [
     board: { board_id: 2, board_name: "장고" },
     allowComments: true,
     isNotification: false,
-  },{
+  },
+  {
     title: "세번째 글입니다~~",
     id: 3,
     content: "세번째 글의 내용입니다...",
     createdAt: "2024-01-12T12:00:00Z",
     viewCount: 33,
     likeCount: 3,
-    commentCount:4,
+    commentCount: 4,
     author: {
       id: 1,
       nickname: "허유민",
@@ -88,5 +92,5 @@ export const aList: ArticleType[] = [
     board: { board_id: 1, board_name: "스프링" },
     allowComments: true,
     isNotification: false,
-  }
+  },
 ];

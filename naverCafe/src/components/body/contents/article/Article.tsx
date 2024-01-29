@@ -1,6 +1,6 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { useParams, Link, useLocation } from "react-router-dom";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import CommentBox from "./comment/CommentBox";
 import RelatedArticles from "./RelatedArticles";
@@ -17,10 +17,20 @@ import {
 } from "../../../../API/ArticleAPI";
 import { useComments } from "../../../../API/CommentAPI";
 import { useNavigate } from "react-router-dom";
+import { useMyProfile } from "../../../../API/UserAPI";
 
-const Wrapper = styled.div`
-  /* class가 auth에 포함되어 있을 떄 article의 author와 현재 로그인 상의 user의 id를 비교 */
-  /* 다를 때만 display: none */
+const Wrapper = styled.div<{ $isMyArticle: boolean }>`
+  .auth {
+    ${(props) => {
+      if (props.$isMyArticle) {
+        return css``;
+      } else {
+        return css`
+          display: none;
+        `;
+      }
+    }}
+  }
 `;
 const ArticleTopButtons = styled.div`
   width: 100%;
@@ -28,6 +38,8 @@ const ArticleTopButtons = styled.div`
   padding: 0 0 14px;
   box-sizing: border-box;
   position: relative;
+  .auth {
+  }
 
   button {
     min-width: 46px;
@@ -41,6 +53,9 @@ const ArticleTopButtons = styled.div`
     color: #000;
     font-weight: 700;
     cursor: pointer;
+    & > a {
+      width: 100%;
+    }
   }
 
   .left {
@@ -354,15 +369,27 @@ const AdvertArea = styled.div`
 
 const Article = () => {
   const { articleId } = useParams();
-  const [isArticleLiked, setIsArticleLiked] = useState<boolean>(false);
-  // Article 컴포넌트 내부에서 서버에서 받아오는 articleData, commentData를 정의하고 사용하겠습니다.
-  // const [articleData, setArticleData] = useState<ArticleData | null>(null);
-  // const [commentData, setCommentData] = useState<CommentsData | null>(null);
   const navigate = useNavigate();
   const { article, refetchArticle } = useArticle(Number(articleId));
-  const { comments } = useComments(Number(articleId));
+  const { comments, refetchComments } = useComments(Number(articleId));
   console.log(article);
+  // 좋아요 설정
+  const [isArticleLiked, setIsArticleLiked] = useState<boolean>(false);
+  useEffect(() => {
+    if (article) {
+      console.log(article.isLiked);
+      setIsArticleLiked(article.isLiked);
+    }
+  }, [article]);
 
+  const { myProfile } = useMyProfile();
+  const isMyArticle = useMemo(() => {
+    if (article && myProfile) {
+      return myProfile?.nickname === article?.article.author.nickname;
+    } else {
+      return null;
+    }
+  }, [article, myProfile]);
   // TOP 버튼을 눌렀을 때 위로 스크롤합니다.
   const TopButtonsRef = useRef<HTMLDivElement>(null);
   const scrollToTop = () => {
@@ -395,13 +422,13 @@ const Article = () => {
     if (isArticleLiked) {
       // 이미 좋아요 -> 좋아요 취소 인 경우
       setIsArticleLiked(false);
-      await addLike(Number(articleId));
+      await deleteLike(Number(articleId));
       // 추가로 좋아요 -1 -> article의 refetch로서..
       await refetchArticle();
     } else {
       // 새롭게 좋아요를 누르는 경우
       setIsArticleLiked(true);
-      await deleteLike(Number(articleId));
+      await addLike(Number(articleId));
       // 추가로 좋아요 +1 -> article의 refetch로서 전체 데이터 업데이트
       await refetchArticle();
     }
@@ -420,16 +447,43 @@ const Article = () => {
     }
   }, [comments]);
 
-  if (article) {
+  // 글 삭제 handle
+  const handleDeleteArticle = async () => {
+    alert("게시글을 삭제하시겠습니까?");
+    await deleteArticle(Number(articleId))
+      .then(() => {
+        navigate(`/board/${article?.article.board.id}`);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  if (article && articleId && comments && isMyArticle !== null) {
     return (
-      <Wrapper>
+      <Wrapper $isMyArticle={isMyArticle}>
         <ArticleTopButtons ref={TopButtonsRef}>
           <div className="left">
-            <button className="edit auth">
-              <Link to={"/write"}>수정</Link>
+            <button
+              className="edit auth"
+              onClick={() => {
+                navigate(`/write?editMode=${true}`, {
+                  state: {
+                    articleId: article.article.id,
+                    title: article.article.title,
+                    content: article.article.content,
+                    board: article.article.board,
+                    allowComments: article.article.allowComments,
+                    isNotification: article.article.isNotification,
+                  },
+                });
+              }}
+            >
+              수정
             </button>
-            <button className="delete auth">
-              <Link to={"/"}>삭제</Link>
+            <button
+              className="delete auth"
+              onClick={() => handleDeleteArticle()}
+            >
+              삭제
             </button>
           </div>
           <div className="right">
@@ -474,7 +528,8 @@ const Article = () => {
                     <span className="createdAt">
                       {article?.article.createdAt
                         .replace(/-/g, ".")
-                        .replace(/T\d\d:/, ". ")}
+                        .replace(/T/, " ")
+                        .replace(/.\d\d\d\d\d\d/, "")}
                     </span>
                     <span className="viewCount">
                       조회 {article?.article.viewCount}
@@ -500,7 +555,11 @@ const Article = () => {
               </div>
             </div>
           </ArticleHeader>
-          <ArticleBody>{article?.article.content}</ArticleBody>
+          <ArticleBody>
+            <div
+              dangerouslySetInnerHTML={{ __html: article?.article.content }}
+            ></div>
+          </ArticleBody>
           <ArticleFooter>
             <div className="aboutAuthor">
               <Link to={"/"}>
@@ -555,7 +614,11 @@ const Article = () => {
             </div>
           </ArticleFooter>
           <div className="comments" ref={CommentsRef}>
-            <CommentBox articleId={articleId} />
+            <CommentBox
+              articleId={articleId}
+              comments={comments.comments}
+              refetchComments={refetchComments}
+            />
           </div>
         </ArticleBox>
         <ArticleBottomButtons>
@@ -566,19 +629,39 @@ const Article = () => {
             </button>
             {/* <button className="reArticle">답글</button> */}
             {/* 답글 기능은 없는 거 같아 일단 제외하겠습니다. */}
-            <button className="edit auth">수정</button>
+            <button
+              className="edit auth"
+              onClick={() => {
+                navigate(`/write?editMode=${true}`, {
+                  state: {
+                    articleId: article.article.id,
+                    title: article.article.title,
+                    content: article.article.content,
+                    board: article.article.board,
+                    allowComments: article.article.allowComments,
+                    isNotification: article.article.isNotification,
+                  },
+                });
+              }}
+            >
+              수정
+            </button>
             <button
               className="delete auth"
-              onClick={() => {
-                deleteArticle(Number(articleId));
-                navigate("/");
-              }}
+              onClick={() => handleDeleteArticle()}
             >
               삭제
             </button>
           </div>
           <div className="right">
-            <button className="articleList">목록</button>
+            <button
+              className="articleList"
+              onClick={() => {
+                navigate(`/board/${article.article.board.id}`);
+              }}
+            >
+              목록
+            </button>
             <button className="scrollTop" onClick={() => scrollToTop()}>
               <img src={upTriangle} alt="위로 가기" />
               <span>TOP</span>
@@ -588,7 +671,9 @@ const Article = () => {
         <AdvertArea />
         <RelatedArticles
           articleId={articleId}
-          boardId={article?.article.board.id}
+          boardId={article.article.board.id}
+          boardName={article.article.board.name}
+          scrollToTop={scrollToTop}
         />
       </Wrapper>
     );

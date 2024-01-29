@@ -8,15 +8,19 @@ import CommentWriter from "./CommentWriter";
 import CommentMenuModal from "./CommentMenuModal";
 
 import { CommentType } from "../../../../../Types";
+import { useMyProfile } from "../../../../../API/UserAPI";
 
 const Wrapper = styled.li`
   /* width: 100%; */
-  padding: 12px 23px 0 0;
-  background: #f9f9fa;
+  padding: 12px 23px 10px 0;
   font-size: 13px;
+  position: relative;
+  background: #f9f9fa;
+
   & > .contentBox {
     width: 800px;
     padding: 0 0 0 46px;
+    left: 29px;
     box-sizing: border-box;
     position: relative;
     & > .left {
@@ -76,11 +80,16 @@ const Wrapper = styled.li`
       }
     }
   }
+  & > .commentWriterBox {
+    display: inline-block;
+    width: 754px;
+    padding-left: 46px;
+  }
 `;
 
 interface PropsComment {
   comment: CommentType;
-  articleId: string | undefined;
+  articleId: string;
   refetchComments: () => Promise<void>;
 }
 const Comment = ({ comment, articleId, refetchComments }: PropsComment) => {
@@ -88,14 +97,14 @@ const Comment = ({ comment, articleId, refetchComments }: PropsComment) => {
     useState<boolean>(false);
   const [isMenuModalOpen, setIsMenuModalOpen] = useState<boolean>(false);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
+  const { myProfile } = useMyProfile();
 
-  console.log("reRendered!");
-
-  if (isEditMode) {
+  if (isEditMode && myProfile) {
     return (
       <Wrapper>
         <CommentWriter
           articleId={articleId}
+          setIsCommentWriterOpen={setIsCommentWriterOpen}
           info={{
             type: "editComment",
             commentId: comment.id,
@@ -106,7 +115,7 @@ const Comment = ({ comment, articleId, refetchComments }: PropsComment) => {
         />
       </Wrapper>
     );
-  } else {
+  } else if (myProfile) {
     return (
       <Wrapper>
         <div className="contentBox">
@@ -126,7 +135,10 @@ const Comment = ({ comment, articleId, refetchComments }: PropsComment) => {
               <div className="content">{comment.content}</div>
               <div className="commentInfo">
                 <span>
-                  {comment.lastModified.replace(/-/g, ".").replace(/T/, ". ")}
+                  {comment.lastModified
+                    .replace(/-/g, ".")
+                    .replace(/T/, ". ")
+                    .replace(/.\d\d\d\d\d\d/, "")}
                 </span>
                 <span>
                   <button
@@ -148,10 +160,17 @@ const Comment = ({ comment, articleId, refetchComments }: PropsComment) => {
               <CommentMenuModal
                 setIsEditMode={setIsEditMode}
                 setIsMenuModalOpen={setIsMenuModalOpen}
+                articleId={articleId}
+                type="comment"
+                commentId={comment.id}
+                refetchComments={refetchComments}
+                isMyComment={myProfile.nickname === comment.nickname}
               />
             ) : null}
           </div>
-          {isCommentWriterOpen ? (
+        </div>
+        {isCommentWriterOpen ? (
+          <div className="commentWriterBox">
             <CommentWriter
               articleId={articleId}
               setIsCommentWriterOpen={setIsCommentWriterOpen}
@@ -159,10 +178,11 @@ const Comment = ({ comment, articleId, refetchComments }: PropsComment) => {
                 type: "reComment",
                 commentId: comment.id,
               }}
+              setIsEditMode={setIsEditMode}
               refetchComments={refetchComments}
             />
-          ) : null}
-        </div>
+          </div>
+        ) : null}
       </Wrapper>
     );
   }

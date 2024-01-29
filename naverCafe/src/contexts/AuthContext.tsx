@@ -1,8 +1,7 @@
 import { createContext, useContext } from "react";
 
 export const AuthContext = createContext<{
-  myUsername: string;
-  accessToken: string;
+  myNickname: string;
 } | null>(null);
 export function useAuthContext() {
   const context = useContext(AuthContext);

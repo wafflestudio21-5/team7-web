@@ -5,17 +5,20 @@ import { Link } from "react-router-dom";
 import CommentWriter from "./CommentWriter";
 import CommentMenuModal from "./CommentMenuModal";
 import menuDotsIcon from "../../../../../assets/comments-menuDots.svg";
+import { useMyProfile } from "../../../../../API/UserAPI";
 
 const Wrapper = styled.li`
   /* width: 100%; */
-  padding: 12px 23px 0 0;
+  padding: 12px 23px 10px 0;
   background: #f9f9fa;
   font-size: 13px;
+  position: relative;
   & > .contentBox {
     width: 800px;
     padding: 0 0 0 92px;
     box-sizing: border-box;
     position: relative;
+    left: 29px;
     & > .left {
       display: flex;
       position: relative;
@@ -73,6 +76,11 @@ const Wrapper = styled.li`
       }
     }
   }
+  & > .commentWriterBox {
+    display: inline-block;
+    width: 754px;
+    padding-left: 46px;
+  }
 `;
 interface PropsReComment {
   commentId: number;
@@ -82,7 +90,7 @@ interface PropsReComment {
     lastModified: string;
     nickname: string;
   };
-  articleId: string | undefined;
+  articleId: string;
   refetchComments: () => Promise<void>;
 }
 
@@ -96,12 +104,14 @@ const ReComment = ({
     useState<boolean>(false);
   const [isMenuModalOpen, setIsMenuModalOpen] = useState<boolean>(false);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
+  const { myProfile } = useMyProfile();
 
-  if (isEditMode) {
+  if (isEditMode && myProfile) {
     return (
       <Wrapper>
         <CommentWriter
           articleId={articleId}
+          setIsCommentWriterOpen={setIsCommentWriterOpen}
           info={{
             type: "editReComment",
             commentId: commentId,
@@ -113,7 +123,7 @@ const ReComment = ({
         />
       </Wrapper>
     );
-  } else {
+  } else if (myProfile) {
     return (
       <Wrapper>
         <div className="contentBox">
@@ -133,7 +143,10 @@ const ReComment = ({
               <div className="content">{reComment.content}</div>
               <div className="commentInfo">
                 <span>
-                  {reComment.lastModified.replace(/-/g, ".").replace(/T/, ". ")}
+                  {reComment.lastModified
+                    .replace(/-/g, ".")
+                    .replace(/T/, ". ")
+                    .replace(/.\d\d\d\d\d\d/, "")}
                 </span>
                 <span>
                   <button
@@ -155,12 +168,21 @@ const ReComment = ({
               <CommentMenuModal
                 setIsEditMode={setIsEditMode}
                 setIsMenuModalOpen={setIsMenuModalOpen}
+                type="reComment"
+                articleId={articleId}
+                commentId={commentId}
+                reCommentId={reComment.id}
+                refetchComments={refetchComments}
+                isMyComment={myProfile.nickname === reComment.nickname}
               />
             ) : null}
           </div>
-          {isCommentWriterOpen ? (
+        </div>
+        {isCommentWriterOpen ? (
+          <div className="commentWriterBox">
             <CommentWriter
               articleId={articleId}
+              setIsEditMode={setIsEditMode}
               setIsCommentWriterOpen={setIsCommentWriterOpen}
               info={{
                 type: "reComment",
@@ -168,8 +190,8 @@ const ReComment = ({
               }}
               refetchComments={refetchComments}
             />
-          ) : null}
-        </div>
+          </div>
+        ) : null}
       </Wrapper>
     );
   }
