@@ -109,7 +109,7 @@ export const NoticeTr = ({
   DateOnly,
 }: {
   notice: ArticleType;
-  isLike: boolean;
+  isLike: boolean | string | undefined;
   DateOnly: (arg: string) => string;
 }) => {
   const navigate = useNavigate();
@@ -125,8 +125,16 @@ export const NoticeTr = ({
           </div>
           <div className="board_list">
             <div className="inner_list">
-              <span className="article_title">{notice.title}</span>
-              <span className="comment">
+              <span
+                className="article_title"
+                onClick={() => navigate(`/articles/${notice.id}`)}
+              >
+                {notice.title}
+              </span>
+              <span
+                className="comment"
+                onClick={() => navigate(`/articles/${notice.id}`)}
+              >
                 {" ["}
                 <em>{notice.commentCount}</em>
                 {"] "}

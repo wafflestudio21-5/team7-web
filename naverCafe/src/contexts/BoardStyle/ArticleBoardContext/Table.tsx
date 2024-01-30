@@ -512,19 +512,26 @@ const CardViewUl = ({
                 <div className="tit_area">
                   <p className="tit">
                     <span className="inner">
-                      <strong>{article.title}</strong>
+                      <strong
+                        onClick={() => navigate(`/articles/${article.id}`)}
+                      >
+                        {article.title}
+                      </strong>
                     </span>
                   </p>
                 </div>
-                <p className="txt">{article.content}</p>
+                <p
+                  className="txt"
+                  onClick={() => navigate(`/articles/${article.id}`)}
+                >
+                  {article.content}
+                </p>
               </div>
               <div className="con_bottom">
                 <div className="user_info">
                   <div
                     className="pers_nick_area"
-                    onClick={() =>
-                      navigate(`/users/${article.author.id}`)
-                    }
+                    onClick={() => navigate(`/users/${article.author.id}`)}
                   >
                     {article.author.nickname}
                   </div>
@@ -672,10 +679,18 @@ export const ArticleTable = ({
                 <div className="title">
                   <div className="board_list">
                     <div className="inner_list">
-                      <span className="article_title">{article.title}</span>
+                      <span
+                        className="article_title"
+                        onClick={() => navigate(`/articles/${article.id}`)}
+                      >
+                        {article.title}
+                      </span>
                       <span></span>
-                      
-                      <span className="comment">
+
+                      <span
+                        className="comment"
+                        onClick={() => navigate(`/articles/${article.id}`)}
+                      >
                         {" ["}
                         <em>{article.commentCount}</em>
                         {"] "}
@@ -686,8 +701,13 @@ export const ArticleTable = ({
               </td>
               <td className="td_author">
                 <div className="ArticleBoardAuthorInfo">
-                  <button >
-                    <span className="nickname" onClick={()=>navigate(`/users/${article.author.id}`)}>{article.author.nickname}</span>
+                  <button>
+                    <span
+                      className="nickname"
+                      onClick={() => navigate(`/users/${article.author.id}`)}
+                    >
+                      {article.author.nickname}
+                    </span>
                   </button>
                 </div>
                 {/* <div className="popup">
