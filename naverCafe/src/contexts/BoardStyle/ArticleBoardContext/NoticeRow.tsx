@@ -2,6 +2,7 @@
 
 import styled from "styled-components";
 import { ArticleType } from "../../../Types";
+import { useNavigate } from "react-router-dom";
 
 const StyledNoticeTr = styled.tr`
   background: #f9f9f8;
@@ -111,6 +112,8 @@ export const NoticeTr = ({
   isLike: boolean;
   DateOnly: (arg: string) => string;
 }) => {
+  const navigate = useNavigate();
+
   return (
     <StyledNoticeTr>
       <td scope="col" colSpan={2} className="td_article">
@@ -135,7 +138,12 @@ export const NoticeTr = ({
       <td scope="col" className="td_author">
         <div className="ArticleBoardAuthorInfo">
           <button>
-            <span className="nickname">{notice.author.nickname}</span>
+            <span
+              className="nickname"
+              onClick={() => navigate(`/users/${notice.author.id}`)}
+            >
+              {notice.author.nickname}
+            </span>
           </button>
         </div>
       </td>

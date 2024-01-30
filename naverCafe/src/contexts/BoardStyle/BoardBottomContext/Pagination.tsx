@@ -47,19 +47,17 @@ export const Pagination = ({ boardId }: { boardId: number }) => {
       newPageNumbers.push(i);
     }
     setPageNumbers(newPageNumbers);
-    console.log(pageNumbers);
   }, [currentPage, articleLength, itemsPerPage]);
 
   return (
     <StyledPagination>
-      {pageNumbers.map((number) => (
-        <StyledButton
+      {pageNumbers.map((number, index) => (
+        <StyledButton tabIndex={index}
           className="page"
           $on={number === currentPage}
           onClick={() => {
             setCurrentPage(number);
             handlePageNumbers();
-            console.log(number);
           }}
         >
           {number}

@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { styled } from "styled-components";
+import { likeBoard, unlikeBoard, useGetLikeBoard } from "../../API/BoardAPI";
+import { BoardType } from "../../Types";
 
 export const Board = styled.div`
   width: 860px;
@@ -53,7 +55,7 @@ const StyledPopularBoardHeader = styled(StyledBoardHeader)`
 
 //CommonBoard: 즐겨찾기 버튼 추가
 const StyledCommonBoardHeader = styled(StyledBoardHeader)`
-  button {
+  input {
     all: unset;
   }
   .bookmark {
@@ -99,15 +101,49 @@ export const PopularBoardHeader = () => {
   );
 };
 
-export const CommonBoardHeader = ({ isFavorite, boardName }: { isFavorite: boolean, boardName:string }) => {
-  const [fav, setFav] = useState(isFavorite);
-  
+export const CommonBoardHeader = ({ board }: { board: BoardType }) => {
+  const { favList, refetch } = useGetLikeBoard();
+  const [isFav, setIsFav] = useState(
+    favList && favList.boards.some((b) => b.id === board.id)
+  );
+
+  const handleFavBoard = async () => {
+    const newFavStatus = !isFav;
+    setIsFav(newFavStatus); //로컬에서 바로 토글 상태를 반영하기 위함
+    console.log(`isFav val: ${isFav}`);
+    console.log(`newFavStat val: ${newFavStatus}`);
+
+    if (isFav) {
+      await unlikeBoard(board.id);
+    } else {
+      likeBoard(board.id);
+    }
+    await refetch();
+  };
+
+  useEffect(() => {
+    refetch();
+    setIsFav(favList && favList.boards.some((b) => b.id === board.id));
+    console.log(`board: `, board, `favList: `, favList, `isFav: ${isFav}`); //isFav는 비동기적 처리로 인해 이전의 값을 출력한다.
+  }, [board]);
+
+  useEffect(() => {
+    setIsFav(favList && favList.boards.some((b) => b.id === board.id));
+    refetch();
+    console.log(`board: `, board, `favList: `, favList, `isFav: ${isFav}`); //isFav는 비동기적 처리로 인해 이전의 값을 출력한다.
+  }, []);
+
   return (
-    <StyledCommonBoardHeader $isFavorite={fav}>
+    <StyledCommonBoardHeader $isFavorite={isFav ? isFav : false}>
       <div className="title-area">
         <div className="info_tit">
-          <h3 className="sub-tit-color">{boardName}</h3>
-          <button onClick={()=>setFav(!fav)} className="bookmark"></button>
+          <h3 className="sub-tit-color">{board.name}</h3>
+          <input
+            type="checkbox"
+            checked={isFav ? isFav : false}
+            onClick={handleFavBoard}
+            className="bookmark"
+          ></input>
         </div>
       </div>
     </StyledCommonBoardHeader>
