@@ -1,10 +1,10 @@
 //baseURL 및 기타 상수
-import { useMemo } from "react";
 import { useWholeBoard } from "./API/BoardAPI";
 import { ArticleType, type Cafe } from "./Types";
 
 export const baseURL = "http://localhost:8080";
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const waffleCafe: Cafe = {
   name: "와플카페",
   url: "https://cafe.naver.com/wafflecafe",
@@ -23,6 +23,7 @@ export const BoardList = () => {
 
 //테스트용
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const aList: ArticleType[] = [
   {
     title: "첫번째 글입니다~~",
@@ -43,7 +44,7 @@ export const aList: ArticleType[] = [
       commentsCount: 6,
       accessToken: "yumin22224",
     },
-    board: { board_id: 3, board_name: "MySQL" },
+    board: { id: 3, name: "MySQL" },
     allowComments: true,
     isNotification: true,
   },
@@ -66,7 +67,7 @@ export const aList: ArticleType[] = [
       commentsCount: 6,
       accessToken: "yumin22224",
     },
-    board: { board_id: 2, board_name: "장고" },
+    board: { id: 2, name: "장고" },
     allowComments: true,
     isNotification: false,
   },
@@ -89,7 +90,7 @@ export const aList: ArticleType[] = [
       commentsCount: 6,
       accessToken: "yumin22224",
     },
-    board: { board_id: 1, board_name: "스프링" },
+    board: { id: 1, name: "스프링" },
     allowComments: true,
     isNotification: false,
   },

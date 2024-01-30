@@ -1,67 +1,78 @@
 // 전체글 게시판
 
 import { useContext, useEffect, useState } from "react";
-import { aList } from "../../../Constants";
 import { boardAttribute } from "../../../contexts/BoardContext/BoardAttrContext";
 import { ArticleTable } from "../../../contexts/BoardStyle/ArticleBoardContext/Table";
 import { BoardBottomOption } from "../../../contexts/BoardStyle/BoardBottomContext/BoardBottomOption";
-import { usePagination } from "../../../contexts/BoardStyle/BoardBottomContext/PaginationContext";
 import {
   Board,
   TotalBoardHeader,
 } from "../../../contexts/BoardStyle/BoardHeaderContext";
 import { TotalBoardTopOption } from "../../../contexts/BoardStyle/BoardTopOptionContext";
-import { ArticleType } from "../../../Types";
+import { ArticleBriefType, ArticleType } from "../../../Types";
 import { CurrentBoardContext } from "../../../contexts/BoardContext/CurrentBoardContext";
 import { wholeArticle } from "../../../API/ArticleAPI";
+import { usePagination } from "../../../contexts/BoardStyle/BoardBottomContext/PaginationContext";
+import { ViewOptionContext } from "../../../contexts/BoardContext/ViewOptionContext";
 
 const TotalBoard = () => {
   const { setCurBoardState } = useContext(CurrentBoardContext);
-  const {
-    articleLength,
-    setTotalLength,
-    indexOfFirstItem,
-    indexOfLastItem,
-    itemsPerPage,
-    updatePagination,
-    currentPage,
-  } = usePagination(0);
-  const articleList = wholeArticle(); //전체 게시물 리스트
-  const [currentItems, setCurrentItems] = useState<{ articles: ArticleType[] }>(
-    {
-      articles: [],
-    }
-  );
+  const [wholeArticles, setWholeArticles] = useState<ArticleType[]>([]);
+  const [wholeArticleLen, setWholeArticleLen] = useState(0);
+  const { size, page, setSize, setPage, setTotPage } =
+    usePagination();
+  const {setViewOp} = useContext(ViewOptionContext);
 
   useEffect(() => {
-    // setTotalLength(articleList ? articleList.length : 0);
-    setTotalLength(aList.length);
     setCurBoardState(0);
-    const newItems = aList.slice(indexOfFirstItem, indexOfLastItem);
-    setCurrentItems({ articles: newItems });
-    updatePagination({ boardId: 0, currentPage: currentPage });
-    console.log(currentPage);
-    console.log(articleLength);
-    console.log(indexOfFirstItem, indexOfLastItem, currentItems);
+    setSize(15);
+    setPage(0);
+
+    async function fetchWholeArticle() {
+      try {
+        const fetchedWholeArticles: ArticleBriefType = await wholeArticle(
+          15,
+          0
+        );
+        console.log(fetchedWholeArticles);
+        setWholeArticles(fetchedWholeArticles.content);
+        setWholeArticleLen(fetchedWholeArticles.totalElements);
+      } catch (err) {
+        console.log("Error fetching whole articles in TotalBoard");
+      }
+    }
+
+    fetchWholeArticle();
+    setViewOp(2);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    const newItems = aList.slice(indexOfFirstItem, indexOfLastItem);
-    setCurrentItems({ articles: newItems });
-    updatePagination({ boardId: 0, currentPage: currentPage });
-    console.log(currentPage);
-  }, [itemsPerPage]);
+    async function fetchWholeArticle() {
+      try {
+        const fetchedWholeArticles: ArticleBriefType = await wholeArticle(size, page);
+        console.log(fetchedWholeArticles);
+        setWholeArticles(fetchedWholeArticles.content);
+        setTotPage(fetchedWholeArticles.totalPages);
+        setWholeArticleLen(fetchedWholeArticles.totalElements);
+      } catch (err) {
+        console.log("Error fetching whole articles in TotalBoard");
+      }
+    }
+
+    fetchWholeArticle();
+  }, [size, page, setTotPage]);
 
   return (
     <>
       <Board>
         <TotalBoardHeader></TotalBoardHeader>
         <TotalBoardTopOption
-          articleLength={articleLength}
+          articleLength={wholeArticleLen}
         ></TotalBoardTopOption>
         <ArticleTable
           board={boardAttribute.TotalBoard}
-          articleList={currentItems.articles} //articleList
+          articleList={wholeArticles} //articleList
         ></ArticleTable>
         <BoardBottomOption boardId={0}></BoardBottomOption>
       </Board>

@@ -4,13 +4,13 @@ import {
   Board,
   PopularBoardHeader,
 } from "../../../contexts/BoardStyle/BoardHeaderContext";
-import { useArticleList } from "../../../API/BoardAPI";
+import { hotArticle } from "../../../API/ArticleAPI";
 import { PopularBoardTopOption } from "../../../contexts/BoardStyle/BoardTopOptionContext";
 import { PopularBoardBottomOption } from "../../../contexts/BoardStyle/BoardBottomContext/BoardBottomOption";
 import { ArticleTable } from "../../../contexts/BoardStyle/ArticleBoardContext/Table";
-import { aList } from "../../../Constants";
 import { boardAttribute } from "../../../contexts/BoardContext/BoardAttrContext";
 import { CurrentBoardContext } from "../../../contexts/BoardContext/CurrentBoardContext";
+import { ArticleBriefType, ArticleType } from "../../../Types";
 
 export type Order = {
   p: string;
@@ -27,36 +27,53 @@ export const orderList: Order[] = [
     strong: "댓글 TOP 게시글",
     nextIndex: 1,
     type: "인기순",
-    query: "VIEW",
+    query: "viewCnt",
   },
   {
     p: "댓글이",
     strong: "좋아요 TOP 게시글",
     nextIndex: 2,
     type: "댓글순",
-    query: "COMMENT",
+    query: "commentCnt",
   },
   {
     p: "좋아요가",
     strong: "인기글",
     nextIndex: 0,
     type: "좋아요순",
-    query: "LIKE",
+    query: "likeCnt",
   },
 ];
 
 const PopularBoard = () => {
   const { setCurBoardState } = useContext(CurrentBoardContext);
   const [currentOrder, setCurrentOrder] = useState<Order>(orderList[0]);
-  const { articleList } = useArticleList({ type: currentOrder.query });
+  const SortOption = [{view:"최근 7일", query:"WEEK"}, {view:"최근 30일",query:"MONTH"},{view: "전체", query:"ALL"}];
+  const [selectedOp, setSelectedOp] = useState(0); //선택된 SortOption의 인덱스
+
+  const [articleList, setArticleList] = useState<ArticleType[]>([]);
 
   useEffect(() => {
-    console.log(currentOrder);
-  }, [currentOrder]);
+    //console.log(currentOrder);
+    async function fetchPopArticle() {
+      try {
+        const fetchedArticles: ArticleBriefType = await hotArticle(currentOrder.query, SortOption[selectedOp].query);
+        setArticleList(fetchedArticles.content);
+      } catch (err) {
+        console.log('Error fetching in PopularBoard');
+      }
+    }
+
+    fetchPopArticle();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [SortOption, currentOrder]);
 
   useEffect(() => {
     setCurBoardState(-1);
-  },[])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+
   return (
     <>
       <Board>
@@ -64,17 +81,20 @@ const PopularBoard = () => {
         <PopularBoardTopOption
           currentOrder={currentOrder}
           setCurrentOrder={setCurrentOrder}
+          SortOption={SortOption}
+          selectedOp={selectedOp}
+          setSelectedOp={setSelectedOp}
         ></PopularBoardTopOption>
         {currentOrder === orderList[2] ? (
           <ArticleTable
             board={boardAttribute.PopularBoard}
-            articleList={aList} //articleList
+            articleList={articleList} //articleList
             isLike={true}
           ></ArticleTable>
         ) : (
           <ArticleTable
             board={boardAttribute.PopularBoard}
-            articleList={aList}
+            articleList={articleList}
             isLike={false}
           ></ArticleTable>
         )}

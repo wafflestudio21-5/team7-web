@@ -3,8 +3,9 @@ import { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getCafeInfo } from "../../API/CafeAPI";
 import { waffleCafe } from "../../Constants";
-import { useBoardGroup } from "../../API/BoardAPI";
+import { useBoardGroup, useGetLikeBoard } from "../../API/BoardAPI";
 import { CurrentBoardContext } from "../../contexts/BoardContext/CurrentBoardContext";
+import { BoardType } from "../../Types";
 
 const Wrapper = styled.div`
   display: inline-block;
@@ -244,18 +245,19 @@ const Buttons = styled.div`
     }
   }
 `;
-const Boards = styled.div`
+const Boards = styled.div<{ $isFavListChecked: boolean }>`
   border-top: 2px solid;
   .bookmarkedBoard {
-    padding: 12px 11px 9px;
+    padding: 12px 11px 12px;
     font-size: 13px;
     font-weight: bold;
     line-height: 14px;
     text-align: left;
-    border-bottom: 1px soild #e5e5e5;
+    border-bottom: 1px solid #e5e5e5;
     position: relative;
     :hover {
       text-decoration: underline;
+      cursor: pointer;
     }
     & > p > img:first-child {
       display: inline-block;
@@ -273,7 +275,10 @@ const Boards = styled.div`
       width: 0;
       height: 0;
       margin: 5px 0px 0px 0px;
-      border-top: 4px solid;
+      ${(prop) =>
+        prop.$isFavListChecked
+          ? "border-bottom: 4px solid;"
+          : "border-top: 4px solid;"}
       border-left: 4px solid transparent;
       border-right: 4px solid transparent;
       vertical-align: top;
@@ -281,15 +286,68 @@ const Boards = styled.div`
       right: 11px;
       cursor: pointer;
     }
-    /* .bookmarkedBoardList {
-    } */
+  }
+  .bookmarkedBoardList {
+    display: ${(prop) => (prop.$isFavListChecked ? "block" : "none")};
+    border-bottom: 1px solid #e5e5e5;
+    text-align: left;
+    p {
+      color: #666;
+      font-size: 12px;
+      line-height: 16px;
+
+      img {
+        margin: 1px 3px 0 0;
+        background-position: -44px -90px;
+        background-image: url(https://ssl.pstatic.net/static/cafe/cafe_pc/sp/sp_icon_white_72ca546e.svg);
+        width: 12px;
+        height: 12px;
+        display: inline-block;
+        backgroun-repeat: no-repeat;
+        vertical-align: top;
+        float: left;
+      }
+    }
+    ul {
+      padding: 0 10px;
+      margin-top: 6px;
+      font-size: 13px;
+      line-height: 24px;
+    }
+
+    ul > li:first-child {
+      margin-top: 2px;
+    }
+    ul > li:last-child {
+      padding-bottom: 6px;
+    }
+
+    ul > li:hover {
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    ul > li > .list {
+      display: inline-block;
+      background-image: url(https://ssl.pstatic.net/static/cafe/cafe_pc/sp/sp_icon_06952b76.svg);
+      background-repeat: no-repeat;
+      vertical-align: top;
+      width: 10px;
+      height: 11px;
+      margin: 6px 5px 0 0;
+      background-position: -306px -42px;
+    }
   }
   .boards {
     margin: 6px 0px 0px;
-    padding: 0px 10px;
+    padding: 0px 0px 4px;
     font-size: 13px;
     line-height: 24px;
     text-align: left;
+    border-bottom: 2px solid;
+    div {
+      padding: 0px 10px;
+    }
     & > div > img {
       display: inline-block;
       background-image: url(https://ssl.pstatic.net/static/cafe/cafe_pc/sp/sp_icon_06952b76.svg);
@@ -410,7 +468,9 @@ const StyledUl = styled.ul`
 const SideBar = () => {
   const [isCafeInfoChecked, setIsCafeInfoChecked] = useState<boolean>(true);
 
-  // const { memberCount } = useCafeInfo(); //백엔드와 연결하고 난 뒤 사용하는 것이 좋을 것 같습니다.
+  const [isFavListChecked, setIsFavListChecked] = useState(false);
+  const { favList, refetch } = useGetLikeBoard();
+
   const { groupList } = useBoardGroup();
   const { curBoardState, setCurBoardState } = useContext(CurrentBoardContext);
   const navigate = useNavigate();
@@ -419,6 +479,10 @@ const SideBar = () => {
     createdAt: string;
     memberCount: number;
   } | null>(null);
+
+  useEffect(() => {
+    refetch();
+  }, [curBoardState, isFavListChecked]);
 
   useEffect(() => {
     getCafeInfo()
@@ -523,9 +587,9 @@ const SideBar = () => {
           <br />
           <button className="cafeChat">카페 채팅</button>
         </Buttons>
-        <Boards>
+        <Boards $isFavListChecked={isFavListChecked}>
           <div className="bookmarkedBoard">
-            <p>
+            <p onClick={() => setIsFavListChecked(!isFavListChecked)}>
               <img
                 src="https://cafe.pstatic.net/cafe4/hidden.gif"
                 alt="즐겨찾기"
@@ -536,7 +600,36 @@ const SideBar = () => {
                 alt="즐겨찾기 더보기"
               />
             </p>
-            <div className="bookmarkedBoardList"></div>
+          </div>
+          <div className="bookmarkedBoardList">
+            <ul className="favBoard">
+              {favList ? (
+                favList.boards
+                  .sort((a, b) => a.id - b.id)
+                  .map((favBoard: BoardType, index: number) => (
+                    <li
+                      className="favBoard"
+                      key={index}
+                      onClick={() => navigate(`/board/${favBoard.id - 1}`)}
+                    >
+                      <img
+                        className="list"
+                        src="https://cafe.pstatic.net/cafe4/hidden.gif"
+                      />
+                      {favBoard.name}
+                    </li>
+                  ))
+              ) : (
+                <li>
+                  <p className="favNotice">
+                    게시판 상단의{" "}
+                    <img src="https://cafe.pstatic.net/cafe4/hidden.gif" />
+                    아이콘을
+                    <br /> 클릭하시면 추가됩니다.
+                  </p>
+                </li>
+              )}
+            </ul>
           </div>
           <div className="boards">
             <StyledDiv $isCurBoard={curBoardState === 0}>
@@ -628,3 +721,18 @@ const SideBar = () => {
   }
 };
 export default SideBar;
+
+/*
+미구현 사항-------------------------------------------------------------------------------------------
+
+#1
+원본 카페에서는 즐겨찾는 게시판에서 게시판을 클릭할 경우
+클릭한 게시판이 강조 처리가 됩니다. (즐겨찾는 게시판의 '스프링' 게시판만, 밑에 있는 '스프링'은 강조 처리 안됨.)
+그런데 그냥 즐겨찾는 게시판에는 강조 처리가 안되는 것으로 놔뒀습니다.
+
+#2
+원본 카페에서는 즐겨찾는 게시판 버튼을 클릭하면 새 창이 뜹니다.
+그런데 새 창은 따로 뜨지 않는 것으로 구현했습니다. (구독 기능을 제외했기 때문에)
+
+---------------------------------------------------------------------------------------------------
+*/
