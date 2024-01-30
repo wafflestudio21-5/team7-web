@@ -40,14 +40,33 @@ export type ArticleType = {
     visitCount: number;
     articlesCount: number;
     commentsCount: number;
-    accessToken?: string;
+    accessToken: string;
   };
   board: {
     id: number;
     name: string;
   };
-  allowComments?: boolean;
+  allowComments: boolean;
   isNotification: boolean;
+};
+export type ArticleBriefType = {
+  id: number;
+  title: string;
+  createdAt: string;
+  viewCount: number;
+  likeCount: number;
+  commentCount: number;
+  author: {
+    id: number;
+    nickname: string;
+    registerDate: string;
+    email: string;
+    rank: string;
+    visitCount: number;
+    articlesCount: number;
+    commentsCount: number;
+    accessToken: string;
+  };
 };
 
 export type CommentType = {
@@ -64,7 +83,24 @@ export type CommentType = {
   }[];
   isSecret: boolean;
 };
+export type CommentBriefType = {
+  id: number;
+  articleId: number;
+  content: string;
+  nickname: string;
+  lastModified: string;
+  articleTitle: string;
+  articleCommentCnt: number;
+};
 
+export type CommentedArticleType = {
+  id: number;
+  title: string;
+  createdAt: string;
+  viewCnt: number;
+  commentCnt: number;
+  authorNickname: string;
+};
 //GET (activity)
 /* 제외한 사항: 모바일카페명 & 카페아이콘, 카페 스탭, 주제, 카페 검색어, 카페 성격, 가입 방식, 카페 활동 - 총 방문자, 우리 카페 바로가기 앱 추가수, 카페 랭킹, 멤버 관리 */
 export type Cafe = {

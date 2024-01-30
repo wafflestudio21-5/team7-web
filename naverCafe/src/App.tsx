@@ -29,6 +29,7 @@ const Wrapper = styled.div`
   margin: 0 auto;
   text-align: center;
 `;
+import Test from "./Test";
 
 function App() {
   const { boardList } = useWholeBoard();
@@ -45,6 +46,7 @@ function App() {
                   {/* 회원가입 및 로그인 page */}
                   <Route path="/signup" element={<SignUp />} />
                   <Route path="/login" element={<Login />} />
+                  <Route path="/test" element={<Test />} />
 
                   {/* main page 구성 */}
                   {/* Layout은 header와 body로 나뉘어져 있습니다. */}
@@ -82,7 +84,8 @@ function App() {
                         />
 
                         {/* userInfo */}
-                        <Route path="/users/:id" element={<UserInfo />} />
+                        <Route path="/users/:nickname" element={<UserInfo />} />
+                        <Route path="/users/:nickname/editinfo" />
                       </Route>
                     </Route>
                     {/* 글쓰기 창은 아래 path로, Layout의 subRoute이므로 Header를 공유할 수 있습니다.*/}

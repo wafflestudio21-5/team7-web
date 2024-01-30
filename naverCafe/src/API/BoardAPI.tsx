@@ -77,8 +77,8 @@ export function useArticleList({
     articleBrief: {
       content: ArticleType[];
       empty: boolean;
-      first: true;
-      last: false;
+      first: boolean;
+      last: boolean;
       number: number;
       numberOfElements: number;
       pageable: {

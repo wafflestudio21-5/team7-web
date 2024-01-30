@@ -1,6 +1,7 @@
 import axios from "axios";
 import { baseURL } from "../Constants";
 import { useCallback, useEffect, useState } from "react";
+import { ArticleBriefType } from "../Types";
 
 // 회원가입 함수
 export function signup(userInfo: {
@@ -22,6 +23,7 @@ export function login(userInfo: { username: string; password: string }) {
 export function socialLogin(code: string) {
   return axios.get(baseURL + `/api/v1/auth/socialSignin/naver?code=${code}`);
 }
+
 // 사이드바 (자신의) 회원정보
 // 회원정보가 바뀌었을 때 refetch가 필요하므로 custom hook으로 만들겠습니다.
 export function useBriefMyInfo() {
@@ -49,6 +51,7 @@ export function useBriefMyInfo() {
   }, [refetchBriefMyInfo]);
   return { briefMyInfo, refetchBriefMyInfo };
 }
+
 // 유저 profile 조회
 export function useMyProfile() {
   const [myProfile, setMyProfile] = useState<{
@@ -70,4 +73,156 @@ export function useMyProfile() {
     console.log(myProfile);
   }, [refetchMyProfile]);
   return { myProfile, refetchMyProfile };
+}
+
+// 회원정보 조회(nickname에 따른)
+export function getUserInfo({ userNickname }: { userNickname: string }) {
+  return axios.get(
+    baseURL + `/api/v1/users/user/${userNickname}`
+    // , {
+    //   headers: {
+    //     Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+    //   },
+    // }
+  );
+}
+
+// 유저가 쓴 게시물 조회(+ 페이지네이션) => refetch 필요
+export function useUserArticles({
+  userNickname,
+  page,
+}: {
+  userNickname: string;
+  page?: number;
+}) {
+  const [userArticles, setUserArticles] = useState<{
+    articleBrief: {
+      content: ArticleBriefType[];
+      empty: boolean;
+      first: boolean;
+      last: boolean;
+      number: number;
+      numberOfElements: number;
+      pageable: {
+        offset: number;
+        pageNumber: number;
+        pageSize: number;
+        paged: boolean;
+        sort: {
+          empty: boolean;
+          sorted: boolean;
+          unsorted: boolean;
+        };
+        unpaged: boolean;
+      };
+      size: number;
+      sort: {
+        empty: boolean;
+        sorted: boolean;
+        unsorted: boolean;
+      };
+      totalElements: number;
+      totalPages: number;
+    };
+  } | null>(null);
+  const url = `/api/v1/users/articles/${userNickname}`;
+  const refetchUserArticles = useCallback(async () => {
+    console.log("userArticle refetched!");
+    const res = await axios.get(baseURL + url, {
+      params: {
+        page: page ? page : "",
+      },
+    });
+    const data = await res.data;
+    setUserArticles(data);
+  }, [url, page]);
+  useEffect(() => {
+    refetchUserArticles();
+    console.log(userArticles);
+  }, [refetchUserArticles]);
+  return { userArticles, refetchUserArticles };
+}
+
+// 유저가 쓴 댓글 조회 => refetch 필요 X
+export function getUserComments({
+  userNickname,
+  page,
+}: {
+  userNickname: string;
+  page?: number;
+}) {
+  return axios.get(baseURL + `/api/v1/users/${userNickname}/comments/`, {
+    params: {
+      page: page ? page : "",
+    },
+  });
+}
+// 유저가 댓글 단 글 조회 => refetch 필요 x
+export function getUserCommentedArticle({
+  userNickname,
+  page,
+}: {
+  userNickname: string;
+  page?: number;
+}) {
+  return axios.get(
+    baseURL + `/api/v1/users/${userNickname}/commented-articles`,
+    {
+      params: {
+        page: page ? page : "",
+      },
+    }
+  );
+}
+
+// 좋아요 한 글 => refetch 필요!
+export function useUserLikedArticles({ page }: { page?: number }) {
+  const [userLikedArticles, setUserLikedArticles] = useState<{
+    articleBrief: {
+      content: ArticleBriefType[];
+      empty: boolean;
+      first: boolean;
+      last: boolean;
+      number: number;
+      numberOfElements: number;
+      pageable: {
+        offset: number;
+        pageNumber: number;
+        pageSize: number;
+        paged: boolean;
+        sort: {
+          empty: boolean;
+          sorted: boolean;
+          unsorted: boolean;
+        };
+        unpaged: boolean;
+      };
+      size: number;
+      sort: {
+        empty: boolean;
+        sorted: boolean;
+        unsorted: boolean;
+      };
+      totalElements: number;
+      totalPages: number;
+    };
+  } | null>(null);
+  const url = `/api/v1/users/liked-articles`;
+  const refetchUserLikedArticles = useCallback(async () => {
+    const res = await axios.get(baseURL + url, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+      params: {
+        page: page ? page : "",
+      },
+    });
+    const data = res.data;
+    setUserLikedArticles(data);
+  }, [url, page]);
+  useEffect(() => {
+    refetchUserLikedArticles();
+    console.log(userLikedArticles);
+  }, [refetchUserLikedArticles]);
+  return { userLikedArticles, refetchUserLikedArticles };
 }
