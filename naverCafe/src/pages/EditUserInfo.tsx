@@ -14,7 +14,7 @@ const Footer = styled.div<{
 const EditUserInfo = () => {
   const [inputNickname, setInputNickname] = useState<string>("");
   const [inputIntroduce, setInputIntroduce] = useState<string>("");
-  const handleConfirm = () => {
+  const handleSubmit = () => {
     if (inputNickname.length !== 0 && inputIntroduce.length !== 0) {
       // post 요청
       setInputNickname("");
@@ -37,7 +37,7 @@ const EditUserInfo = () => {
         </div>
         <div className="introduce">
           <label htmlFor="">소개</label>
-          <textarea></textarea>
+          <textarea />
         </div>
       </Content>
       <Footer
@@ -45,7 +45,7 @@ const EditUserInfo = () => {
         $inputIntroduceLength={inputIntroduce.length}
       >
         <button className="cancel">취소</button>
-        <button className="confirm" onClick={() => handleConfirm()}>
+        <button className="confirm" onClick={() => handleSubmit()}>
           확인
         </button>
       </Footer>

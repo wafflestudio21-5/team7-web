@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { Link } from "react-router-dom";
+import { CommentBriefType } from "../../../../../Types";
 
 const Wrapper = styled.li`
   width: 768px;
@@ -32,14 +33,7 @@ const Wrapper = styled.li`
   }
 `;
 interface PropsUserComment {
-  comment: {
-    id: number;
-    content: string;
-    last_modified: string;
-    title: string;
-    articleId: number;
-    commentCount: number;
-  };
+  comment: CommentBriefType;
 }
 const UserComment = ({ comment }: PropsUserComment) => {
   return (
@@ -47,13 +41,14 @@ const UserComment = ({ comment }: PropsUserComment) => {
       <Link to={`/articles/${comment.articleId}`}>
         <div className="content">{comment.content}</div>
         <div className="date">
-          {comment.last_modified
+          {comment.lastModified
             .replace(/-/g, ".")
-            .replace(/T\d\d:\d\d:\d\d/, ". ")}
+            .replace(/T\d\d:\d\d:\d\d/, ". ")
+            .replace(/.\d\d\d\d\d\d/, "")}
         </div>
         <div className="title">
-          {comment.title}
-          <em>{`[${comment.commentCount}]`}</em>
+          {comment.articleTitle}
+          <em>{`[${comment.articleCommentCnt}]`}</em>
         </div>
       </Link>
     </Wrapper>

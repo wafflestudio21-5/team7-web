@@ -494,59 +494,26 @@ const SideBar = () => {
         console.error(err);
       });
   }, []);
-  if (cafeInfo) {
-    return (
-      <Wrapper>
-        <Tab className={isCafeInfoChecked ? "cafeInfo" : "myActivity"}>
-          <button onClick={() => setIsCafeInfoChecked(true)}>카페정보</button>
-          <button onClick={() => setIsCafeInfoChecked(false)}>나의활동</button>
-        </Tab>
-        {isCafeInfoChecked ? (
-          <CafeInfo>
-            <div className="manager">
-              <div className="managerProfile">
-                <div className="photo">
-                  <img
-                    src="https://ssl.pstatic.net/static/cafe/cafe_pc/default/cafe_thumb_noimg_55.png"
-                    alt="카페 메니저 사진"
-                  />
-                </div>
-                <div className="managerInfo">
-                  <p>{waffleCafe.manager}</p>
-                  <p>{waffleCafe.createdAt}</p>
-                  <p>카페소개</p>
-                </div>
-              </div>
-              {/* <div className="manageCafe">
-              <span>카페 관리</span>
-              <span>통계</span>
-            </div> */}
-              {/* 카페 관리와 통게 링크는 등급이 매니저인 사람에게만 보이는 란인 것 같아 보류해두겠습니다. */}
-            </div>
-            <div className="cafeInfo">
-              <p>
-                <span className="cafeState" />
-                씨앗 1단계
-              </p>
-              <p>
-                <span className="peopleLogo" />
-                {cafeInfo.memberCount}
-                <Link to={`/`}>초대</Link>
-              </p>
-            </div>
-          </CafeInfo>
-        ) : (
-          <MyActivity>
-            <div className="user">
-              <div className="userPhoto">
+  return (
+    <Wrapper>
+      <Tab className={isCafeInfoChecked ? "cafeInfo" : "myActivity"}>
+        <button onClick={() => setIsCafeInfoChecked(true)}>카페정보</button>
+        <button onClick={() => setIsCafeInfoChecked(false)}>나의활동</button>
+      </Tab>
+      {isCafeInfoChecked ? (
+        <CafeInfo>
+          <div className="manager">
+            <div className="managerProfile">
+              <div className="photo">
                 <img
-                  src="https://ssl.pstatic.net/static/cafe/cafe_pc/default/cafe_profile_70.png"
-                  alt="프로필 이미지"
+                  src="https://ssl.pstatic.net/static/cafe/cafe_pc/default/cafe_thumb_noimg_55.png"
+                  alt="카페 메니저 사진"
                 />
               </div>
-              <div className="userInfo">
-                <Link to={`/`}>user 이름</Link>
-                <p>2024.00.00 가입</p>
+              <div className="managerInfo">
+                <p>{waffleCafe.manager}</p>
+                <p>{waffleCafe.createdAt}</p>
+                <p>카페소개</p>
               </div>
             </div>
             <div className="userHistory">
@@ -631,94 +598,158 @@ const SideBar = () => {
               )}
             </ul>
           </div>
-          <div className="boards">
-            <StyledDiv $isCurBoard={curBoardState === 0}>
+        </CafeInfo>
+      ) : (
+        <MyActivity>
+          <div className="user">
+            <div className="userPhoto">
               <img
-                src="https://cafe.pstatic.net/cafe4/hidden.gif"
-                alt="전체글보기"
+                src="https://ssl.pstatic.net/static/cafe/cafe_pc/default/cafe_profile_70.png"
+                alt="프로필 이미지"
               />
-              <Link
-                to={`/totalboard`}
-                onClick={() => {
-                  setCurBoardState(0);
-                }}
-              >
-                전체글보기
-              </Link>
-            </StyledDiv>
-            <StyledDiv $isCurBoard={curBoardState === -1}>
-              <img
-                src="https://cafe.pstatic.net/cafe4/hidden.gif"
-                alt="인기글"
-              />
-              <Link
-                to={`/popularboard`}
-                onClick={() => {
-                  setCurBoardState(-1);
-                }}
-              >
-                인기글
-              </Link>
-            </StyledDiv>
-            {groupList &&
-              groupList.boardGroups.map((group, index) => (
-                <>
-                  <StyledGroupTit className="cafe-menu-tit" key={index}>
-                    <h3>
-                      <span>{group.name}</span>
-                    </h3>
-                  </StyledGroupTit>
-                  <StyledUl className="cafe-menu-list">
-                    {group.boards.map((board, index) => (
-                      <li>
-                        <img
-                          className="list"
-                          src="https://cafe.pstatic.net/cafe4/hidden.gif"
-                        ></img>
-                        <img
-                          className="brdimg"
-                          src="https://cafe.pstatic.net/cafe4/hidden.gif"
-                          alt={board.name}
-                        />
-                        <StyledDiv
-                          key={index}
-                          $isCurBoard={curBoardState === board.id}
-                        >
-                          <Link
-                            to={`/board/${board.id - 1}`}
-                            onClick={() => {
-                              setCurBoardState(board.id);
-                            }}
-                          >
-                            {board.name}
-                          </Link>
-                        </StyledDiv>
-                      </li>
-                    ))}
-                  </StyledUl>
-                </>
-              ))}
-
-            {/* 그 외 게시판 새로 추가시 더해지는 기능이 있으면 좋겠습니다. */}
-            {/* 그러러면 boards div 안에 있는 div들이 state로서 선언되면 될 것 같습니다. */}
+            </div>
+            <div className="userInfo">
+              <Link to={`/`}>user 이름</Link>
+              <p>2024.00.00 가입</p>
+            </div>
           </div>
-        </Boards>
-        <RecentComments>
-          <p>최신 댓글ㆍ답글</p>
-          <ul className="recentCommentList">
-            {/* state로서 li 요소를 나타내면 좋을 것 같습니다. */}
-            {/* 만약 요소의 개수가 0이라면 다른 text를 담는 것으로 하는 로직이면 좋을 것 같습니다. */}
-          </ul>
-        </RecentComments>
-        <CafeSmartBot>
-          <img
-            src="https://ssl.pstatic.net/static/cafe/banner_chatbot.png"
-            alt="카페 스마트봇"
-          />
-        </CafeSmartBot>
-      </Wrapper>
-    );
-  }
+          <div className="userHistory">
+            <ul>
+              <li>user 직책</li>
+              <li>
+                <span />
+                방문 횟수
+                <em>n회</em>
+              </li>
+              <li>
+                <span />
+                <Link to={`/`}>내가 쓴 게시글</Link>
+                <em>n개</em>
+              </li>
+              <li>
+                <span />
+                <Link to={`/`}>내가 쓴 댓글</Link>
+                <em>2개</em>
+              </li>
+              <li>
+                <span />
+                <Link to={`/`}>내 거래내역 보기</Link>
+              </li>
+            </ul>
+          </div>
+        </MyActivity>
+      )}
+      <Buttons>
+        <button
+          className="writePost"
+          onClick={() => {
+            navigate("/write");
+          }}
+        >
+          카페 글쓰기
+        </button>
+        <br />
+        <button className="cafeChat">카페 채팅</button>
+      </Buttons>
+      <Boards>
+        <div className="bookmarkedBoard">
+          <p>
+            <img
+              src="https://cafe.pstatic.net/cafe4/hidden.gif"
+              alt="즐겨찾기"
+            />
+            즐겨찾는 게시판
+            <img
+              src="https://cafe.pstatic.net/cafe4/hidden.gif"
+              alt="즐겨찾기 더보기"
+            />
+          </p>
+          <div className="bookmarkedBoardList"></div>
+        </div>
+        <div className="boards">
+          <StyledDiv $isCurBoard={curBoardState === 0}>
+            <img
+              src="https://cafe.pstatic.net/cafe4/hidden.gif"
+              alt="전체글보기"
+            />
+            <Link
+              to={`/totalboard`}
+              onClick={() => {
+                setCurBoardState(0);
+              }}
+            >
+              전체글보기
+            </Link>
+          </StyledDiv>
+          <StyledDiv $isCurBoard={curBoardState === -1}>
+            <img src="https://cafe.pstatic.net/cafe4/hidden.gif" alt="인기글" />
+            <Link
+              to={`/popularboard`}
+              onClick={() => {
+                setCurBoardState(-1);
+              }}
+            >
+              인기글
+            </Link>
+          </StyledDiv>
+          {groupList &&
+            groupList.boardGroups.map((group, index) => (
+              <>
+                <StyledGroupTit className="cafe-menu-tit" key={index}>
+                  <h3>
+                    <span>{group.name}</span>
+                  </h3>
+                </StyledGroupTit>
+                <StyledUl className="cafe-menu-list">
+                  {group.boards.map((board, index) => (
+                    <li>
+                      <img
+                        className="list"
+                        src="https://cafe.pstatic.net/cafe4/hidden.gif"
+                      ></img>
+                      <img
+                        className="brdimg"
+                        src="https://cafe.pstatic.net/cafe4/hidden.gif"
+                        alt={board.name}
+                      />
+                      <StyledDiv
+                        key={index}
+                        $isCurBoard={curBoardState === board.id}
+                      >
+                        <Link
+                          to={`/board/${board.id - 1}`}
+                          onClick={() => {
+                            setCurBoardState(board.id);
+                          }}
+                        >
+                          {board.name}
+                        </Link>
+                      </StyledDiv>
+                    </li>
+                  ))}
+                </StyledUl>
+              </>
+            ))}
+
+          {/* 그 외 게시판 새로 추가시 더해지는 기능이 있으면 좋겠습니다. */}
+          {/* 그러러면 boards div 안에 있는 div들이 state로서 선언되면 될 것 같습니다. */}
+        </div>
+      </Boards>
+      <RecentComments>
+        <p>최신 댓글ㆍ답글</p>
+        <ul className="recentCommentList">
+          {/* state로서 li 요소를 나타내면 좋을 것 같습니다. */}
+          {/* 만약 요소의 개수가 0이라면 다른 text를 담는 것으로 하는 로직이면 좋을 것 같습니다. */}
+        </ul>
+      </RecentComments>
+      <CafeSmartBot>
+        <img
+          src="https://ssl.pstatic.net/static/cafe/banner_chatbot.png"
+          alt="카페 스마트봇"
+        />
+      </CafeSmartBot>
+    </Wrapper>
+  );
 };
 export default SideBar;
 
