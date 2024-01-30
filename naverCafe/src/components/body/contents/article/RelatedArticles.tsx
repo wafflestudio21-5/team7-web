@@ -1,6 +1,6 @@
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 import { Link } from "react-router-dom";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import newArticleIcon from "../../../../assets/relatedArticle-newArticleIcon.svg";
 import { useArticleList } from "../../../../API/BoardAPI";
 
@@ -60,88 +60,88 @@ const RelatedArticle = styled.li<{ $isArticleFocused: boolean }>`
     }
   }
 `;
-const ArticleListContainer = styled.div<{
-  $articleListOnActive: number | null;
-}>`
-  & > .buttons {
-    button {
-      background-color: inherit;
-      border: none;
-      font-size: 13px;
-      width: 24px;
-      height: 24px;
-      border-radius: 4px;
-      box-sizing: border-box;
-      margin: 0 4px;
-    }
-  }
+// const ArticleListContainer = styled.div<{
+//   $articleListOnActive: number | null;
+// }>`
+//   & > .buttons {
+//     button {
+//       background-color: inherit;
+//       border: none;
+//       font-size: 13px;
+//       width: 24px;
+//       height: 24px;
+//       border-radius: 4px;
+//       box-sizing: border-box;
+//       margin: 0 4px;
+//     }
+//   }
 
-  ${(props) => {
-    if (props.$articleListOnActive === 1) {
-      return css`
-        & > .buttons {
-          button {
-            &:not(.firstButton):hover {
-              background-color: #f0f0f0;
-            }
-          }
-          & > .firstButton {
-            font-weight: 700;
-            background-color: #e5e7ea;
-            &:hover {
-              background-color: #d8d9dc;
-            }
-          }
-        }
-        & > .relatedArticleList:not(.first) {
-          display: none;
-        }
-      `;
-    } else if (props.$articleListOnActive === 2) {
-      return css`
-        & > .buttons {
-          button {
-            &:not(.secondButton):hover {
-              background-color: #f0f0f0;
-            }
-          }
-          & > .secondButton {
-            font-weight: 700;
-            background-color: #e5e7ea;
-            &:hover {
-              background-color: #d8d9dc;
-            }
-          }
-        }
-        & > .relatedArticleList:not(.second) {
-          display: none;
-        }
-      `;
-    } else if (props.$articleListOnActive === 3) {
-      return css`
-        & > .buttons {
-          button {
-            &:not(.thirdButton):hover {
-              background-color: #f0f0f0;
-            }
-          }
-          & > .thirdButton {
-            font-weight: 700;
-            background-color: #e5e7ea;
-            &:hover {
-              background-color: #d8d9dc;
-            }
-          }
-        }
-        & > .relatedArticleList:not(.third) {
-          display: none;
-        }
-      `;
-    } else {
-      return css``;
-    }
-  }}
-`;
+//   ${(props) => {
+//     if (props.$articleListOnActive === 1) {
+//       return css`
+//         & > .buttons {
+//           button {
+//             &:not(.firstButton):hover {
+//               background-color: #f0f0f0;
+//             }
+//           }
+//           & > .firstButton {
+//             font-weight: 700;
+//             background-color: #e5e7ea;
+//             &:hover {
+//               background-color: #d8d9dc;
+//             }
+//           }
+//         }
+//         & > .relatedArticleList:not(.first) {
+//           display: none;
+//         }
+//       `;
+//     } else if (props.$articleListOnActive === 2) {
+//       return css`
+//         & > .buttons {
+//           button {
+//             &:not(.secondButton):hover {
+//               background-color: #f0f0f0;
+//             }
+//           }
+//           & > .secondButton {
+//             font-weight: 700;
+//             background-color: #e5e7ea;
+//             &:hover {
+//               background-color: #d8d9dc;
+//             }
+//           }
+//         }
+//         & > .relatedArticleList:not(.second) {
+//           display: none;
+//         }
+//       `;
+//     } else if (props.$articleListOnActive === 3) {
+//       return css`
+//         & > .buttons {
+//           button {
+//             &:not(.thirdButton):hover {
+//               background-color: #f0f0f0;
+//             }
+//           }
+//           & > .thirdButton {
+//             font-weight: 700;
+//             background-color: #e5e7ea;
+//             &:hover {
+//               background-color: #d8d9dc;
+//             }
+//           }
+//         }
+//         & > .relatedArticleList:not(.third) {
+//           display: none;
+//         }
+//       `;
+//     } else {
+//       return css``;
+//     }
+//   }}
+// `;
 
 // 로컬에서 테스트를 위한 데이터입니다.
 // const exampleArticleList = {
@@ -361,9 +361,9 @@ const RelatedArticles = ({
 }: PropsRelatedArticles) => {
   const { articleList } = useArticleList({ boardId: boardId });
   console.log(articleList);
-  const [onActiveButtonNumber, setOnActiveButtonNumber] = useState<
-    number | null
-  >(1);
+  // const [onActiveButtonNumber, setOnActiveButtonNumber] = useState<
+  //   number | null
+  // >(1);
   // article이 새로운 article인지 아닌지 판단하는 함수입니다.
   const isNewArticle = (createdAt: string) => {
     const dateNow = new Date();
@@ -382,7 +382,7 @@ const RelatedArticles = ({
   };
   // 페이지네이션 관련 리팩토링...
   const relatedArticleList = useMemo(() => {
-    return articleList?.articleBrief.content.map((article) => (
+    return articleList?.articleBrief.map((article) => (
       <RelatedArticle
         $isArticleFocused={Number(articleId) === article.id ? true : false}
         key={article.id}

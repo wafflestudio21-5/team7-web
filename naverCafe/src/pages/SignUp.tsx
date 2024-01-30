@@ -1,7 +1,6 @@
 import axios from "axios";
 import { FocusEvent, useState } from "react";
 import styled, { css } from "styled-components";
-import { baseURL } from "../Constants";
 
 const Wrapper = styled.div`
   width: 500px;
