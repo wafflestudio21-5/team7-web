@@ -2,12 +2,12 @@ import { styled, css } from "styled-components";
 import { FirstCol } from "./FirstColumn";
 import { NoticeTr } from "./NoticeRow";
 import { BoardType } from "../../BoardContext/BoardAttrContext";
-import { aList } from "../../../Constants";
 import { useNoticeContext } from "../../BoardContext/NoticeContext";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ArticleType } from "../../../Types";
 import { ViewOptionContext } from "../../BoardContext/ViewOptionContext";
 import { useNavigate } from "react-router-dom";
+import { notiArticle } from "../../../API/ArticleAPI";
 
 const StyledTable = styled.table<{ $brdName: boolean }>`
   width: 100%;
@@ -568,6 +568,7 @@ export const ArticleTable = ({
   }) => {
   const navigate = useNavigate();
   const { isNoticeOff } = useNoticeContext();
+  const [noticeList, setNoticeList] = useState<ArticleType[]>([]);
   const [isSortLike, setIsSortLike] = useState(false); //인기순 (기준이 명확하지 않아 일단 보류해두었습니다.)
   const { viewOp } = useContext(ViewOptionContext);
 
@@ -577,6 +578,20 @@ export const ArticleTable = ({
     const dateNum = arg.match(dateRegex)![0];
     return dateNum.split("-").join(".");
   };
+
+  useEffect(() => {
+    async function fetchNotiArticle() {
+      try {
+        const fetchedNotices:ArticleType[] = await notiArticle();
+        setNoticeList(fetchedNotices);
+      } catch (err) {
+        console.log('Error fetching notices');
+      }
+    }
+
+    fetchNotiArticle();
+  },[])
+  
 
   return (
     <StyledTable $brdName={board.firstCol === "boardName"}>
@@ -619,7 +634,7 @@ export const ArticleTable = ({
       <StyledTbody>
         {/* notice의 개수는 페이지네이션 한 페이지당 글 개수에 포함 x */}
         {board.noticeRow && !isNoticeOff
-          ? aList.map((notice) => (
+          ? noticeList.map((notice) => (
               <NoticeTr
                 notice={notice}
                 isLike={board.likeCol}

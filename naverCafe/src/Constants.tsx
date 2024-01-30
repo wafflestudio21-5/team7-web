@@ -1,10 +1,10 @@
 //baseURL 및 기타 상수
-import { useMemo } from "react";
 import { useWholeBoard } from "./API/BoardAPI";
 import { ArticleType, type Cafe } from "./Types";
 
 export const baseURL = "http://localhost:8080";
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const waffleCafe: Cafe = {
   name: "와플카페",
   url: "https://cafe.naver.com/wafflecafe",
@@ -23,6 +23,7 @@ export const BoardList = () => {
 
 //테스트용
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const aList: ArticleType[] = [
   {
     title: "첫번째 글입니다~~",

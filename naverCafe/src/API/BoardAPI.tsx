@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useCallback, useState, useEffect } from "react";
 import { baseURL } from "../Constants";
-import { ArticleType, BoardType, GroupType } from "../Types";
+import { ArticleBriefType, ArticleType, BoardType, GroupType } from "../Types";
 
 export function useWholeBoard() {
   const [boardList, setBoardList] = useState<{ boards: BoardType[] } | null>(
@@ -38,10 +38,23 @@ export function useBoardGroup() {
 }
 
 //게시판 즐겨찾기
-//이상하게 axios를 사용하면, unlikeBoard와 달리 likeBoard에서 500에러가 발생함. 따라서 fetch를 사용
-//해결되지 않은 에러: Error in likeBoard: SyntaxError: Unexpected end of JSON input
-//전체 일반게시판 컴포넌트가 새로 렌더링될 때 favList와 isFav가 null인 에러.
-export function likeBoard(boardId:number) {
+
+/*
+미해결 오류---------------------------------------------------------------------------------------------
+
+#1 : likeBoard
+이상하게 axios를 사용하면, unlikeBoard와 달리 likeBoard에서 500에러가 발생함. 따라서 likeBoard만 fetch를 사용
+
+#2 : likeBoard
+Error in likeBoard: SyntaxError: Unexpected end of JSON input
+(하지만 post는 잘 됨, Postman에서는 200 OK)
+
+#3 : useGetLikeBoard
+전체 일반게시판 컴포넌트가 새로 렌더링될 때 favList와 isFav가 null인 에러.
+
+----------------------------------------------------------------------------------------------------
+*/
+export function likeBoard(boardId: number) {
   const url = `${baseURL}/api/v1/boards/${boardId}/likes`;
   const accessToken = localStorage.getItem("accessToken");
 
@@ -61,7 +74,6 @@ export function likeBoard(boardId:number) {
       console.error("Error in likeBoard:", error);
     });
 }
-
 
 //게시판 즐겨찾기 취소
 export function unlikeBoard(boardId: number) {
@@ -111,34 +123,7 @@ export function useArticleList({
   sort?: string;
 }) {
   const [articleList, setArticleList] = useState<{
-    articleBrief: {
-      content: ArticleType[];
-      empty: boolean;
-      first: true;
-      last: false;
-      number: number;
-      numberOfElements: number;
-      pageable: {
-        offset: number;
-        pageNumber: number;
-        pageSize: number;
-        paged: boolean;
-        sort: {
-          empty: boolean;
-          sorted: boolean;
-          unsorted: boolean;
-        };
-        unpaged: boolean;
-      };
-      size: number;
-      sort: {
-        empty: boolean;
-        sorted: boolean;
-        unsorted: boolean;
-      };
-      totalElements: number;
-      totalPages: number;
-    };
+    articleBrief: ArticleBriefType;
   } | null>(null);
 
   const url = `/api/v1/boards/${boardId}/articles`;

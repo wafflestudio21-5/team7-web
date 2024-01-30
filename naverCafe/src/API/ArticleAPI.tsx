@@ -110,13 +110,25 @@ export function deleteLike(articleId: number) {
 // 전체 article 조회
 export function wholeArticle() {
   return axios
-    .get(baseURL + `api/v1/articles`)
+    .get(baseURL + `/api/v1/articles`)
     .then((res) => {
       console.log(res);
-      return res;
+      return res.data;
     })
     .catch((err) => {
       console.log(err);
       return;
     });
+}
+
+//공지 조회
+export async function notiArticle(): Promise<ArticleType[]> {
+  try {
+    const res = await axios.get(baseURL + `/api/v1/articles/notification`);
+    console.log(res);
+    return res.data.articleBrief;
+  } catch (err) {
+      console.log(err);
+      return [];
+  }
 }
