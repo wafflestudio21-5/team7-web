@@ -8,6 +8,7 @@ import { ArticleType } from "../../../Types";
 import { ViewOptionContext } from "../../BoardContext/ViewOptionContext";
 import { useNavigate } from "react-router-dom";
 import { notiArticle } from "../../../API/ArticleAPI";
+import { usePagination } from "../BoardBottomContext/PaginationContext";
 
 const StyledTable = styled.table<{ $brdName: boolean }>`
   width: 100%;
@@ -206,7 +207,7 @@ export const StyledTr = styled.tr`
       padding: 8px;
 
       button {
-        all:unset;
+        all: unset;
         display: inline-block;
         padding: 2px 8px;
         margin: 0;
@@ -572,11 +573,12 @@ export const ArticleTable = ({
   board: BoardType;
   articleList: ArticleType[];
   isLike?: boolean;
-  }) => {
+}) => {
   const navigate = useNavigate();
   const { isNoticeOff } = useNoticeContext();
   const [noticeList, setNoticeList] = useState<ArticleType[]>([]);
-  const [isSortLike, setIsSortLike] = useState(false); 
+  const [isSortLike, setIsSortLike] = useState(false);
+  const { setSort } = usePagination();
   const { viewOp } = useContext(ViewOptionContext);
 
   //특정 시간까지는 시간이 표시되고, 그 이후부터는 날짜가 표시되는데 일단 날짜만 표시하는 것으로 뒀습니다.
@@ -586,19 +588,35 @@ export const ArticleTable = ({
     return dateNum.split("-").join(".");
   };
 
+  const handleSortLike = () => {
+    setIsSortLike(!isSortLike);
+    if (isSortLike) {
+      setSort(""); //비동기 처리로 인해.. 그런데 올바른 방법은 아닌 것 같음
+    } else {
+      setSort("likeCnt,desc");
+    }
+  };
+
   useEffect(() => {
     async function fetchNotiArticle() {
       try {
-        const fetchedNotices:ArticleType[] = await notiArticle();
+        const fetchedNotices: ArticleType[] = await notiArticle();
         setNoticeList(fetchedNotices);
       } catch (err) {
-        console.log('Error fetching notices');
+        console.log("Error fetching notices");
       }
     }
 
     fetchNotiArticle();
-  },[])
-  
+
+    setIsSortLike(false);
+    setSort("");
+  }, []);
+
+  useEffect(() => {
+    setIsSortLike(false);
+    setSort("");
+  }, [board]);
 
   return (
     <StyledTable $brdName={board.firstCol === "boardName"}>
@@ -625,10 +643,7 @@ export const ArticleTable = ({
           {board.likeCol || isLike ? (
             <th scope="col">
               {board.likeCol === "sort" ? (
-                <span
-                  className="sort_likes"
-                  onClick={() => setIsSortLike(!isSortLike)}
-                >
+                <span className="sort_likes" onClick={() => handleSortLike()}>
                   좋아요
                 </span>
               ) : (
