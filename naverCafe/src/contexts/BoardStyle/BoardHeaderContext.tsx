@@ -124,13 +124,15 @@ export const CommonBoardHeader = ({ board }: { board: BoardType }) => {
   useEffect(() => {
     refetch();
     setIsFav(favList && favList.boards.some((b) => b.id === board.id));
-    console.log(`board: `, board, `favList: `, favList, `isFav: ${isFav}`); //isFav는 비동기적 처리로 인해 이전의 값을 출력한다.
+    //console.log(`board: `, board, `favList: `, favList, `isFav: ${isFav}`); //isFav는 비동기적 처리로 인해 이전의 값을 출력한다.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [board]);
 
   useEffect(() => {
     setIsFav(favList && favList.boards.some((b) => b.id === board.id));
     refetch();
-    console.log(`board: `, board, `favList: `, favList, `isFav: ${isFav}`); //isFav는 비동기적 처리로 인해 이전의 값을 출력한다.
+    //console.log(`board: `, board, `favList: `, favList, `isFav: ${isFav}`); //isFav는 비동기적 처리로 인해 이전의 값을 출력한다.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

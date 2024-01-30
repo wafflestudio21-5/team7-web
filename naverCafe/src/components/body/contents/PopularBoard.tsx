@@ -65,10 +65,12 @@ const PopularBoard = () => {
     }
 
     fetchPopArticle();
-  }, [currentOrder, selectedOp]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [SortOption, currentOrder]);
 
   useEffect(() => {
     setCurBoardState(-1);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
 

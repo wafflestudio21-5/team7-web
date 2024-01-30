@@ -36,6 +36,7 @@ const CommonBoard = ({ board }: { board: BoardType }) => {
     setPage(0);
     setSort("");
     setViewOp(2);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [board]);
 
   useEffect(() => {
@@ -55,7 +56,7 @@ const CommonBoard = ({ board }: { board: BoardType }) => {
     }
 
     fetchArticles();
-    console.log(articleList);
+    //console.log(articleList);
   }, [board, size, page, sort, setTotPage, ]);
 
   return (

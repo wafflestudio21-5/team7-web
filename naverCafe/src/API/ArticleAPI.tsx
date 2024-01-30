@@ -80,6 +80,7 @@ export function useArticle(articleId: number) {
   useEffect(() => {
     refetchArticle();
     console.log(article);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refetchArticle]);
   return { article, refetchArticle };
 }

@@ -597,8 +597,6 @@ export const ArticleTable = ({
     }
 
     fetchNotiArticle();
-
-    console.log(articleList);
   },[])
   
 
