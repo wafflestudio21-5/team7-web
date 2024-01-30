@@ -569,7 +569,7 @@ export const ArticleTable = ({
   const navigate = useNavigate();
   const { isNoticeOff } = useNoticeContext();
   const [noticeList, setNoticeList] = useState<ArticleType[]>([]);
-  const [isSortLike, setIsSortLike] = useState(false); //인기순 (기준이 명확하지 않아 일단 보류해두었습니다.)
+  const [isSortLike, setIsSortLike] = useState(false); 
   const { viewOp } = useContext(ViewOptionContext);
 
   //특정 시간까지는 시간이 표시되고, 그 이후부터는 날짜가 표시되는데 일단 날짜만 표시하는 것으로 뒀습니다.
@@ -590,6 +590,8 @@ export const ArticleTable = ({
     }
 
     fetchNotiArticle();
+
+    console.log(articleList);
   },[])
   
 

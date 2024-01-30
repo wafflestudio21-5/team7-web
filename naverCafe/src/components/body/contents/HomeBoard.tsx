@@ -3,10 +3,11 @@ import styled from "styled-components";
 import { StyledHomeBoard } from "../../../contexts/BoardStyle/BoardHeaderContext";
 import { ArticleTable } from "../../../contexts/BoardStyle/ArticleBoardContext/Table";
 import { boardAttribute } from "../../../contexts/BoardContext/BoardAttrContext";
-import { aList } from "../../../Constants";
 import { useNavigate } from "react-router-dom";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { CurrentBoardContext } from "../../../contexts/BoardContext/CurrentBoardContext";
+import { ArticleBriefType, ArticleType } from "../../../Types";
+import { wholeArticle } from "../../../API/ArticleAPI";
 
 const CafeIntro = styled.div`
   width: 860px;
@@ -115,11 +116,27 @@ const StyledBoardTitle = styled.div`
 const HomeBoard = () => {
   const navigate = useNavigate();
   const { setCurBoardState } = useContext(CurrentBoardContext);
+  const [wholeArticles, setWholeArticles] = useState<ArticleType[]>([]);
 
   useEffect(() => {
     setCurBoardState(-2);
-  }, [])
-  
+
+    async function fetchWholeArticle() {
+      try {
+        const fetchedWholeArticles: ArticleBriefType = await wholeArticle(
+          26,
+          0
+        );
+        console.log(fetchedWholeArticles);
+        setWholeArticles(fetchedWholeArticles.content);
+      } catch (err) {
+        console.log("Error fetching whole articles in HomeBoard");
+      }
+    }
+
+    fetchWholeArticle();
+  }, []);
+
   return (
     <StyledHomeBoard>
       <CafeIntro>
@@ -163,7 +180,7 @@ const HomeBoard = () => {
         </StyledBoardTitle>
         <ArticleTable
           board={boardAttribute.HomeBoard}
-          articleList={aList}
+          articleList={wholeArticles}
         ></ArticleTable>
       </StyledHomeArticle>
     </StyledHomeBoard>

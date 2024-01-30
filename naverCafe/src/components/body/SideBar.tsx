@@ -323,8 +323,8 @@ const Boards = styled.div<{ $isFavListChecked: boolean }>`
     }
 
     ul > li:hover {
-      text-decoration:underline;
-      cursor:pointer;
+      text-decoration: underline;
+      cursor: pointer;
     }
 
     ul > li > .list {
@@ -604,19 +604,21 @@ const SideBar = () => {
           <div className="bookmarkedBoardList">
             <ul className="favBoard">
               {favList ? (
-                favList.boards.map((favBoard: BoardType, index: number) => (
-                  <li
-                    className="favBoard"
-                    key={index}
-                    onClick={() => navigate(`/board/${favBoard.id - 1}`)}
-                  >
-                    <img
-                      className="list"
-                      src="https://cafe.pstatic.net/cafe4/hidden.gif"
-                    />
-                    {favBoard.name}
-                  </li>
-                ))
+                favList.boards
+                  .sort((a, b) => a.id - b.id)
+                  .map((favBoard: BoardType, index: number) => (
+                    <li
+                      className="favBoard"
+                      key={index}
+                      onClick={() => navigate(`/board/${favBoard.id - 1}`)}
+                    >
+                      <img
+                        className="list"
+                        src="https://cafe.pstatic.net/cafe4/hidden.gif"
+                      />
+                      {favBoard.name}
+                    </li>
+                  ))
               ) : (
                 <li>
                   <p className="favNotice">
@@ -720,8 +722,6 @@ const SideBar = () => {
 };
 export default SideBar;
 
-
-
 /*
 미구현 사항-------------------------------------------------------------------------------------------
 
@@ -734,5 +734,5 @@ export default SideBar;
 원본 카페에서는 즐겨찾는 게시판 버튼을 클릭하면 새 창이 뜹니다.
 그런데 새 창은 따로 뜨지 않는 것으로 구현했습니다. (구독 기능을 제외했기 때문에)
 
-----------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 */

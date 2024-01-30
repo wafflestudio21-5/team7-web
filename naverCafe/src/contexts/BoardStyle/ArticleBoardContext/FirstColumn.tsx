@@ -5,10 +5,15 @@ import { BoardType } from "../../../Types";
 import styled from "styled-components";
 
 const StyledBoardName = styled.div`
+  padding-left: 6px;
   &:hover {
     text-decoration: underline;
     cursor: pointer;
   }
+`;
+
+const StyledDot = styled.img`
+  margin-bottom:2px;
 `;
 
 export const FirstCol = (props: {
@@ -21,16 +26,16 @@ export const FirstCol = (props: {
 
   switch (props.firstCol) {
     case "dot":
-      return <img src="https://cafe.pstatic.net/cafe4/ico-blank.gif"></img>;
+      return <StyledDot src="https://cafe.pstatic.net/cafe4/ico-blank.gif"></StyledDot>;
     case "boardName":
       return (
-        <StyledBoardName onClick={() => navigate(`/board/${props.board.id}`)}>
+        <StyledBoardName onClick={() => navigate(`/board/${props.board.id-1}`)}>
           {props.board.name}
         </StyledBoardName>
       );
     case "ranking":
-      return props.ranking;
+      return props.ranking+1;
     case "number":
-      return props.articleId;
+      return props.articleId; //원본 카페에서는 article이 생성된 순서대로 index가 부여되기 때문에 일단 이렇게 뒀습니다.
   }
 };

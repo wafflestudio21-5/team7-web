@@ -107,18 +107,19 @@ export function deleteLike(articleId: number) {
 // article 공지로 등록 -> 이 기능이 필요한가?
 // 모든 article 조회 -> 이 기능이 필요한가?
 
-// 전체 article 조회
-export function wholeArticle() {
-  return axios
-    .get(baseURL + `/api/v1/articles`)
-    .then((res) => {
-      console.log(res);
-      return res.data;
-    })
-    .catch((err) => {
-      console.log(err);
-      return;
-    });
+//---------------------------------------------------------------------------------------------
+
+// 전체 article 조회 (노션에서는 default값-size:15, page:1-이 있다곤 했지만 일단 파라미터가 필수인 것으로 했습니다.)
+export async function wholeArticle(size: number, page: number) {
+  try {
+    const url = baseURL + `/api/v1/articles?size=${size}&page=${page}`;
+    const res = await axios.get(url);
+    console.log(res);
+    return res.data.articleBrief;
+  } catch (err) {
+    console.log(err);
+    return [];
+  }
 }
 
 //공지 조회
@@ -128,7 +129,30 @@ export async function notiArticle(): Promise<ArticleType[]> {
     console.log(res);
     return res.data.articleBrief;
   } catch (err) {
-      console.log(err);
-      return [];
+    console.log(err);
+    return [];
+  }
+}
+
+
+//아직 백엔드에서 정렬이 제대로 되어 오지는 않는 것 같지만, 제대로 작동하는 것은 확인하였습니다.
+export async function hotArticle(
+  HotSortType: string,
+  HotTimeType: string,
+  page?: number
+) {
+  try {
+    const res = await axios.get(baseURL + `/api/v1/articles/hot`, {
+      params: {
+        sortBy: HotSortType,
+        time: HotTimeType,
+        page: page ? page : "",
+      },
+    });
+    console.log(res);
+    return res.data.articleBrief;
+  } catch (err) {
+    console.log(err);
+    return {content:[]};
   }
 }

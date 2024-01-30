@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useCallback, useState, useEffect } from "react";
 import { baseURL } from "../Constants";
-import { ArticleBriefType, ArticleType, BoardType, GroupType } from "../Types";
+import { ArticleType, BoardType, GroupType } from "../Types";
 
 export function useWholeBoard() {
   const [boardList, setBoardList] = useState<{ boards: BoardType[] } | null>(
@@ -38,7 +38,6 @@ export function useBoardGroup() {
 }
 
 //게시판 즐겨찾기
-
 /*
 미해결 오류---------------------------------------------------------------------------------------------
 
@@ -52,7 +51,7 @@ Error in likeBoard: SyntaxError: Unexpected end of JSON input
 #3 : useGetLikeBoard
 전체 일반게시판 컴포넌트가 새로 렌더링될 때 favList와 isFav가 null인 에러.
 
-----------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------
 */
 export function likeBoard(boardId: number) {
   const url = `${baseURL}/api/v1/boards/${boardId}/likes`;
@@ -110,8 +109,8 @@ export function useGetLikeBoard() {
   return { favList, refetch };
 }
 
-//게시판별 게시물 리스트 및 인기게시판 게시물 리스트
-export function useArticleList({
+//게시판별 게시물 리스트
+export async function getArticleList({
   boardId,
   size,
   page,
@@ -122,12 +121,8 @@ export function useArticleList({
   page?: number;
   sort?: string;
 }) {
-  const [articleList, setArticleList] = useState<{
-    articleBrief: ArticleBriefType;
-  } | null>(null);
-
-  const url = `/api/v1/boards/${boardId}/articles`;
-  const refetch = useCallback(async () => {
+  try {
+    const url = `/api/v1/boards/${boardId}/articles`;
     const res = await axios.get(baseURL + url, {
       params: {
         size: size ? size : "",
@@ -135,14 +130,38 @@ export function useArticleList({
         sort: sort ? sort : "",
       },
     });
+    return res.data.articleBrief;
+  } catch (err) {
+    console.log(err);
+    return {content:[]};
+  }
+}
+
+
+//RelatedArticle에서 사용되는 줄 모르고 위처럼 getArticle로 바꾸어놓았었습니다...
+export function useArticleList({
+  boardId,
+  type,
+}: {
+  boardId?: number;
+  type?: string;
+}) {
+  const [articleList, setArticleList] = useState<{
+    articleBrief: ArticleType[];
+  } | null>(null);
+
+  const url =
+    type === undefined
+      ? `/api/v1/boards/${boardId}/articles`
+      : `/api/v1/articles/hot?sortBy=${type}`;
+  const refetch = useCallback(async () => {
+    const res = await axios.get(baseURL + url);
     const data = await res.data;
     setArticleList(data);
-  }, [url, size, page, sort]);
+  }, [url]);
 
   useEffect(() => {
     refetch();
   }, [refetch]);
   return { articleList, refetch };
 }
-
-//공지글 가져오기 (전체)

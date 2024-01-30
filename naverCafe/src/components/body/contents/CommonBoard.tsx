@@ -2,10 +2,9 @@
 
 import { useContext, useEffect, useState } from "react";
 import {
-  useArticleList,
+  getArticleList,
   useGetLikeBoard,
 } from "../../../API/BoardAPI";
-import { aList } from "../../../Constants";
 import { boardAttribute } from "../../../contexts/BoardContext/BoardAttrContext";
 import { ArticleTable } from "../../../contexts/BoardStyle/ArticleBoardContext/Table";
 import { BoardBottomOption } from "../../../contexts/BoardStyle/BoardBottomContext/BoardBottomOption";
@@ -16,60 +15,55 @@ import {
 } from "../../../contexts/BoardStyle/BoardHeaderContext";
 import { CommonBoardTopOption } from "../../../contexts/BoardStyle/BoardTopOptionContext";
 import { useNoticeContext } from "../../../contexts/BoardContext/NoticeContext";
-import { ArticleType, BoardType } from "../../../Types";
+import { ArticleBriefType, ArticleType, BoardType } from "../../../Types";
 import { CurrentBoardContext } from "../../../contexts/BoardContext/CurrentBoardContext";
+import { ViewOptionContext } from "../../../contexts/BoardContext/ViewOptionContext";
 
 const CommonBoard = ({ board }: { board: BoardType }) => {
-  const { id } = board;
-
-  const { setIsNoticeOff } = useNoticeContext(); //공지 토글
-
+  const { setIsNoticeOff } = useNoticeContext();
+  const { setViewOp } = useContext(ViewOptionContext);
   const { refetch } = useGetLikeBoard();
-
   const { setCurBoardState } = useContext(CurrentBoardContext);
-  const { articleList } = useArticleList({ boardId: id });
-  const {
-    setTotalLength,
-    indexOfFirstItem,
-    indexOfLastItem,
-    setItemsPerPage,
-    itemsPerPage,
-  } = usePagination(id);
-  const [currentItems, setCurrentItems] = useState<{ articles: ArticleType[] }>(
-    { articles: [] }
-  );
+
+  const [articleList, setArticleList] = useState<ArticleType[]>([]);
+  const { size, page, sort, setSize, setPage, setSort, setTotPage } = usePagination();
+  
   useEffect(() => {
-    const newItems = aList.slice(indexOfFirstItem, indexOfLastItem);
-    setCurrentItems({ articles: newItems });
-  }, [articleList, itemsPerPage, indexOfFirstItem, indexOfLastItem]);
-
-  //보드가 바뀔 때마다
-  useEffect(() => {
-    // setTotalLength(articleList ? articleList.length : 0);
-    setTotalLength(aList.length);
-    setItemsPerPage(15);
-    setCurBoardState(id);
-
-    setIsNoticeOff(false); //보드가 바뀔 때마다 notice 토글 초기화
-
+    setCurBoardState(board.id);
+    setIsNoticeOff(false);
+    refetch();
+    setSize(15);
+    setPage(0);
+    setSort("");
+    setViewOp(2);
   }, [board]);
 
   useEffect(() => {
-    refetch();
-  },[])
+    async function fetchArticles() {
+      try {
+        const fetchedArticles:ArticleBriefType = await getArticleList({
+          boardId: board.id,
+          size,
+          page,
+          sort,
+        });
+        setArticleList(fetchedArticles.content);
+        setTotPage(fetchedArticles.totalPages);
+      } catch (err) {
+        console.log("Error fetching article list in CommonBoard");
+      }
+    }
 
+    fetchArticles();
+    console.log(articleList);
+  }, [board, size, page, sort, setTotPage, ]);
 
   return (
     <>
       <Board>
-        <CommonBoardHeader
-          board={board}
-        ></CommonBoardHeader>
+        <CommonBoardHeader board={board}></CommonBoardHeader>
         <CommonBoardTopOption boardId={board.id}></CommonBoardTopOption>
-        <ArticleTable
-          board={boardAttribute.CommonBoard}
-          articleList={currentItems.articles}
-        ></ArticleTable>
+        <ArticleTable board={boardAttribute.CommonBoard} articleList={articleList}></ArticleTable>
         <BoardBottomOption boardId={board.id}></BoardBottomOption>
       </Board>
     </>
