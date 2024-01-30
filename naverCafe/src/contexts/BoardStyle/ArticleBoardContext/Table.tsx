@@ -2,12 +2,13 @@ import { styled, css } from "styled-components";
 import { FirstCol } from "./FirstColumn";
 import { NoticeTr } from "./NoticeRow";
 import { BoardType } from "../../BoardContext/BoardAttrContext";
-import { aList } from "../../../Constants";
 import { useNoticeContext } from "../../BoardContext/NoticeContext";
-import { useContext, useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ArticleType } from "../../../Types";
 import { ViewOptionContext } from "../../BoardContext/ViewOptionContext";
 import { useNavigate } from "react-router-dom";
+import { notiArticle } from "../../../API/ArticleAPI";
+import { usePagination } from "../BoardBottomContext/PaginationContext";
 
 const StyledTable = styled.table<{ $brdName: boolean }>`
   width: 100%;
@@ -206,7 +207,7 @@ export const StyledTr = styled.tr`
       padding: 8px;
 
       button {
-        all:unset;
+        all: unset;
         display: inline-block;
         padding: 2px 8px;
         margin: 0;
@@ -502,8 +503,8 @@ const CardViewUl = ({
       {articleList.map((article, index) => (
         <StyledCardLi key={index}>
           {isTotalBoard ? (
-            <p onClick={() => navigate(`/board/${article.board.board_id - 1}`)}>
-              {article.board.board_name}
+            <p onClick={() => navigate(`/board/${article.board.id - 1}`)}>
+              {article.board.name}
             </p>
           ) : null}
           <div className="card_area">
@@ -512,15 +513,29 @@ const CardViewUl = ({
                 <div className="tit_area">
                   <p className="tit">
                     <span className="inner">
-                      <strong>{article.title}</strong>
+                      <strong
+                        onClick={() => navigate(`/articles/${article.id}`)}
+                      >
+                        {article.title}
+                      </strong>
                     </span>
                   </p>
                 </div>
-                <p className="txt">{article.content}</p>
+                <p
+                  className="txt"
+                  onClick={() => navigate(`/articles/${article.id}`)}
+                >
+                  {article.content}
+                </p>
               </div>
               <div className="con_bottom">
                 <div className="user_info">
-                  <div className="pers_nick_area">{article.author.nickname}</div>
+                  <div
+                    className="pers_nick_area"
+                    onClick={() => navigate(`/users/${article.author.id}`)}
+                  >
+                    {article.author.nickname}
+                  </div>
                   <div className="date_num">
                     <span className="date">{DateOnly(article.createdAt)}</span>
                     <span className="num">조회 {article.viewCount}</span>
@@ -559,9 +574,11 @@ export const ArticleTable = ({
   articleList: ArticleType[];
   isLike?: boolean;
 }) => {
+  const navigate = useNavigate();
   const { isNoticeOff } = useNoticeContext();
-  const [isNickClicked, setIsNickClicked] = useState(false);
-  const [isSortLike, setIsSortLike] = useState(false); //인기순 (기준이 명확하지 않아 일단 보류해두었습니다.)
+  const [noticeList, setNoticeList] = useState<ArticleType[]>([]);
+  const [isSortLike, setIsSortLike] = useState(false);
+  const { setSort } = usePagination();
   const { viewOp } = useContext(ViewOptionContext);
 
   //특정 시간까지는 시간이 표시되고, 그 이후부터는 날짜가 표시되는데 일단 날짜만 표시하는 것으로 뒀습니다.
@@ -571,14 +588,35 @@ export const ArticleTable = ({
     return dateNum.split("-").join(".");
   };
 
-  const buttonRef = useRef(null);
-  //const {}
-
-  const handleModal = () => {
-    if (buttonRef.current) {
-
+  const handleSortLike = () => {
+    setIsSortLike(!isSortLike);
+    if (isSortLike) {
+      setSort(""); //비동기 처리로 인해.. 그런데 올바른 방법은 아닌 것 같음
+    } else {
+      setSort("likeCnt,desc");
     }
   };
+
+  useEffect(() => {
+    async function fetchNotiArticle() {
+      try {
+        const fetchedNotices: ArticleType[] = await notiArticle();
+        setNoticeList(fetchedNotices);
+      } catch (err) {
+        console.log("Error fetching notices");
+      }
+    }
+
+    fetchNotiArticle();
+
+    setIsSortLike(false);
+    setSort("");
+  }, []);
+
+  useEffect(() => {
+    setIsSortLike(false);
+    setSort("");
+  }, [board]);
 
   return (
     <StyledTable $brdName={board.firstCol === "boardName"}>
@@ -605,10 +643,7 @@ export const ArticleTable = ({
           {board.likeCol || isLike ? (
             <th scope="col">
               {board.likeCol === "sort" ? (
-                <span
-                  className="sort_likes"
-                  onClick={() => setIsSortLike(!isSortLike)}
-                >
+                <span className="sort_likes" onClick={() => handleSortLike()}>
                   좋아요
                 </span>
               ) : (
@@ -621,7 +656,7 @@ export const ArticleTable = ({
       <StyledTbody>
         {/* notice의 개수는 페이지네이션 한 페이지당 글 개수에 포함 x */}
         {board.noticeRow && !isNoticeOff
-          ? aList.map((notice) => (
+          ? noticeList.map((notice) => (
               <NoticeTr
                 notice={notice}
                 isLike={board.likeCol}
@@ -647,7 +682,7 @@ export const ArticleTable = ({
                   {/* 아티클마다 첫번째 정보 */}
                   <FirstCol
                     firstCol={board.firstCol}
-                    board={article.board.board_name}
+                    board={article.board}
                     ranking={index}
                     articleId={article.id}
                   ></FirstCol>
@@ -657,12 +692,20 @@ export const ArticleTable = ({
                 <div className="title">
                   <div className="board_list">
                     <div className="inner_list">
-                      <span className="article_title">{article.title}</span>
+                      <span
+                        className="article_title"
+                        onClick={() => navigate(`/articles/${article.id}`)}
+                      >
+                        {article.title}
+                      </span>
                       <span></span>
-                      {/* 댓글 개수를 넣어야 하는데 ArticleType에 없어서 일단 보류했습니다. */}
-                      <span className="comment">
+
+                      <span
+                        className="comment"
+                        onClick={() => navigate(`/articles/${article.id}`)}
+                      >
                         {" ["}
-                        <em>{article.viewCount}</em>
+                        <em>{article.commentCount}</em>
                         {"] "}
                       </span>
                     </div>
@@ -671,13 +714,18 @@ export const ArticleTable = ({
               </td>
               <td className="td_author">
                 <div className="ArticleBoardAuthorInfo">
-                  <button onClick={()=>handleModal} ref={buttonRef}>
-                    <span className="nickname">{article.author.nickname}</span>
+                  <button>
+                    <span
+                      className="nickname"
+                      onClick={() => navigate(`/users/${article.author.id}`)}
+                    >
+                      {article.author.nickname}
+                    </span>
                   </button>
                 </div>
-                <div className="popup">
+                {/* <div className="popup">
                   <button>게시글보기</button>
-                </div>
+                </div> */}
               </td>
               <td className="td_date">{DateOnly(article.createdAt)}.</td>
               <td className="td_view">{article.viewCount}</td>

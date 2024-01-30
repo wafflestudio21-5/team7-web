@@ -339,7 +339,7 @@ export const BoardBottomOption = ({ boardId }: { boardId: number }) => {
   return (
     <StyledBoardBottomOption>
       <PostBtn></PostBtn>
-      <Pagination boardId={boardId} />
+      <Pagination/>
       <ListSearch boardId={boardId}></ListSearch>
     </StyledBoardBottomOption>
   );

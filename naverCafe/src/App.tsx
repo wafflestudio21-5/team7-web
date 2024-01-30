@@ -20,10 +20,6 @@ import UserInfo from "./components/body/contents/userInfo/UserInfo";
 import { NoticeContextProvider } from "./contexts/BoardContext/NoticeContext";
 import { CurrentBoardStateProvider } from "./contexts/BoardContext/CurrentBoardContext";
 import { ViewOptionStateProvider } from "./contexts/BoardContext/ViewOptionContext";
-import {
-  NickModalContext,
-  NickModalContextProvider,
-} from "./contexts/BoardContext/nickNameModalContext";
 
 const Wrapper = styled.div`
   margin: 0 auto;
@@ -41,7 +37,6 @@ function App() {
         <NoticeContextProvider>
           <CurrentBoardStateProvider>
             <ViewOptionStateProvider>
-              <NickModalContextProvider>
                 <Routes>
                   {/* 회원가입 및 로그인 page */}
                   <Route path="/signup" element={<SignUp />} />
@@ -94,7 +89,6 @@ function App() {
                     <Route path="/write" element={<Writing />} />
                   </Route>
                 </Routes>
-              </NickModalContextProvider>
             </ViewOptionStateProvider>
           </CurrentBoardStateProvider>
         </NoticeContextProvider>

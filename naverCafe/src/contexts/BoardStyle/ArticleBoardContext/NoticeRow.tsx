@@ -2,6 +2,7 @@
 
 import styled from "styled-components";
 import { ArticleType } from "../../../Types";
+import { useNavigate } from "react-router-dom";
 
 const StyledNoticeTr = styled.tr`
   background: #f9f9f8;
@@ -108,9 +109,11 @@ export const NoticeTr = ({
   DateOnly,
 }: {
   notice: ArticleType;
-  isLike: boolean;
+  isLike: boolean | string | undefined;
   DateOnly: (arg: string) => string;
 }) => {
+  const navigate = useNavigate();
+
   return (
     <StyledNoticeTr>
       <td scope="col" colSpan={2} className="td_article">
@@ -122,8 +125,16 @@ export const NoticeTr = ({
           </div>
           <div className="board_list">
             <div className="inner_list">
-              <span className="article_title">{notice.title}</span>
-              <span className="comment">
+              <span
+                className="article_title"
+                onClick={() => navigate(`/articles/${notice.id}`)}
+              >
+                {notice.title}
+              </span>
+              <span
+                className="comment"
+                onClick={() => navigate(`/articles/${notice.id}`)}
+              >
                 {" ["}
                 <em>{notice.commentCount}</em>
                 {"] "}
@@ -135,12 +146,17 @@ export const NoticeTr = ({
       <td scope="col" className="td_author">
         <div className="ArticleBoardAuthorInfo">
           <button>
-            <span className="nickname">{notice.author.nickname}</span>
+            <span
+              className="nickname"
+              onClick={() => navigate(`/users/${notice.author.id}`)}
+            >
+              {notice.author.nickname}
+            </span>
           </button>
         </div>
       </td>
       <td scope="col" className="td_date">
-        {DateOnly(notice.createdAt)}
+        {DateOnly(notice.createdAt)}.
       </td>
       <td scope="col" className="td_view">
         {notice.viewCount}

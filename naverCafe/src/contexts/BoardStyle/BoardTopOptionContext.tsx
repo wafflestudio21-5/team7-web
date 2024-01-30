@@ -204,7 +204,7 @@ const StyledSortListDiv = styled.div<{ $isSelected: boolean }>`
 `;
 
 const SortArea = ({ boardId }: { boardId: number }) => {
-  const { setItemsPerPage } = usePagination(boardId);
+  const { setSize } = usePagination();
 
   //공지 토글
   const { isNoticeOff, setIsNoticeOff } = useNoticeContext();
@@ -227,7 +227,7 @@ const SortArea = ({ boardId }: { boardId: number }) => {
 
   const handleSortOp = (arg: number) => {
     const sortNum = SortOption[arg].match(/\d+/);
-    setItemsPerPage(parseInt(sortNum![0], 10));
+    setSize(parseInt(sortNum![0], 10));
     setSortOp(arg);
     setIsSortSelected(!isSortSelected);
   };
@@ -235,9 +235,6 @@ const SortArea = ({ boardId }: { boardId: number }) => {
   useEffect(() => {
     setSortOp(2);
   }, [boardId]);
-
-  //게시물 유형별 정렬
-  //미구현: 클릭시 실제 view 변경
 
   const { ViewOption, viewOp, setViewOp } = useContext(ViewOptionContext);
 
@@ -498,14 +495,18 @@ const StyledOptionList = styled.div<{ $isSelected: boolean }>`
 export const PopularBoardTopOption = ({
   currentOrder,
   setCurrentOrder,
+  SortOption,
+  selectedOp,
+  setSelectedOp,
 }: {
   currentOrder: Order;
   setCurrentOrder: (arg: Order) => void;
+  SortOption: {view:string, query:string}[];
+  selectedOp: number;
+  setSelectedOp: (arg: number) => void;
 }) => {
   const [isSortSelected, setIsSortSelected] = useState(false);
-  const SortOption = ["최근 7일", "최근 30일", "전체"];
-  const [selectedOp, setSelectedOp] = useState(0); //선택된 SortOption의 인덱스
-
+ 
   const handleSelectOp = (arg: number) => {
     setIsSortSelected(!isSortSelected);
     setSelectedOp(arg);
@@ -527,7 +528,7 @@ export const PopularBoardTopOption = ({
                 setIsSortSelected(!isSortSelected);
               }}
             >
-              {SortOption[selectedOp]}
+              {SortOption[selectedOp].view}
               <svg></svg>
             </button>
             <StyledOptionList
@@ -542,7 +543,7 @@ export const PopularBoardTopOption = ({
                       className="option"
                       onClick={() => handleSelectOp(index)}
                     >
-                      <span className="option_text">{option}</span>
+                      <span className="option_text">{option.view}</span>
                     </button>
                   </li>
                 ))}
