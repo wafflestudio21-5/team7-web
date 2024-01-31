@@ -4,7 +4,14 @@ import { useCallback, useEffect, useState } from "react";
 import { ArticleBriefType } from "../Types";
 
 // 회원가입 함수
-export function signup(userInfo: {
+export function signup({
+  username,
+  password,
+  name,
+  email,
+  birthDate,
+  phoneNumber,
+}: {
   username: string;
   password: string;
   name: string;
@@ -12,7 +19,18 @@ export function signup(userInfo: {
   birthDate: string;
   phoneNumber: string;
 }) {
-  return axios.post(baseURL + "/api/v1/signup", userInfo);
+  return axios.post(
+    baseURL + "/api/v1/signup",
+    {
+      username: username,
+      password: password,
+      name: name,
+      email: email,
+      birthDate: birthDate,
+      phoneNumber: phoneNumber,
+    },
+    {}
+  );
 }
 
 // 로그인

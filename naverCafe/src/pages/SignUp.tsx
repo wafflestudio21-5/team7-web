@@ -1,6 +1,7 @@
-import axios from "axios";
 import { FocusEvent, useState } from "react";
 import styled, { css } from "styled-components";
+import { signup } from "../API/UserAPI";
+import { useNavigate } from "react-router-dom";
 
 const Wrapper = styled.div`
   width: 500px;
@@ -369,6 +370,7 @@ const SignUp = () => {
   const [name, setName] = useState<string>("");
   const [userBirth, setUserBirth] = useState<string>("");
   const [userPhoneNumber, setUserPhoneNumber] = useState<string>("");
+  const navigate = useNavigate();
 
   const [infoOnClick, setInfoOnClick] = useState({
     id: false,
@@ -515,24 +517,24 @@ const SignUp = () => {
   const [isAuthPaperNeverClicked, setIsAuthPaperNeverClicked] =
     useState<boolean>(true);
 
-  const createAccount = () => {
-    return axios
-      .post("http://localhost:8080/api/v1/signup", {
-        username: userName,
-        password: userPassword,
-        name: name,
-        email: userEmail,
-        birthDate: userBirth,
-        phoneNumber: userPhoneNumber,
-      })
-      .then((res) => {
-        console.log(res);
-        return res;
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
+  // const createAccount = () => {
+  //   return axios
+  //     .post("http://localhost:8080/api/v1/signup", {
+  //       username: userName,
+  //       password: userPassword,
+  //       name: name,
+  //       email: userEmail,
+  //       birthDate: userBirth,
+  //       phoneNumber: userPhoneNumber,
+  //     })
+  //     .then((res) => {
+  //       console.log(res);
+  //       return res;
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+  // };
 
   //handleCreateAccount에서 전체 input 필드에 대한 유효성 검사를 한번에 진행하는 함수입니다.
   const validateAll = () => {
@@ -563,7 +565,7 @@ const SignUp = () => {
     };
   };
 
-  const handleCreateAccount = () => {
+  const handleCreateAccount = async () => {
     const finalError: FinalError = validateAll();
     setError(finalError);
 
@@ -572,7 +574,18 @@ const SignUp = () => {
     );
 
     if (!hasErrors && isAuthPaperChecked) {
-      createAccount();
+      await signup({
+        username: userName,
+        password: userPassword,
+        name: name,
+        email: userEmail,
+        birthDate: userBirth,
+        phoneNumber: userPhoneNumber,
+      })
+        .then(() => {
+          navigate("/login");
+        })
+        .catch((err) => console.log(err));
     } else if (!isAuthPaperChecked) {
       console.log("auth paper is not checked");
       setIsAuthPaperChecked(false);
