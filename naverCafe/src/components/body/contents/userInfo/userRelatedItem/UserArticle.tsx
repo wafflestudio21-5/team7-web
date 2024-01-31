@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { ArticleBriefType } from "../../../../../Types";
+import { ArticleType } from "../../../../../Types";
 const Wrapper = styled.li`
   display: grid;
   height: 38px;
@@ -90,7 +90,7 @@ const Wrapper = styled.li`
 `;
 
 interface PropsUserArticle {
-  article: ArticleBriefType;
+  article: ArticleType;
   isMyInfo: boolean;
   checkedArticleIdList: number[];
   setCheckedArticleIdList: (value: number[]) => void;

@@ -32,7 +32,7 @@ const UserCommentList = ({
   );
 
   useEffect(() => {
-    getUserComments({ userNickname: userNickname, page: pageNumber })
+    getUserComments({ page: pageNumber })
       .then((res) => {
         return res.data.userComments;
       })
@@ -41,8 +41,18 @@ const UserCommentList = ({
         setTotalPages(res.totalPages);
       })
       .catch((err) => console.error(err));
+  }, []);
+
+  useEffect(() => {
+    getUserComments({ page: pageNumber })
+      .then((res) => {
+        return res.data.userComments;
+      })
+      .then((res) => {
+        setUserCommentList(res.content);
+      })
+      .catch((err) => console.error(err));
   }, [pageNumber, userNickname]);
-  console.log(totalPages);
 
   if (userCommentList)
     return (

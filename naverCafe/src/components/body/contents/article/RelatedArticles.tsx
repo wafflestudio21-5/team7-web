@@ -380,9 +380,13 @@ const RelatedArticles = ({
       return false;
     }
   };
+  // const handleArticleList = () => {
+  //   let index;
+
+  // }
   // 페이지네이션 관련 리팩토링...
   const relatedArticleList = useMemo(() => {
-    return articleList?.articleBrief.map((article) => (
+    return articleList?.content.map((article) => (
       <RelatedArticle
         $isArticleFocused={Number(articleId) === article.id ? true : false}
         key={article.id}
@@ -424,122 +428,6 @@ const RelatedArticles = ({
       </RelatedArticle>
     ));
   }, [articleId, articleList, scrollToTop]);
-
-  // const handleRelatedArticleList = () => {
-  //   // 최종적으로 리턴할 article 배열이 담긴 JSX.Element 입니다.
-  //   const newRelatedArticles = (upperLimitIndex: number) => {
-  //     if (relatedArticleList) {
-  //       if (upperLimitIndex >= 10) {
-  //         return (
-  //           <ArticleListContainer $articleListOnActive={onActiveButtonNumber}>
-  //             <ul className="relatedArticleList third">
-  //               {relatedArticleList
-  //                 .slice(
-  //                   upperLimitIndex - 14 < 0 ? 0 : upperLimitIndex - 14,
-  //                   upperLimitIndex - 9
-  //                 )
-  //                 .reverse()}
-  //             </ul>
-  //             <ul className="relatedArticleList second">
-  //               {relatedArticleList
-  //                 .slice(upperLimitIndex - 9, upperLimitIndex - 4)
-  //                 .reverse()}
-  //             </ul>
-  //             <ul className="relatedArticleList first">
-  //               {relatedArticleList
-  //                 .slice(upperLimitIndex - 4, upperLimitIndex + 1)
-  //                 .reverse()}
-  //             </ul>
-  //             <div className="buttons">
-  //               <button
-  //                 className="firstButton"
-  //                 onClick={() => setOnActiveButtonNumber(1)}
-  //               >
-  //                 1
-  //               </button>
-  //               <button
-  //                 className="secondButton"
-  //                 onClick={() => setOnActiveButtonNumber(2)}
-  //               >
-  //                 2
-  //               </button>
-  //               <button
-  //                 className="thirdButton"
-  //                 onClick={() => setOnActiveButtonNumber(3)}
-  //               >
-  //                 3
-  //               </button>
-  //             </div>
-  //           </ArticleListContainer>
-  //         );
-  //       } else if (5 <= upperLimitIndex && upperLimitIndex < 10) {
-  //         return (
-  //           <ArticleListContainer $articleListOnActive={onActiveButtonNumber}>
-  //             <ul className="relatedArticleList second">
-  //               {relatedArticleList.slice(0, upperLimitIndex - 4).reverse()}
-  //             </ul>
-  //             <ul className="relatedArticleList first">
-  //               {relatedArticleList
-  //                 .slice(upperLimitIndex - 4, upperLimitIndex + 1)
-  //                 .reverse()}
-  //             </ul>
-  //             <div className="buttons">
-  //               <button
-  //                 className="firstButton"
-  //                 onClick={() => setOnActiveButtonNumber(1)}
-  //               >
-  //                 1
-  //               </button>
-  //               <button
-  //                 className="secondButton"
-  //                 onClick={() => setOnActiveButtonNumber(2)}
-  //               >
-  //                 2
-  //               </button>
-  //             </div>
-  //           </ArticleListContainer>
-  //         );
-  //       } else {
-  //         return (
-  //           <ArticleListContainer $articleListOnActive={onActiveButtonNumber}>
-  //             <ul className="relatedArticleList first">
-  //               {relatedArticleList
-  //                 .slice(
-  //                   upperLimitIndex - 4 < 0 ? 0 : upperLimitIndex - 4,
-  //                   upperLimitIndex === 2
-  //                     ? 5
-  //                     : upperLimitIndex === 3
-  //                     ? 5
-  //                     : upperLimitIndex + 1
-  //                 )
-  //                 .reverse()}
-  //             </ul>
-  //           </ArticleListContainer>
-  //         );
-  //       }
-  //     }
-  //   };
-  //   if (articleId) {
-  //     // 현재 보고 있는 article이 전체 article list에서 몇번째 index에 있는지 조사합니다.
-  //     const articleIndex = articleList?.articleBrief.findIndex(
-  //       (article) => article.id === Number(articleId)
-  //     );
-  //     if (articleIndex) {
-  //       if (articleList?.articleBrief[articleIndex + 2] !== undefined) {
-  //         return newRelatedArticles(articleIndex + 2);
-  //       } else if (articleList?.articleBrief[articleIndex + 1] !== undefined) {
-  //         return newRelatedArticles(articleIndex + 1);
-  //       } else {
-  //         return newRelatedArticles(articleIndex);
-  //       }
-  //     } else {
-  //       return null;
-  //     }
-  //   }
-  //   // 보여줄 related article index의 '상한'(더욱 최신글)을 조사하고, 이에 따라 pagination button 개수와 보여줄 article을 정합니다.
-  // };
-
-  // pagination refactoring
 
   return (
     <Wrapper>

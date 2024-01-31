@@ -62,6 +62,10 @@ const Wrapper = styled.div<{
     }
   }
   & > .pageButtons {
+    display: flex;
+    justify-content: center;
+    position: relative;
+    top: 58px;
     button {
       background-color: inherit;
       border: none;
@@ -75,7 +79,7 @@ const Wrapper = styled.div<{
     button:hover {
       background-color: #f0f0f0;
     }
-    & > .active {
+    & > li > .active {
       font-weight: 700;
       background-color: #e5e7ea;
       &:hover {
@@ -96,6 +100,7 @@ interface PropsUserBottomButtons {
   totalPages: number;
   refetchUserArticles?: () => Promise<void>;
   refetchUserLikedArticles?: () => Promise<void>;
+  setIsFirstRendering?: (value: boolean) => void;
 }
 const UserBottomButtons = ({
   id,
@@ -108,6 +113,7 @@ const UserBottomButtons = ({
   totalPages,
   refetchUserArticles,
   refetchUserLikedArticles,
+  setIsFirstRendering,
 }: PropsUserBottomButtons) => {
   const [isCheckAllArticleClicked, setIsCheckAllArticleClicked] =
     useState<boolean>(false);
@@ -138,7 +144,7 @@ const UserBottomButtons = ({
     if (checkedArticleIdList.length === 0) {
       setIsNotCheckedModalOpen(true);
     } else {
-      if (id === 0 && refetchUserArticles) {
+      if (id === 0 && refetchUserArticles && setIsFirstRendering) {
         alert("게시글을 삭제하시겠습니까?");
         // await Promise.all을 해주어야지 article 삭제 작업이 완전히 완료될 때까지 기다렸다가 다음 코드가 실행됨
         // 만약 그냥 map(async () => await ~~) 이라면, 삭제 작업 각각은 비동기처리가 되기에, 아래의 await refetch 함수가 동기적으로 먼저 처리되게 됨
@@ -152,8 +158,10 @@ const UserBottomButtons = ({
           // async - await callback과 같은 효과로, 그냥 promise를 반환하는 callback
         );
         setCheckedArticleIdList([]);
+        setPageNumber(1);
+        setIsFirstRendering(true);
         await refetchUserArticles();
-      } else if (id === 3 && refetchUserLikedArticles) {
+      } else if (id === 3 && refetchUserLikedArticles && setIsFirstRendering) {
         alert("좋아요를 취소하시겠습니까?");
         await Promise.all(
           checkedArticleIdList.map((articleId) => {
@@ -161,6 +169,8 @@ const UserBottomButtons = ({
           })
         );
         setCheckedArticleIdList([]);
+        setPageNumber(1);
+        setIsFirstRendering(true);
         await refetchUserLikedArticles();
       }
       setCheckedArticleIdList([]);
@@ -171,22 +181,21 @@ const UserBottomButtons = ({
   const pageButtons =
     totalPages === 1
       ? null
-      : Array(totalPages).map((value, index) => {
-          return (
-            <li key={index}>
-              <button
-                className={
-                  pageNumber === index + 1
-                    ? "pageButton active"
-                    : "pageButton inactive"
-                }
-                onClick={() => setPageNumber(index + 1)}
-              >
-                {index + 1}
-              </button>
-            </li>
-          );
-        });
+      : Array.from({ length: totalPages }, (_, index) => (
+          <li key={index}>
+            <button
+              className={
+                pageNumber === index + 1
+                  ? "pageButton active"
+                  : "pageButton inactive"
+              }
+              onClick={() => setPageNumber(index + 1)}
+            >
+              {index + 1}
+            </button>
+          </li>
+        ));
+  console.log(totalPages);
 
   if (id === 0) {
     return (

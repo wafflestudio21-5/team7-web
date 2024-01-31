@@ -12,28 +12,28 @@ const Wrapper = styled.div`
 interface PropsUserLikedArticleList {
   id: number;
   isMyInfo: boolean;
-  userNickname: string;
+  //   userNickname: string;
   checkedArticleIdList: number[];
   setCheckedArticleIdList: (value: number[]) => void;
 }
 const UserLikedArticleList = ({
   id,
   isMyInfo,
-  userNickname,
   checkedArticleIdList,
   setCheckedArticleIdList,
 }: PropsUserLikedArticleList) => {
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
+  const [isFirstRendering, setIsFirstRendering] = useState<boolean>(true);
 
-  const { userLikedArticles, refetchUserLikedArticles } = useUserLikedArticles(
-    {}
-  );
+  const { userLikedArticles, refetchUserLikedArticles } = useUserLikedArticles({
+    page: pageNumber,
+  });
   const articleIdList = userLikedArticles?.articleBrief.content.map(
     (article) => article.id
   );
   useEffect(() => {
-    if (userLikedArticles) {
+    if (userLikedArticles && isFirstRendering) {
       setTotalPages(userLikedArticles.articleBrief.totalPages);
     }
   }, [userLikedArticles]);
@@ -67,6 +67,7 @@ const UserLikedArticleList = ({
             setPageNumber={setPageNumber}
             totalPages={totalPages}
             refetchUserLikedArticles={refetchUserLikedArticles}
+            setIsFirstRendering={setIsFirstRendering}
           />
         </div>
       </Wrapper>

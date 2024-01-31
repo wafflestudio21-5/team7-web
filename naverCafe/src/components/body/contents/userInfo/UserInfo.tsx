@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getUserInfo, useMyProfile } from "../../../../API/UserAPI";
+import { UserInfoType } from "../../../../Types";
 
 import UserArticleList from "./userRelatedList/UserArticleList";
 import UserCommentList from "./userRelatedList/UserCommentList";
@@ -104,16 +105,6 @@ const List = styled.div`
     }
   }
 `;
-type UserInfoType = {
-  nickname: string;
-  rank: string;
-  introduction: string | null;
-  visitCount: number;
-  myArticleCount: number;
-  myCommentCount: number;
-  registerDate: string;
-  image: string | null;
-};
 
 const UserInfo = () => {
   const { nickname } = useParams();
@@ -210,7 +201,7 @@ const UserInfo = () => {
         <UserLikedArticleList
           id={3}
           isMyInfo={isMyInfo}
-          userNickname={userNickname as string}
+          // userNickname={userNickname as string}
           checkedArticleIdList={checkedArticleIdList}
           setCheckedArticleIdList={setCheckedArticleIdList}
         />
@@ -244,7 +235,7 @@ const UserInfo = () => {
             </div>
           </div>
         </div>
-        <div className="introduce">{userInfo?.introduction}hihi</div>
+        <div className="introduce">{userInfo?.introduction}</div>
         <Tab>
           {infoList.map((info) => {
             if (!isMyInfo) {

@@ -5,7 +5,9 @@ import { getCafeInfo } from "../../API/CafeAPI";
 import { waffleCafe } from "../../Constants";
 import { useBoardGroup, useGetLikeBoard } from "../../API/BoardAPI";
 import { CurrentBoardContext } from "../../contexts/BoardContext/CurrentBoardContext";
-import { BoardType } from "../../Types";
+import { BoardType, UserInfoType } from "../../Types";
+import { useMyProfile } from "../../API/UserAPI";
+import { getUserInfo } from "../../API/UserAPI";
 
 const Wrapper = styled.div`
   display: inline-block;
@@ -142,10 +144,30 @@ const MyActivity = styled.div`
     border-bottom: 1px solid #ebebeb;
     padding: 12px 10px;
 
-    & > .userPhoto > img {
-      width: 57.25px;
-      height: 57.25px;
-      box-sizing: border-box;
+    & > .userPhoto {
+      position: relative;
+      & > img {
+        width: 57.25px;
+        height: 57.25px;
+        box-sizing: border-box;
+      }
+      & > .editUserInfo {
+        display: inline-block;
+        background-image: url(https://ssl.pstatic.net/static/cafe/cafe_pc/sp/sp_icon_06952b76.svg);
+        background-repeat: no-repeat;
+        background-position: -172px -226px;
+        width: 16px;
+        height: 16px;
+        box-sizing: border-box;
+        border: 0;
+        outline: 0;
+        z-index: 1;
+        border-radius: 50%;
+        position: absolute;
+        bottom: 0;
+        right: 0px;
+        cursor: pointer;
+      }
     }
     & > .userInfo {
       margin-left: 6px;
@@ -467,7 +489,8 @@ const StyledUl = styled.ul`
 
 const SideBar = () => {
   const [isCafeInfoChecked, setIsCafeInfoChecked] = useState<boolean>(true);
-
+  const { myProfile } = useMyProfile();
+  const [myInfo, setMyInfo] = useState<UserInfoType | null>(null);
   const [isFavListChecked, setIsFavListChecked] = useState(false);
   const { favList, refetch } = useGetLikeBoard();
 
@@ -494,45 +517,121 @@ const SideBar = () => {
         console.error(err);
       });
   }, []);
-  return (
-    <Wrapper>
-      <Tab className={isCafeInfoChecked ? "cafeInfo" : "myActivity"}>
-        <button onClick={() => setIsCafeInfoChecked(true)}>카페정보</button>
-        <button onClick={() => setIsCafeInfoChecked(false)}>나의활동</button>
-      </Tab>
-      {isCafeInfoChecked ? (
-        <CafeInfo>
-          <div className="manager">
-            <div className="managerProfile">
-              <div className="photo">
+  useEffect(() => {
+    if (myProfile) {
+      getUserInfo({ userNickname: myProfile.nickname })
+        .then((res) => {
+          console.log(res.data);
+          return res.data.userInfo;
+        })
+        .then((res) => {
+          setMyInfo({
+            nickname: res.nickname,
+            rank: res.rank,
+            introduction: res.introduction,
+            visitCount: res.visit_count,
+            myArticleCount: res.my_article_count,
+            myCommentCount: res.my_comment_count,
+            registerDate: res.register_date,
+            image: res.image,
+          });
+        })
+        .catch((err) => console.error(err));
+    }
+  }, [myProfile]);
+
+  const handleOnClickProfile = () => {
+    console.log("yes");
+    if (myProfile) {
+      const url = `http://localhost:5173/users/${myProfile.nickname}/editInfo`;
+      window.open(url, "_blank", "width=400, height=780");
+      window.addEventListener("message", (event) => {
+        if (event.data === "myProfileChanged") {
+          navigate("/");
+          window.location.reload();
+        }
+      });
+    }
+  };
+
+  if (cafeInfo) {
+    return (
+      <Wrapper>
+        <Tab className={isCafeInfoChecked ? "cafeInfo" : "myActivity"}>
+          <button onClick={() => setIsCafeInfoChecked(true)}>카페정보</button>
+          <button onClick={() => setIsCafeInfoChecked(false)}>나의활동</button>
+        </Tab>
+        {isCafeInfoChecked ? (
+          <CafeInfo>
+            <div className="manager">
+              <div className="managerProfile">
+                <div className="photo">
+                  <img
+                    src="https://ssl.pstatic.net/static/cafe/cafe_pc/default/cafe_thumb_noimg_55.png"
+                    alt="카페 메니저 사진"
+                  />
+                </div>
+                <div className="managerInfo">
+                  <p>{waffleCafe.manager}</p>
+                  <p>{waffleCafe.createdAt}</p>
+                  <p>카페소개</p>
+                </div>
+              </div>
+              {/* <div className="manageCafe">
+              <span>카페 관리</span>
+              <span>통계</span>
+            </div> */}
+              {/* 카페 관리와 통게 링크는 등급이 매니저인 사람에게만 보이는 란인 것 같아 보류해두겠습니다. */}
+            </div>
+            <div className="cafeInfo">
+              <p>
+                <span className="cafeState" />
+                씨앗 1단계
+              </p>
+              <p>
+                <span className="peopleLogo" />
+                {cafeInfo.memberCount}
+                <Link to={`/`}>초대</Link>
+              </p>
+            </div>
+          </CafeInfo>
+        ) : (
+          <MyActivity>
+            <div className="user">
+              <div className="userPhoto">
                 <img
-                  src="https://ssl.pstatic.net/static/cafe/cafe_pc/default/cafe_thumb_noimg_55.png"
-                  alt="카페 메니저 사진"
+                  src="https://ssl.pstatic.net/static/cafe/cafe_pc/default/cafe_profile_70.png"
+                  alt="프로필 이미지"
+                />
+                <button
+                  className="editUserInfo"
+                  onClick={() => handleOnClickProfile()}
                 />
               </div>
-              <div className="managerInfo">
-                <p>{waffleCafe.manager}</p>
-                <p>{waffleCafe.createdAt}</p>
-                <p>카페소개</p>
+              <div className="userInfo">
+                <Link to={`/users/${myInfo?.nickname}`}>
+                  {myInfo?.nickname}
+                </Link>
+                <p>{myInfo?.registerDate}</p>
               </div>
             </div>
             <div className="userHistory">
               <ul>
-                <li>user 직책</li>
+                <li>{myInfo?.rank}</li>
                 <li>
                   <span />
                   방문 횟수
-                  <em>n회</em>
+                  <em>{myInfo?.visitCount}</em>
                 </li>
                 <li>
                   <span />
-                  <Link to={`/`}>내가 쓴 게시글</Link>
-                  <em>n개</em>
+                  <Link to={`/users/${myInfo?.nickname}`}>내가 쓴 게시글</Link>
+                  <em>{myInfo?.myArticleCount}</em>
                 </li>
                 <li>
                   <span />
-                  <Link to={`/`}>내가 쓴 댓글</Link>
-                  <em>2개</em>
+                  <Link to={`/users/${myInfo?.nickname}`}>내가 쓴 댓글</Link>
+                  <em>{myInfo?.myCommentCount}</em>
                 </li>
                 <li>
                   <span />
@@ -598,158 +697,94 @@ const SideBar = () => {
               )}
             </ul>
           </div>
-        </CafeInfo>
-      ) : (
-        <MyActivity>
-          <div className="user">
-            <div className="userPhoto">
+          <div className="boards">
+            <StyledDiv $isCurBoard={curBoardState === 0}>
               <img
-                src="https://ssl.pstatic.net/static/cafe/cafe_pc/default/cafe_profile_70.png"
-                alt="프로필 이미지"
+                src="https://cafe.pstatic.net/cafe4/hidden.gif"
+                alt="전체글보기"
               />
-            </div>
-            <div className="userInfo">
-              <Link to={`/`}>user 이름</Link>
-              <p>2024.00.00 가입</p>
-            </div>
-          </div>
-          <div className="userHistory">
-            <ul>
-              <li>user 직책</li>
-              <li>
-                <span />
-                방문 횟수
-                <em>n회</em>
-              </li>
-              <li>
-                <span />
-                <Link to={`/`}>내가 쓴 게시글</Link>
-                <em>n개</em>
-              </li>
-              <li>
-                <span />
-                <Link to={`/`}>내가 쓴 댓글</Link>
-                <em>2개</em>
-              </li>
-              <li>
-                <span />
-                <Link to={`/`}>내 거래내역 보기</Link>
-              </li>
-            </ul>
-          </div>
-        </MyActivity>
-      )}
-      <Buttons>
-        <button
-          className="writePost"
-          onClick={() => {
-            navigate("/write");
-          }}
-        >
-          카페 글쓰기
-        </button>
-        <br />
-        <button className="cafeChat">카페 채팅</button>
-      </Buttons>
-      <Boards>
-        <div className="bookmarkedBoard">
-          <p>
-            <img
-              src="https://cafe.pstatic.net/cafe4/hidden.gif"
-              alt="즐겨찾기"
-            />
-            즐겨찾는 게시판
-            <img
-              src="https://cafe.pstatic.net/cafe4/hidden.gif"
-              alt="즐겨찾기 더보기"
-            />
-          </p>
-          <div className="bookmarkedBoardList"></div>
-        </div>
-        <div className="boards">
-          <StyledDiv $isCurBoard={curBoardState === 0}>
-            <img
-              src="https://cafe.pstatic.net/cafe4/hidden.gif"
-              alt="전체글보기"
-            />
-            <Link
-              to={`/totalboard`}
-              onClick={() => {
-                setCurBoardState(0);
-              }}
-            >
-              전체글보기
-            </Link>
-          </StyledDiv>
-          <StyledDiv $isCurBoard={curBoardState === -1}>
-            <img src="https://cafe.pstatic.net/cafe4/hidden.gif" alt="인기글" />
-            <Link
-              to={`/popularboard`}
-              onClick={() => {
-                setCurBoardState(-1);
-              }}
-            >
-              인기글
-            </Link>
-          </StyledDiv>
-          {groupList &&
-            groupList.boardGroups.map((group, index) => (
-              <>
-                <StyledGroupTit className="cafe-menu-tit" key={index}>
-                  <h3>
-                    <span>{group.name}</span>
-                  </h3>
-                </StyledGroupTit>
-                <StyledUl className="cafe-menu-list">
-                  {group.boards.map((board, index) => (
-                    <li>
-                      <img
-                        className="list"
-                        src="https://cafe.pstatic.net/cafe4/hidden.gif"
-                      ></img>
-                      <img
-                        className="brdimg"
-                        src="https://cafe.pstatic.net/cafe4/hidden.gif"
-                        alt={board.name}
-                      />
-                      <StyledDiv
-                        key={index}
-                        $isCurBoard={curBoardState === board.id}
-                      >
-                        <Link
-                          to={`/board/${board.id - 1}`}
-                          onClick={() => {
-                            setCurBoardState(board.id);
-                          }}
+              <Link
+                to={`/totalboard`}
+                onClick={() => {
+                  setCurBoardState(0);
+                }}
+              >
+                전체글보기
+              </Link>
+            </StyledDiv>
+            <StyledDiv $isCurBoard={curBoardState === -1}>
+              <img
+                src="https://cafe.pstatic.net/cafe4/hidden.gif"
+                alt="인기글"
+              />
+              <Link
+                to={`/popularboard`}
+                onClick={() => {
+                  setCurBoardState(-1);
+                }}
+              >
+                인기글
+              </Link>
+            </StyledDiv>
+            {groupList &&
+              groupList.boardGroups.map((group, index) => (
+                <>
+                  <StyledGroupTit className="cafe-menu-tit" key={index}>
+                    <h3>
+                      <span>{group.name}</span>
+                    </h3>
+                  </StyledGroupTit>
+                  <StyledUl className="cafe-menu-list">
+                    {group.boards.map((board, index) => (
+                      <li>
+                        <img
+                          className="list"
+                          src="https://cafe.pstatic.net/cafe4/hidden.gif"
+                        ></img>
+                        <img
+                          className="brdimg"
+                          src="https://cafe.pstatic.net/cafe4/hidden.gif"
+                          alt={board.name}
+                        />
+                        <StyledDiv
+                          key={index}
+                          $isCurBoard={curBoardState === board.id}
                         >
-                          {board.name}
-                        </Link>
-                      </StyledDiv>
-                    </li>
-                  ))}
-                </StyledUl>
-              </>
-            ))}
+                          <Link
+                            to={`/board/${board.id - 1}`}
+                            onClick={() => {
+                              setCurBoardState(board.id);
+                            }}
+                          >
+                            {board.name}
+                          </Link>
+                        </StyledDiv>
+                      </li>
+                    ))}
+                  </StyledUl>
+                </>
+              ))}
 
-          {/* 그 외 게시판 새로 추가시 더해지는 기능이 있으면 좋겠습니다. */}
-          {/* 그러러면 boards div 안에 있는 div들이 state로서 선언되면 될 것 같습니다. */}
-        </div>
-      </Boards>
-      <RecentComments>
-        <p>최신 댓글ㆍ답글</p>
-        <ul className="recentCommentList">
-          {/* state로서 li 요소를 나타내면 좋을 것 같습니다. */}
-          {/* 만약 요소의 개수가 0이라면 다른 text를 담는 것으로 하는 로직이면 좋을 것 같습니다. */}
-        </ul>
-      </RecentComments>
-      <CafeSmartBot>
-        <img
-          src="https://ssl.pstatic.net/static/cafe/banner_chatbot.png"
-          alt="카페 스마트봇"
-        />
-      </CafeSmartBot>
-    </Wrapper>
-  );
+            {/* 그 외 게시판 새로 추가시 더해지는 기능이 있으면 좋겠습니다. */}
+            {/* 그러러면 boards div 안에 있는 div들이 state로서 선언되면 될 것 같습니다. */}
+          </div>
+        </Boards>
+        <RecentComments>
+          <p>최신 댓글ㆍ답글</p>
+          <ul className="recentCommentList">
+            {/* state로서 li 요소를 나타내면 좋을 것 같습니다. */}
+            {/* 만약 요소의 개수가 0이라면 다른 text를 담는 것으로 하는 로직이면 좋을 것 같습니다. */}
+          </ul>
+        </RecentComments>
+        <CafeSmartBot>
+          <img
+            src="https://ssl.pstatic.net/static/cafe/banner_chatbot.png"
+            alt="카페 스마트봇"
+          />
+        </CafeSmartBot>
+      </Wrapper>
+    );
+  }
 };
 export default SideBar;
 

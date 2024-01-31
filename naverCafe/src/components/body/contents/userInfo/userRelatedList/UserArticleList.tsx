@@ -8,7 +8,6 @@ import UserBottomButtons from "../UserBottomButtons";
 const Wrapper = styled.div`
   font-size: 13px;
 `;
-
 interface PropsUserArticleList {
   id: number;
   isMyInfo: boolean;
@@ -25,9 +24,11 @@ const UserArticleList = ({
 }: PropsUserArticleList) => {
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
+  const [isFirstRendering, setIsFirstRendering] = useState<boolean>(true);
 
   const { userArticles, refetchUserArticles } = useUserArticles({
     userNickname: userNickname,
+    page: pageNumber,
   });
   const articleIdList = userArticles?.articleBrief.content.map(
     (article) => article.id
@@ -36,6 +37,11 @@ const UserArticleList = ({
   useEffect(() => {
     if (userArticles) {
       setTotalPages(userArticles.articleBrief.totalPages);
+    }
+  }, [isFirstRendering]);
+  useEffect(() => {
+    if (userArticles && isFirstRendering) {
+      setIsFirstRendering(false);
     }
   }, [userArticles]);
 
@@ -68,6 +74,7 @@ const UserArticleList = ({
             setPageNumber={setPageNumber}
             totalPages={totalPages}
             refetchUserArticles={refetchUserArticles}
+            setIsFirstRendering={setIsFirstRendering}
           />
         </div>
       </Wrapper>

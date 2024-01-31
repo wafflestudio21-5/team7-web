@@ -37,8 +37,16 @@ const UserCommentedArticleList = ({
       .then((res) => {
         setUserCommentedArticleList(res.content);
         setTotalPages(res.totalPages);
-      });
-  }, [pageNumber, userNickname]);
+      })
+      .catch((err) => console.log(err));
+  }, []);
+  useEffect(() => {
+    getUserCommentedArticle({ userNickname: userNickname, page: pageNumber })
+      .then((res) => res.data.commentedArticles)
+      .then((res) => setUserCommentedArticleList(res.content))
+      .catch((err) => console.log(err));
+  }, [userNickname, pageNumber]);
+
   if (userCommentedArticleList) {
     return (
       <Wrapper>

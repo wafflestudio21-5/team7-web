@@ -38,7 +38,7 @@ export type ArticleBriefType = {
   last: boolean;
   size: number;
   number: number;
-  sort: { empty: boolean; unsorted: boolean; sorted: boolean; };
+  sort: { empty: boolean; unsorted: boolean; sorted: boolean };
   numberOfElements: number;
   first: boolean;
   empty: boolean;
@@ -46,7 +46,7 @@ export type ArticleBriefType = {
 export type ArticleType = {
   id: number;
   title: string;
-  content: string;
+  content?: string;
   createdAt: string;
   viewCount: number;
   likeCount: number;
@@ -66,27 +66,8 @@ export type ArticleType = {
     id: number;
     name: string;
   };
-  allowComments: boolean;
+  allowComments?: boolean;
   isNotification: boolean;
-};
-export type ArticleBriefType = {
-  id: number;
-  title: string;
-  createdAt: string;
-  viewCount: number;
-  likeCount: number;
-  commentCount: number;
-  author: {
-    id: number;
-    nickname: string;
-    registerDate: string;
-    email: string;
-    rank: string;
-    visitCount: number;
-    articlesCount: number;
-    commentsCount: number;
-    accessToken: string;
-  };
 };
 
 export type CommentType = {
@@ -121,6 +102,17 @@ export type CommentedArticleType = {
   commentCnt: number;
   authorNickname: string;
 };
+export type UserInfoType = {
+  nickname: string;
+  rank: string;
+  introduction: string | null;
+  visitCount: number;
+  myArticleCount: number;
+  myCommentCount: number;
+  registerDate: string;
+  image: string | null;
+};
+
 //GET (activity)
 /* 제외한 사항: 모바일카페명 & 카페아이콘, 카페 스탭, 주제, 카페 검색어, 카페 성격, 가입 방식, 카페 활동 - 총 방문자, 우리 카페 바로가기 앱 추가수, 카페 랭킹, 멤버 관리 */
 export type Cafe = {

@@ -56,8 +56,8 @@ export function useBriefMyInfo() {
 export function useMyProfile() {
   const [myProfile, setMyProfile] = useState<{
     nickname: string;
-    content: string;
-    image: string;
+    content: string | null;
+    image: string | null;
   } | null>(null);
   const refetchMyProfile = useCallback(async () => {
     const res = await axios.get(baseURL + "/api/v1/users/user-profile", {
@@ -96,44 +96,18 @@ export function useUserArticles({
   page?: number;
 }) {
   const [userArticles, setUserArticles] = useState<{
-    articleBrief: {
-      content: ArticleBriefType[];
-      empty: boolean;
-      first: boolean;
-      last: boolean;
-      number: number;
-      numberOfElements: number;
-      pageable: {
-        offset: number;
-        pageNumber: number;
-        pageSize: number;
-        paged: boolean;
-        sort: {
-          empty: boolean;
-          sorted: boolean;
-          unsorted: boolean;
-        };
-        unpaged: boolean;
-      };
-      size: number;
-      sort: {
-        empty: boolean;
-        sorted: boolean;
-        unsorted: boolean;
-      };
-      totalElements: number;
-      totalPages: number;
-    };
+    articleBrief: ArticleBriefType;
   } | null>(null);
   const url = `/api/v1/users/articles/${userNickname}`;
   const refetchUserArticles = useCallback(async () => {
     console.log("userArticle refetched!");
     const res = await axios.get(baseURL + url, {
       params: {
-        page: page ? page : "",
+        page: page ? page : 1,
       },
     });
     const data = await res.data;
+    console.log(data);
     setUserArticles(data);
   }, [url, page]);
   useEffect(() => {
@@ -144,16 +118,13 @@ export function useUserArticles({
 }
 
 // 유저가 쓴 댓글 조회 => refetch 필요 X
-export function getUserComments({
-  userNickname,
-  page,
-}: {
-  userNickname: string;
-  page?: number;
-}) {
-  return axios.get(baseURL + `/api/v1/users/${userNickname}/comments/`, {
+export function getUserComments({ page }: { page?: number }) {
+  return axios.get(baseURL + `/api/v1/users/comments`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+    },
     params: {
-      page: page ? page : "",
+      page: page ? page : 1,
     },
   });
 }
@@ -169,7 +140,7 @@ export function getUserCommentedArticle({
     baseURL + `/api/v1/users/${userNickname}/commented-articles`,
     {
       params: {
-        page: page ? page : "",
+        page: page ? page : 1,
       },
     }
   );
@@ -178,34 +149,7 @@ export function getUserCommentedArticle({
 // 좋아요 한 글 => refetch 필요!
 export function useUserLikedArticles({ page }: { page?: number }) {
   const [userLikedArticles, setUserLikedArticles] = useState<{
-    articleBrief: {
-      content: ArticleBriefType[];
-      empty: boolean;
-      first: boolean;
-      last: boolean;
-      number: number;
-      numberOfElements: number;
-      pageable: {
-        offset: number;
-        pageNumber: number;
-        pageSize: number;
-        paged: boolean;
-        sort: {
-          empty: boolean;
-          sorted: boolean;
-          unsorted: boolean;
-        };
-        unpaged: boolean;
-      };
-      size: number;
-      sort: {
-        empty: boolean;
-        sorted: boolean;
-        unsorted: boolean;
-      };
-      totalElements: number;
-      totalPages: number;
-    };
+    articleBrief: ArticleBriefType;
   } | null>(null);
   const url = `/api/v1/users/liked-articles`;
   const refetchUserLikedArticles = useCallback(async () => {
@@ -214,7 +158,7 @@ export function useUserLikedArticles({ page }: { page?: number }) {
         Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
       },
       params: {
-        page: page ? page : "",
+        page: page ? page : 1,
       },
     });
     const data = res.data;
@@ -225,4 +169,29 @@ export function useUserLikedArticles({ page }: { page?: number }) {
     console.log(userLikedArticles);
   }, [refetchUserLikedArticles]);
   return { userLikedArticles, refetchUserLikedArticles };
+}
+
+// 유저 프로필 수정
+export function editMyProfile({
+  nickname,
+  content,
+  image,
+}: {
+  nickname: string;
+  content: string;
+  image: string;
+}) {
+  return axios.put(
+    baseURL + "/api/v1/users/user-profile",
+    {
+      nickname: nickname,
+      content: content,
+      image: image,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+    }
+  );
 }
