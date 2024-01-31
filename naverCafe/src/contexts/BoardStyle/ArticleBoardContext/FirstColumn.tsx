@@ -13,7 +13,8 @@ const StyledBoardName = styled.div`
 `;
 
 const StyledDot = styled.img`
-  margin-bottom:2px;
+  margin-bottom: 2px;
+  margin-left: 8px;
 `;
 
 export const FirstCol = (props: {
@@ -26,15 +27,19 @@ export const FirstCol = (props: {
 
   switch (props.firstCol) {
     case "dot":
-      return <StyledDot src="https://cafe.pstatic.net/cafe4/ico-blank.gif"></StyledDot>;
+      return (
+        <StyledDot src="https://cafe.pstatic.net/cafe4/ico-blank.gif"></StyledDot>
+      );
     case "boardName":
       return (
-        <StyledBoardName onClick={() => navigate(`/board/${props.board.id-1}`)}>
+        <StyledBoardName
+          onClick={() => navigate(`/board/${props.board.id - 1}`)}
+        >
           {props.board.name}
         </StyledBoardName>
       );
     case "ranking":
-      return props.ranking+1;
+      return props.ranking + 1;
     case "number":
       return props.articleId; //원본 카페에서는 article이 생성된 순서대로 index가 부여되기 때문에 일단 이렇게 뒀습니다.
   }

@@ -9,9 +9,12 @@ export function useWholeBoard() {
   );
   const url = "/api/v1/boards";
   const refetch = useCallback(async () => {
-    const res = await axios.get(baseURL + url);
-    const data = await res.data;
-    setBoardList(data);
+    try {
+      const res = await axios.get(baseURL + url);
+      setBoardList(res.data);
+    } catch (error) {
+      console.error("Failed to fetch boards:", error);
+    }
   }, [url]);
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
