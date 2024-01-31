@@ -1,8 +1,15 @@
 //UserPage에서 MyPage, MemberPage로 나뉘면 될 것 같습니다.
 import styled from "styled-components";
-import { useState } from "react";
-import { useUserContext } from "../../../../contexts/UserContext";
-import UserInfoPaginationBox from "./UserInfoPaginationBox";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { getUserInfo, useMyProfile } from "../../../../API/UserAPI";
+import { UserInfoType } from "../../../../Types";
+
+import UserArticleList from "./userRelatedList/UserArticleList";
+import UserCommentList from "./userRelatedList/UserCommentList";
+import UserCommentedArticleList from "./userRelatedList/UserCommentedArticleList";
+import UserLikedArticleList from "./userRelatedList/UserLikedArticleList";
+
 const Wrapper = styled.div``;
 const Header = styled.div`
   & > .userInfo {
@@ -35,6 +42,10 @@ const Header = styled.div`
         }
       }
     }
+  }
+  & > .introduce {
+    text-align: left;
+    word-break: break-all;
   }
 `;
 const Tab = styled.ul`
@@ -94,39 +105,64 @@ const List = styled.div`
     }
   }
 `;
-const exampleUserInfo = {
-  userId: "gryffindorGoat",
-  username: "harry potter",
-  userNickname: "해리포터",
-  rank: 3,
-  visit_count: 23,
-  my_article_count: 3,
-};
+
 const UserInfo = () => {
+  const { nickname } = useParams();
+  const userNickname = nickname ? nickname : "";
+  const { myProfile } = useMyProfile();
+  const [userInfo, setUserInfo] = useState<UserInfoType | null>(null);
+  // 내 정보인지, 타인의 정보인지 알아봅니다.
+  const [isMyInfo, setIsMyInfo] = useState<boolean>(false);
+
+  // userInfo를 설정합니다.
+  useEffect(() => {
+    if (userNickname) {
+      getUserInfo({ userNickname: userNickname })
+        .then((res) => {
+          console.log(res.data);
+          return res.data.userInfo;
+        })
+        .then((res) => {
+          setUserInfo({
+            nickname: res.nickname,
+            rank: res.rank,
+            introduction: res.introduction,
+            visitCount: res.visit_count,
+            myArticleCount: res.my_article_count,
+            myCommentCount: res.my_comment_count,
+            registerDate: res.register_date,
+            image: res.image,
+          });
+        })
+        .catch((err) => console.error(err));
+    }
+  }, [userNickname]);
+
+  // 현재 보고 있는 게 나의 정보인지 아닌지 확인합니다.
+  useEffect(() => {
+    if (myProfile && userNickname) {
+      if (myProfile.nickname === userNickname) {
+        setIsMyInfo(true);
+      } else {
+        setIsMyInfo(false);
+      }
+    }
+  }, [myProfile, userNickname]);
+
   const [tabSelectIndex, setTabSelectIndex] = useState<number>(0);
-  // pageNumber와 checkedArticleIdList는 PaginationBox안에서 다루고 싶었지만...
-  // 계속 오류가 생겨 적절해보이진 않지만 UserInfo에서 관리합니다.
-  // 나중에 원인을 찾으면 refactoring 하겠습니다.
-  const [pageNumber, setPageNumber] = useState<number>(1);
   const [checkedArticleIdList, setCheckedArticleIdList] = useState<number[]>(
     []
   );
 
-  const myInfo = useUserContext();
-  // exampleUserInfo를 context로서 전달, checkBox 표시 여부는 userId 비교를 통해?
-  // 아니면 list -> 요소 props 전달을 통해?
-  const userInfo = exampleUserInfo;
   const infoList = [
     {
       id: 0,
-      title: "작성글",
-      dataList: (
-        <UserInfoPaginationBox
+      select: "작성글",
+      data: (
+        <UserArticleList
           id={0}
-          bunch={3}
-          userInfo={userInfo}
-          pageNumber={pageNumber}
-          setPageNumber={setPageNumber}
+          isMyInfo={isMyInfo}
+          userNickname={userNickname as string}
           checkedArticleIdList={checkedArticleIdList}
           setCheckedArticleIdList={setCheckedArticleIdList}
         />
@@ -134,14 +170,12 @@ const UserInfo = () => {
     },
     {
       id: 1,
-      title: "작성댓글",
-      dataList: (
-        <UserInfoPaginationBox
+      select: "작성댓글",
+      data: (
+        <UserCommentList
           id={1}
-          bunch={13}
-          userInfo={userInfo}
-          pageNumber={pageNumber}
-          setPageNumber={setPageNumber}
+          isMyInfo={isMyInfo}
+          userNickname={userNickname as string}
           checkedArticleIdList={checkedArticleIdList}
           setCheckedArticleIdList={setCheckedArticleIdList}
         />
@@ -149,14 +183,12 @@ const UserInfo = () => {
     },
     {
       id: 2,
-      title: "댓글단 글",
-      dataList: (
-        <UserInfoPaginationBox
+      select: "댓글단 글",
+      data: (
+        <UserCommentedArticleList
           id={2}
-          bunch={26}
-          userInfo={userInfo}
-          pageNumber={pageNumber}
-          setPageNumber={setPageNumber}
+          isMyInfo={isMyInfo}
+          userNickname={userNickname as string}
           checkedArticleIdList={checkedArticleIdList}
           setCheckedArticleIdList={setCheckedArticleIdList}
         />
@@ -164,14 +196,12 @@ const UserInfo = () => {
     },
     {
       id: 3,
-      title: "좋아요한 글",
-      dataList: (
-        <UserInfoPaginationBox
+      select: "좋아요한 글",
+      data: (
+        <UserLikedArticleList
           id={3}
-          bunch={26}
-          userInfo={userInfo}
-          pageNumber={pageNumber}
-          setPageNumber={setPageNumber}
+          isMyInfo={isMyInfo}
+          // userNickname={userNickname as string}
           checkedArticleIdList={checkedArticleIdList}
           setCheckedArticleIdList={setCheckedArticleIdList}
         />
@@ -185,25 +215,30 @@ const UserInfo = () => {
         <div className="userInfo">
           <span className="userThumb">
             <img
-              src="https://ssl.pstatic.net/static/cafe/cafe_pc/default/cafe_profile_363.png"
+              src={
+                userInfo?.image
+                  ? userInfo.image
+                  : "https://ssl.pstatic.net/static/cafe/cafe_pc/default/cafe_profile_363.png"
+              }
               alt="프로필 사진"
             />
           </span>
           <div className="text">
-            <h2>{`${exampleUserInfo.userNickname}(${exampleUserInfo.userId})`}</h2>
+            <h2>{`${userInfo?.nickname}(rank: ${userInfo?.rank})`}</h2>
             <div className="info">
               <span>
-                방문 <strong>{exampleUserInfo.visit_count}</strong>
+                방문 <strong>{userInfo?.visitCount}</strong>
               </span>
               <span>
-                작성글 <strong>{exampleUserInfo.my_article_count}</strong>
+                작성글 <strong>{userInfo?.myArticleCount}</strong>
               </span>
             </div>
           </div>
         </div>
+        <div className="introduce">{userInfo?.introduction}</div>
         <Tab>
           {infoList.map((info) => {
-            if (exampleUserInfo.userId !== myInfo.userId) {
+            if (!isMyInfo) {
               if (info.id === 0 || info.id === 2) {
                 return (
                   <li
@@ -212,12 +247,11 @@ const UserInfo = () => {
                       info.id === tabSelectIndex ? "active" : "inactive"
                     }
                     onClick={() => {
-                      setPageNumber(1);
                       setCheckedArticleIdList([]);
                       setTabSelectIndex(info.id);
                     }}
                   >
-                    {info.title}
+                    {info.select}
                   </li>
                 );
               }
@@ -227,13 +261,11 @@ const UserInfo = () => {
                   key={info.id}
                   className={info.id === tabSelectIndex ? "active" : "inactive"}
                   onClick={() => {
-                    setPageNumber(1);
                     setCheckedArticleIdList([]);
-
                     setTabSelectIndex(info.id);
                   }}
                 >
-                  {info.title}
+                  {info.select}
                 </li>
               );
             }
@@ -252,8 +284,8 @@ const UserInfo = () => {
             <div className="viewCount">조회</div>
           </div>
         )}
-        <div>
-          {infoList.filter((info) => info.id === tabSelectIndex)[0].dataList}
+        <div className="list">
+          {infoList.filter((info) => info.id === tabSelectIndex)[0].data}
         </div>
       </List>
     </Wrapper>

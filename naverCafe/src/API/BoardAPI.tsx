@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useCallback, useState, useEffect } from "react";
 import { baseURL } from "../Constants";
-import { ArticleType, BoardType, GroupType } from "../Types";
+import { ArticleBriefType, BoardType, GroupType } from "../Types";
 
 export function useWholeBoard() {
   const [boardList, setBoardList] = useState<{ boards: BoardType[] } | null>(
@@ -136,35 +136,40 @@ export async function getArticleList({
     return res.data.articleBrief;
   } catch (err) {
     console.log(err);
-    return {content:[]};
+    return { content: [] };
   }
 }
-
 
 //RelatedArticle에서 사용되는 줄 모르고 위처럼 getArticle로 바꾸어놓았었습니다...
 export function useArticleList({
   boardId,
-  type,
+  size,
+  page,
+  sort,
 }: {
-  boardId?: number;
-  type?: string;
+  boardId: number;
+  size?: number;
+  page?: number;
+  sort?: string;
 }) {
-  const [articleList, setArticleList] = useState<{
-    articleBrief: ArticleType[];
-  } | null>(null);
+  const [articleList, setArticleList] = useState<ArticleBriefType | null>(null);
 
-  const url =
-    type === undefined
-      ? `/api/v1/boards/${boardId}/articles`
-      : `/api/v1/articles/hot?sortBy=${type}`;
+  const url = `/api/v1/boards/${boardId}/articles`;
   const refetch = useCallback(async () => {
-    const res = await axios.get(baseURL + url);
-    const data = await res.data;
+    const res = await axios.get(baseURL + url, {
+      params: {
+        size: size ? size : "",
+        page: page ? page : "",
+        sort: sort ? sort : "",
+      },
+    });
+    const data = await res.data.articleBrief;
     setArticleList(data);
-  }, [url]);
+  }, [url, page, size, sort]);
 
   useEffect(() => {
     refetch();
+    console.log(articleList);
   }, [refetch]);
   return { articleList, refetch };
 }

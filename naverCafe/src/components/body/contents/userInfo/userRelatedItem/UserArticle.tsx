@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { Link } from "react-router-dom";
-import { useUserContext } from "../../../../../contexts/UserContext";
 import { useEffect, useState } from "react";
+import { ArticleType } from "../../../../../Types";
 const Wrapper = styled.li`
   display: grid;
   height: 38px;
@@ -14,26 +14,25 @@ const Wrapper = styled.li`
       display: none;
     }
     & > .checkBoxShown {
+      position: relative;
+      button {
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        cursor: pointer;
+        border: transparent;
+        outline: transparent;
+        position: relative;
+        top: 5.5px;
+      }
       & > .checkBoxClicked {
         button {
-          display: inline-block;
-          width: 14px;
-          height: 14px;
           background-image: url(https://ca-fe.pstatic.net/web-section/static/img/ico-write-check-on.svg?ed25ed391f00228242d83867666d617e=);
-          cursor: pointer;
-          border: none;
-          outline: none;
         }
       }
       & > .checkBoxNotClicked {
         button {
-          display: inline-block;
-          width: 14px;
-          height: 14px;
           background-image: url(https://ca-fe.pstatic.net/web-section/static/img/ico-write-check-off.svg?35434b8085dcc93722a1fc0df301bcf1=);
-          cursor: pointer;
-          border: none;
-          outline: none;
         }
       }
     }
@@ -65,7 +64,7 @@ const Wrapper = styled.li`
         color: #ff2f3b;
         margin-left: 5px;
         position: relative;
-        top: -2px;
+        top: -1.5px;
       }
     }
   }
@@ -91,33 +90,17 @@ const Wrapper = styled.li`
 `;
 
 interface PropsUserArticle {
-  article: {
-    id: number;
-    content: string;
-    last_modified: string;
-    title: string;
-    viewCount: number;
-    commentCount: number;
-  };
-  userInfo: {
-    userId: string;
-    username: string;
-    userNickname: string;
-    rank: number;
-    visit_count: number;
-    my_article_count: number;
-  };
+  article: ArticleType;
+  isMyInfo: boolean;
   checkedArticleIdList: number[];
   setCheckedArticleIdList: (value: number[]) => void;
 }
 const UserArticle = ({
   article,
-  userInfo,
+  isMyInfo,
   checkedArticleIdList,
   setCheckedArticleIdList,
 }: PropsUserArticle) => {
-  const myInfo = useUserContext();
-
   const [isCheckBoxClicked, setIsCheckBoxClicked] = useState<boolean>(false);
 
   useEffect(() => {
@@ -144,13 +127,7 @@ const UserArticle = ({
   return (
     <Wrapper>
       <div className="left">
-        <div
-          className={
-            myInfo.userId === userInfo.userId
-              ? "checkBoxShown"
-              : "checkBoxNotShown"
-          }
-        >
+        <div className={isMyInfo ? "checkBoxShown" : "checkBoxNotShown"}>
           <div
             className={
               isCheckBoxClicked ? "checkBoxClicked" : "checkBoxNotClicked"
@@ -169,9 +146,10 @@ const UserArticle = ({
       </div>
       <div className="right">
         <div className="date">
-          {article.last_modified
+          {article.createdAt
             .replace(/-/g, ".")
-            .replace(/T\d\d:\d\d:\d\d/, ". ")}
+            .replace(/T\d\d:\d\d:\d\d/, ". ")
+            .replace(/.\d\d\d\d\d\d/, "")}
         </div>
         <div className="viewCount">{article.viewCount}</div>
       </div>

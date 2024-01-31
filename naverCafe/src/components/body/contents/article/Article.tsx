@@ -457,7 +457,13 @@ const Article = () => {
       .catch((err) => console.error(err));
   };
 
-  if (article && articleId && comments && isMyArticle !== null) {
+  if (
+    article &&
+    article.article.content &&
+    articleId &&
+    comments &&
+    isMyArticle !== null
+  ) {
     return (
       <Wrapper $isMyArticle={isMyArticle}>
         <ArticleTopButtons ref={TopButtonsRef}>
@@ -557,12 +563,12 @@ const Article = () => {
           </ArticleHeader>
           <ArticleBody>
             <div
-              dangerouslySetInnerHTML={{ __html: article?.article.content }}
+              dangerouslySetInnerHTML={{ __html: article.article.content }}
             ></div>
           </ArticleBody>
           <ArticleFooter>
             <div className="aboutAuthor">
-              <Link to={"/"}>
+              <Link to={`/users/${article?.article.author.nickname}`}>
                 <img
                   src="https://ssl.pstatic.net/static/cafe/cafe_pc/default/cafe_profile_77.png?type=c77_77"
                   alt="작성자 프로필 사진"
@@ -623,7 +629,12 @@ const Article = () => {
         </ArticleBox>
         <ArticleBottomButtons>
           <div className="left">
-            <button className="writeArticle">
+            <button
+              className="writeArticle"
+              onClick={() => {
+                navigate("/write");
+              }}
+            >
               <img src={writeArticleIcon} alt="글쓰기 아이콘" />
               <span>글쓰기</span>
             </button>

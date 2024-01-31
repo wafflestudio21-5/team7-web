@@ -5,7 +5,9 @@ import { getCafeInfo } from "../../API/CafeAPI";
 import { waffleCafe } from "../../Constants";
 import { useBoardGroup, useGetLikeBoard } from "../../API/BoardAPI";
 import { CurrentBoardContext } from "../../contexts/BoardContext/CurrentBoardContext";
-import { BoardType } from "../../Types";
+import { BoardType, UserInfoType } from "../../Types";
+import { useMyProfile } from "../../API/UserAPI";
+import { getUserInfo } from "../../API/UserAPI";
 
 const Wrapper = styled.div`
   display: inline-block;
@@ -142,10 +144,30 @@ const MyActivity = styled.div`
     border-bottom: 1px solid #ebebeb;
     padding: 12px 10px;
 
-    & > .userPhoto > img {
-      width: 57.25px;
-      height: 57.25px;
-      box-sizing: border-box;
+    & > .userPhoto {
+      position: relative;
+      & > img {
+        width: 57.25px;
+        height: 57.25px;
+        box-sizing: border-box;
+      }
+      & > .editUserInfo {
+        display: inline-block;
+        background-image: url(https://ssl.pstatic.net/static/cafe/cafe_pc/sp/sp_icon_06952b76.svg);
+        background-repeat: no-repeat;
+        background-position: -172px -226px;
+        width: 16px;
+        height: 16px;
+        box-sizing: border-box;
+        border: 0;
+        outline: 0;
+        z-index: 1;
+        border-radius: 50%;
+        position: absolute;
+        bottom: 0;
+        right: 0px;
+        cursor: pointer;
+      }
     }
     & > .userInfo {
       margin-left: 6px;
@@ -467,7 +489,8 @@ const StyledUl = styled.ul`
 
 const SideBar = () => {
   const [isCafeInfoChecked, setIsCafeInfoChecked] = useState<boolean>(true);
-
+  const { myProfile } = useMyProfile();
+  const [myInfo, setMyInfo] = useState<UserInfoType | null>(null);
   const [isFavListChecked, setIsFavListChecked] = useState(false);
   const { favList, refetch } = useGetLikeBoard();
 
@@ -494,6 +517,43 @@ const SideBar = () => {
         console.error(err);
       });
   }, []);
+  useEffect(() => {
+    if (myProfile) {
+      getUserInfo({ userNickname: myProfile.nickname })
+        .then((res) => {
+          console.log(res.data);
+          return res.data.userInfo;
+        })
+        .then((res) => {
+          setMyInfo({
+            nickname: res.nickname,
+            rank: res.rank,
+            introduction: res.introduction,
+            visitCount: res.visit_count,
+            myArticleCount: res.my_article_count,
+            myCommentCount: res.my_comment_count,
+            registerDate: res.register_date,
+            image: res.image,
+          });
+        })
+        .catch((err) => console.error(err));
+    }
+  }, [myProfile]);
+
+  const handleOnClickProfile = () => {
+    console.log("yes");
+    if (myProfile) {
+      const url = `http://localhost:5173/users/${myProfile.nickname}/editInfo`;
+      window.open(url, "_blank", "width=400, height=780");
+      window.addEventListener("message", (event) => {
+        if (event.data === "myProfileChanged") {
+          navigate("/");
+          window.location.reload();
+        }
+      });
+    }
+  };
+
   if (cafeInfo) {
     return (
       <Wrapper>
@@ -543,29 +603,35 @@ const SideBar = () => {
                   src="https://ssl.pstatic.net/static/cafe/cafe_pc/default/cafe_profile_70.png"
                   alt="프로필 이미지"
                 />
+                <button
+                  className="editUserInfo"
+                  onClick={() => handleOnClickProfile()}
+                />
               </div>
               <div className="userInfo">
-                <Link to={`/`}>user 이름</Link>
-                <p>2024.00.00 가입</p>
+                <Link to={`/users/${myInfo?.nickname}`}>
+                  {myInfo?.nickname}
+                </Link>
+                <p>{myInfo?.registerDate}</p>
               </div>
             </div>
             <div className="userHistory">
               <ul>
-                <li>user 직책</li>
+                <li>{myInfo?.rank}</li>
                 <li>
                   <span />
                   방문 횟수
-                  <em>n회</em>
+                  <em>{myInfo?.visitCount}</em>
                 </li>
                 <li>
                   <span />
-                  <Link to={`/`}>내가 쓴 게시글</Link>
-                  <em>n개</em>
+                  <Link to={`/users/${myInfo?.nickname}`}>내가 쓴 게시글</Link>
+                  <em>{myInfo?.myArticleCount}</em>
                 </li>
                 <li>
                   <span />
-                  <Link to={`/`}>내가 쓴 댓글</Link>
-                  <em>2개</em>
+                  <Link to={`/users/${myInfo?.nickname}`}>내가 쓴 댓글</Link>
+                  <em>{myInfo?.myCommentCount}</em>
                 </li>
                 <li>
                   <span />
