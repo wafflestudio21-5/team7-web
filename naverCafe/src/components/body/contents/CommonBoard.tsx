@@ -33,7 +33,7 @@ const CommonBoard = ({ board }: { board: BoardType }) => {
     setIsNoticeOff(false);
     refetch();
     setSize(15);
-    setPage(0);
+    setPage(1);
     setSort("");
     setViewOp(2);
   // eslint-disable-next-line react-hooks/exhaustive-deps

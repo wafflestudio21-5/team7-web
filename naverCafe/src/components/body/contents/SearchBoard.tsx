@@ -25,7 +25,8 @@ const StyledSearchInput = styled.div`
 
   div:last-child {
     margin-left: auto;
-    vertical-align:middle;
+    margin-right: 10px;
+    vertical-align: middle;
   }
 
   .select_component {
@@ -108,11 +109,89 @@ const StyledSearchInput = styled.div`
   }
 `;
 
+const DetailButton = styled.div<{ $isSelected: boolean }>`
+  &:hover {
+    //text-decoration: underline;
+    cursor: pointer;
+  }
+  &::after {
+    content: "";
+    display: inline-block;
+    background-image: url(https://ssl.pstatic.net/static/cafe/cafe_pc/sp/sp_icon_06952b76.svg);
+    background-repeat: no-repeat;
+    background-position: ${(prop) =>
+      prop.$isSelected ? "-25px -250px" : "-229px -185px"};
+    width: 12px;
+    height: 5px;
+    top: -2px;
+    left: 4px;
+    position: relative;
+  }
+`;
+
+const DetailSearchDiv = styled.div<{ $isSelected: boolean }>`
+  display: ${(prop) => (prop.$isSelected ? "block" : "none")};
+  border-top: 1px solid #ebebea;
+  background-color: #f9f9f8;
+  padding: 16px;
+  font-size: 13px;
+  font-weight: 400;
+  color: #333;
+
+  .input_component {
+    width: 191px;
+    margin-right: 3px;
+    background-color: #fff;
+    display: inline-block;
+    position: relative;
+    height: 36px;
+    box-sizing: border-box;
+    border: solid 1px #ddd;
+    vertical-align: top;
+  }
+
+  input {
+    width: 164px;
+    padding-right: 0;
+    font-size: 12px;
+    height: 100%;
+    border: 0;
+    box-sizing: border-box;
+    &::placeholder {
+      color: #b4b4b4;
+    }
+  }
+
+  button {
+    display: inline-block;
+    min-width: 52px;
+    height: 36px;
+    box-sizing: border-box;
+    border: solid 1px rgba(0, 0, 0, 0.1);
+    background-color: #5a5a5a;
+    cursor: pointer;
+
+    &::before {
+      display: inline-block;
+      background-image: url(https://ssl.pstatic.net/static/cafe/cafe_pc/sp/sp_icon_06952b76.svg);
+      background-repeat: no-repeat;
+      vertical-align: top;
+      content: "";
+      background-position: -229px -157px;
+      width: 16px;
+      height: 20px;
+    }
+  }
+`;
+
 const SearchTopDiv = () => {
   const totDivStyle: React.CSSProperties = {
     marginBottom: "35px",
     position: "relative",
   };
+
+  //상세검색 버튼
+  const [isDetailClicked, setIsDetailClicked] = useState(false);
 
   //기간
   const TermOption = ["전체기간", "1일", "1주", "1개월", "6개월", "1년"];
@@ -256,12 +335,29 @@ const SearchTopDiv = () => {
           <button className="btn-search-grean">검색</button>
         </div>
 
-        <div>상세 검색</div>
-      </StyledSearchInput>
+        <DetailButton
+          $isSelected={isDetailClicked}
+          onClick={() => setIsDetailClicked(!isDetailClicked)}
+        >
+          상세 검색
+        </DetailButton>
+      </StyledSearchInput>{" "}
+      {/* 논리 연산자까지 고려해서 검색을 해야하는 걸까... 일단 tip layer는 제외 */}
+      <DetailSearchDiv $isSelected={isDetailClicked}>
+        <div className="input_component">
+          <input type="text" placeholder="다음 단어 모두 포함" />
+        </div>
+        <div className="input_component">
+          <input type="text" placeholder="다음 단어 제외" />
+        </div>
+        <div className="input_component">
+          <input type="text" placeholder="다음 단어 중 1개 이상 포함" />
+        </div>
+        <button/>
+      </DetailSearchDiv>
     </div>
   );
 };
-
 
 //BoardTopOption 의 SortArea를 재활용하고 싶지만...
 //나머지 선택자는 구현X
@@ -269,7 +365,7 @@ const SearchListDiv = () => {
   const totDivStyle: React.CSSProperties = {
     padding: "6px 0 10px",
     display: "flex",
-    justifyContent:"flex-end",
+    justifyContent: "flex-end",
   };
 
   //한 페이지당 글 개수로 정렬
@@ -329,3 +425,5 @@ const SearchBoard = () => {
   );
 };
 export default SearchBoard;
+
+//검색 게시판에 추가기능이 있으면 좋겠다. (빠진 부분이 좀 있는 편이니까)

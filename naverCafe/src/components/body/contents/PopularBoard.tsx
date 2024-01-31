@@ -57,16 +57,20 @@ const PopularBoard = () => {
     //console.log(currentOrder);
     async function fetchPopArticle() {
       try {
-        const fetchedArticles: ArticleBriefType = await hotArticle(currentOrder.query, SortOption[selectedOp].query);
+        const fetchedArticles: ArticleBriefType = await hotArticle(
+          currentOrder.query,
+          SortOption[selectedOp].query
+        );
         setArticleList(fetchedArticles.content);
       } catch (err) {
-        console.log('Error fetching in PopularBoard');
+        console.log("Error fetching in PopularBoard");
       }
     }
 
     fetchPopArticle();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [SortOption, currentOrder]);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [SortOption[selectedOp].query, currentOrder.query]);
 
   useEffect(() => {
     setCurBoardState(-1);
