@@ -109,31 +109,36 @@ export const CommonBoardHeader = ({ board }: { board: BoardType }) => {
 
   const handleFavBoard = async () => {
     const newFavStatus = !isFav;
-    setIsFav(newFavStatus); //로컬에서 바로 토글 상태를 반영하기 위함
+
     console.log(`isFav val: ${isFav}`);
     console.log(`newFavStat val: ${newFavStatus}`);
 
     if (isFav) {
       await unlikeBoard(board.id);
     } else {
-      likeBoard(board.id);
+      await likeBoard(board.id);
     }
     await refetch();
+    setIsFav(newFavStatus); //로컬에서 바로 토글 상태를 반영하기 위함
   };
 
   useEffect(() => {
-    refetch();
+    //refetch();
     setIsFav(favList && favList.boards.some((b) => b.id === board.id));
     //console.log(`board: `, board, `favList: `, favList, `isFav: ${isFav}`); //isFav는 비동기적 처리로 인해 이전의 값을 출력한다.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [board]);
 
   useEffect(() => {
     setIsFav(favList && favList.boards.some((b) => b.id === board.id));
-    refetch();
-    //console.log(`board: `, board, `favList: `, favList, `isFav: ${isFav}`); //isFav는 비동기적 처리로 인해 이전의 값을 출력한다.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // refetch();
+    console.log(`board: `, board, `favList: `, favList, `isFav: ${isFav}`); //isFav는 비동기적 처리로 인해 이전의 값을 출력한다.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
 
   return (
     <StyledCommonBoardHeader $isFavorite={isFav ? isFav : false}>

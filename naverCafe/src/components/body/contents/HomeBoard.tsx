@@ -125,7 +125,7 @@ const HomeBoard = () => {
       try {
         const fetchedWholeArticles: ArticleBriefType = await wholeArticle(
           26,
-          0
+          1
         );
         console.log(fetchedWholeArticles);
         setWholeArticles(fetchedWholeArticles.content);

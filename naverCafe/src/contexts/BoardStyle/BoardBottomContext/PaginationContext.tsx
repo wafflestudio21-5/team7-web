@@ -26,7 +26,7 @@ export const PaginationContext = createContext<PaginationState>({
 
 export const PaginationProvider = ({ children }: { children: ReactNode }) => {
   const [size, setSize] = useState(15);
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
   const [sort, setSort] = useState("");
   const [totPage, setTotPage] = useState(1);
 

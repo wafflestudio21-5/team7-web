@@ -8,7 +8,8 @@ export type Boards =
   | "HomeBoard"
   | "TotalBoard"
   | "PopularBoard"
-  | "CommonBoard";
+  | "CommonBoard"
+  | "SearchBoard";
 
 export type BoardType = {
   type: string;
@@ -48,6 +49,13 @@ export const boardAttribute: BoardAttrType = {
     likeCol: "sort",
     firstCol: "number",
     noticeRow: true,
+    head: true,
+  },
+  SearchBoard: {
+    type: "popular",
+    likeCol: false,
+    firstCol: "number",
+    noticeRow: false,
     head: true,
   },
 };

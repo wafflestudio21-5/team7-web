@@ -70,6 +70,13 @@ export type ArticleType = {
   isNotification: boolean;
 };
 
+export type ArticleAPIType = {
+  article: ArticleType;
+  isLiked: false;
+  prevId: number;
+  nextId: number;
+}
+
 export type CommentType = {
   id: number;
   content: string;

@@ -15,7 +15,7 @@ const StyledBoardBottomOption = styled.div``;
 const StyledPostBtn = styled.div`
   margin-top: 9px;
   text-align: right;
-
+  font-size:13px;
   .write {
     &::before {
       display: inline-block;
@@ -65,6 +65,7 @@ const StyledListSearch = styled.div`
   border-top-color: #ebebea;
   background-color: #f9f9f8;
   text-align: center;
+  font-size: 13px;
 
   .select_component {
     width: 144px;
@@ -146,7 +147,7 @@ const StyledListSearch = styled.div`
   }
 `;
 
-const StyledSelectDiv = styled.div<{ $isSelected: boolean }>`
+export const StyledSelectDiv = styled.div<{ $isSelected: boolean }>`
   .text::after {
     content: "";
     display: inline-block;
@@ -163,7 +164,7 @@ const StyledSelectDiv = styled.div<{ $isSelected: boolean }>`
   }
 `;
 
-const StyledUl = styled.ul<{ $isSelected: boolean; $isTerm: boolean }>`
+export const StyledUl = styled.ul<{ $isSelected: boolean; $isTerm: boolean;  $isBoard?:boolean}>`
   display: ${(prop) => (prop.$isSelected ? "block" : "none")};
   overflow-y: auto;
   position: absolute;
@@ -246,7 +247,7 @@ const ListSearch = ({ boardId }: { boardId: number }) => {
   //제목, 내용
   const ContentOption = ["제목만", "글작성자", "댓글내용", "댓글작성자"];
   const [isContentSelected, setIsContentSelected] = useState(false);
-  const [contentOp, setContentOp] = useState(0); //TermOption의 인덱스를 저장
+  const [contentOp, setContentOp] = useState(0); //ContentOption의 인덱스를 저장
 
   const handleContentOp = (arg: number) => {
     setContentOp(arg);
@@ -335,18 +336,17 @@ const ListSearch = ({ boardId }: { boardId: number }) => {
   );
 };
 
-export const BoardBottomOption = ({ boardId }: { boardId: number }) => {
+export const BoardBottomOption = ({ boardId, noPost }: { boardId: number; noPost?: boolean; }) => {
   return (
     <StyledBoardBottomOption>
-      <PostBtn></PostBtn>
-      <Pagination/>
-      <ListSearch boardId={boardId}></ListSearch>
+      {noPost ? null : <PostBtn />}
+      <Pagination />
+      <ListSearch boardId={boardId} />
     </StyledBoardBottomOption>
   );
 };
 
 //PopularBoard
-//미구현:  tip_layer의 자세히 보기를 선택하지 못하는 에러, svg 아이콘(>)
 const StyledPopularBoardBottomOption = styled.div`
   .option_area {
     display: flex;

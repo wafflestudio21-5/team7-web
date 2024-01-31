@@ -36,8 +36,8 @@ export const Pagination = () => {
           <StyledButton
             tabIndex={index}
             className="page"
-            $on={number === page+1}
-            onClick={() => setPage(number-1)}
+            $on={number === page}
+            onClick={() => setPage(number)}
           >
             {number}
           </StyledButton>

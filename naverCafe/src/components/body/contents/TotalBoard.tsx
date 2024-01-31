@@ -26,13 +26,13 @@ const TotalBoard = () => {
   useEffect(() => {
     setCurBoardState(0);
     setSize(15);
-    setPage(0);
+    setPage(1);
 
     async function fetchWholeArticle() {
       try {
         const fetchedWholeArticles: ArticleBriefType = await wholeArticle(
           15,
-          0
+          1
         );
         console.log(fetchedWholeArticles);
         setWholeArticles(fetchedWholeArticles.content);

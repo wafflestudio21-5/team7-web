@@ -10,6 +10,7 @@ const StyledBoardTopOption = styled.div`
   padding: 6px 0 10px;
   display: flex;
   justify-content: flex-end;
+  font-size: 13px;
 `;
 
 //TotalBoard: 글 개수 | 공지 숨기기 | 게시글 보기 형식 | 게시글 표시 개수
@@ -133,7 +134,7 @@ const StyledSortArea = styled.div<{ $viewOp: string }>`
   }
 `;
 
-const StyledSortListDiv = styled.div<{ $isSelected: boolean }>`
+export const StyledSortListDiv = styled.div<{ $isSelected: boolean }>`
   display: inline-block;
   position: relative;
   height: 30px;
@@ -269,7 +270,6 @@ const SortArea = ({ boardId }: { boardId: number }) => {
         >
           {SortOption[sortOp]}
         </p>
-        {/* 원본 카페에서도 리스트 밖의 영역을 선택했을 때 닫히는 기능이 없어서 일단 이렇게 두었습니다. */}
         <ul className="select_list">
           <li onClick={() => handleSortOp(0)}>5개씩</li>
           <li onClick={() => handleSortOp(1)}>10개씩</li>
@@ -501,12 +501,12 @@ export const PopularBoardTopOption = ({
 }: {
   currentOrder: Order;
   setCurrentOrder: (arg: Order) => void;
-  SortOption: {view:string, query:string}[];
+  SortOption: { view: string; query: string }[];
   selectedOp: number;
   setSelectedOp: (arg: number) => void;
 }) => {
   const [isSortSelected, setIsSortSelected] = useState(false);
- 
+
   const handleSelectOp = (arg: number) => {
     setIsSortSelected(!isSortSelected);
     setSelectedOp(arg);
