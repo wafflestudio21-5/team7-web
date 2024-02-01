@@ -8,6 +8,21 @@ import axios from "axios";
 const Wrapper = styled.div`
   width: 458px;
   margin: 0 auto;
+  .loginButton {
+    width: 402px;
+    height: 52px;
+    background-color: #03c75a;
+    margin-top: 16px;
+    padding: 13px 0;
+    color: white;
+    border: solid 1px rgba(0, 0, 0, 0.15);
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 24px;
+    cursor: pointer;
+  }
 `;
 const Header = styled.div`
   height: 186px;
@@ -285,23 +300,16 @@ const IDLogin = styled.div<{
     color: #ff003e;
     text-align: left;
   }
+`;
+const SocialLogin = styled.div`
   & > .loginButton {
-    width: 402px;
-    height: 52px;
-    background-color: #03c75a;
-    margin-top: 16px;
-    padding: 13px 0;
-    color: white;
-    border: solid 1px rgba(0, 0, 0, 0.15);
-    border-radius: 6px;
-    box-sizing: border-box;
-    font-size: 20px;
-    font-weight: 700;
-    line-height: 24px;
-    cursor: pointer;
+    position: relative;
+    top: 55px;
+    & > a {
+      color: #fff;
+    }
   }
 `;
-const SocialLogin = styled.div``;
 
 const Find = styled.div`
   margin-top: 20px;
@@ -341,8 +349,10 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log("activated!");
     const getCodeFromURL = () => {
       const code = new URL(window.location.href).searchParams.get("code");
+      console.log(code);
       if (code) {
         // If code exists in the URL, send a request to exchange it for an access token
         exchangeCodeForToken(code);
@@ -356,9 +366,12 @@ const Login = () => {
         );
         const tokenData = await tokenResponse.data;
         // Save the access token to localStorage
-        localStorage.setItem("accessToken", tokenData.access_token);
+        console.log(tokenData);
+        localStorage.setItem("accessToken", tokenData.accessToken);
         // Clear the URL query string to remove the code parameter
-        window.history.replaceState({}, document.title, "/");
+        // window.history.replaceState({}, document.title, "/");
+        navigate("/");
+        window.location.reload();
       } catch (error) {
         console.error("Error exchanging code for token:", error);
       }
@@ -481,9 +494,9 @@ const Login = () => {
             </IDLogin>
           ) : (
             <SocialLogin>
-              <button>
+              <button className="loginButton">
                 <a href="https://nid.naver.com/oauth2.0/authorize?client_id=OemkbWdkEHFr93oA3sxR&redirect_uri=http://localhost:5173&response_type=code&state=STATE_STRING">
-                  Naver 아이디로 로그인
+                  Naver로 로그인
                 </a>
               </button>
             </SocialLogin>
@@ -492,10 +505,10 @@ const Login = () => {
         <Find>
           <ul>
             <li>
-              <Link to={"/"}>비밀번호 찾기</Link>
+              <Link to={"/login"}>비밀번호 찾기</Link>
             </li>
             <li>
-              <Link to={"/"}>아이디 찾기</Link>
+              <Link to={"/login"}>아이디 찾기</Link>
             </li>
             <li>
               <Link to={"/signup"}>회원가입</Link>
