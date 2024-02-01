@@ -521,7 +521,7 @@ const SignUp = () => {
         username: userName,
         password: userPassword,
         name: name,
-        email: userEmail,
+        email: userEmail ? userEmail : null,
         birthDate: userBirth,
         phoneNumber: userPhoneNumber,
       })

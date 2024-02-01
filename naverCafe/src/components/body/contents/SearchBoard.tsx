@@ -638,6 +638,8 @@ const SearchBoard = () => {
     console.log(
       `contentOp: ${contentOp}, startDate: ${startDate}, endDate: ${endDate}`
     );
+    setSize(15);
+    setPage(1);
   }, []);
 
   return (
