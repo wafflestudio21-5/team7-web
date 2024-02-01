@@ -701,7 +701,7 @@ const SideBar = () => {
                         <li
                           className="favBoard"
                           key={index}
-                          onClick={() => navigate(`/board/${favBoard.id - 1}`)}
+                          onClick={() => navigate(`/board/${favBoard.id}`)}
                         >
                           <img
                             className="list"
