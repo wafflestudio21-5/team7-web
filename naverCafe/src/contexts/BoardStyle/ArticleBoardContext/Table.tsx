@@ -148,6 +148,7 @@ const StyledTbody = styled.tbody`
     text-align: center;
     padding: 100px 0;
     border-bottom: 1px solid #f2f2f2;
+    font-size:13px;
   }
 `;
 
@@ -740,7 +741,7 @@ export const ArticleTable = ({
               </StyledTr>
             ))
           ))}
-        {articleList.length === 0 && <td className="noArticle" colSpan={6}>등록된 게시글이 없습니다.</td>}
+        {articleList.length === 0 && <td className="noArticle" colSpan={board.likeCol ? 6 : 5}>등록된 게시글이 없습니다.</td>}
       </StyledTbody>
     </StyledTable>
   );
