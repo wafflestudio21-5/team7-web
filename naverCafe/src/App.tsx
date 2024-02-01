@@ -73,7 +73,7 @@ function App() {
                         {boardList &&
                           boardList.boards.map((board, index) => (
                             <Route
-                              path={"/board/" + index}
+                              path={"/board/" + (index+1)}
                               element={<CommonBoard board={board} />}
                             />
                           ))}

@@ -19,7 +19,6 @@ import {
   formatDate,
   useSearch,
 } from "../../../contexts/BoardContext/SearchContext";
-import { useLocation } from "react-router-dom";
 
 //BoardBottomOption 의 ListSearch를 재활용하고 싶지만...
 const StyledSearchInput = styled.div`
@@ -113,6 +112,7 @@ const StyledSearchInput = styled.div`
       margin: 0;
       padding: 0;
       font-size: 13px;
+      cursor:pointer;
     }
   }
 `;
@@ -650,6 +650,10 @@ const SearchBoard = () => {
     setPage(1);
     setBoardOp(0);
   }, []);
+
+  useEffect(() => {
+    setPage(1);
+  }, [size]);
 
   return (
     <div>

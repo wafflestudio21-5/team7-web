@@ -512,7 +512,7 @@ const CardViewUl = ({
       {articleList.map((article, index) => (
         <StyledCardLi key={index}>
           {isTotalBoard ? (
-            <p onClick={() => navigate(`/board/${article.board.id - 1}`)}>
+            <p onClick={() => navigate(`/board/${article.board.id}`)}>
               {article.board.name}
             </p>
           ) : null}

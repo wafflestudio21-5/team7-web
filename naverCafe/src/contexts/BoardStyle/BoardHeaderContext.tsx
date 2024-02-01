@@ -132,7 +132,7 @@ export const CommonBoardHeader = ({ board }: { board: BoardType }) => {
 
   useEffect(() => {
     if (myProfile) {
-      //refetch();
+      refetch();
       setIsFav(favList && favList.boards.some((b) => b.id === board.id));
       //console.log(`board: `, board, `favList: `, favList, `isFav: ${isFav}`); //isFav는 비동기적 처리로 인해 이전의 값을 출력한다.
     }
@@ -140,15 +140,24 @@ export const CommonBoardHeader = ({ board }: { board: BoardType }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [board]);
 
-  useEffect(() => {
-    if (myProfile) {
-      setIsFav(favList && favList.boards.some((b) => b.id === board.id));
-      // refetch();
-      console.log(`board: `, board, `favList: `, favList, `isFav: ${isFav}`); //isFav는 비동기적 처리로 인해 이전의 값을 출력한다.
-    }
+useEffect(() => {
+  if (myProfile) {
+    // refetch 함수 호출 후 프로미스가 resolve되면 상태를 업데이트합니다.
+    refetch()
+      .then(() => {
+        // setState 함수는 비동기적으로 실행되므로 이전 상태를 바로 로그에 찍으면 업데이트 이전의 상태를 볼 수 있습니다.
+        setIsFav(favList && favList.boards.some((b) => b.id === board.id));
+      })
+      .catch((error) =>
+        console.error("Error fetching favorite boards:", error)
+      );
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    // 로그를 바로 찍으면 refetch 이후 상태가 반영되기 전의 값을 볼 수 있습니다.
+    // 따라서, 이 로그는 항상 비동기 작업이 완료된 후의 상태를 정확히 반영하지 않습니다.
+    console.log(`board: `, board, `favList: `, favList, `isFav: ${isFav}`);
+  }
+}, [myProfile, refetch, board]);
+
 
   return (
     <StyledCommonBoardHeader $isFavorite={isFav ? isFav : false}>

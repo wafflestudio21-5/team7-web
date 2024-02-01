@@ -41,7 +41,11 @@ const CommonBoard = ({ board }: { board: BoardType }) => {
       refetch();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [board]);
+  }, [board, myProfile]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [size]);
 
   useEffect(() => {
     async function fetchArticles() {

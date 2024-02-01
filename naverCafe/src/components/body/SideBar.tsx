@@ -778,7 +778,7 @@ const SideBar = () => {
                           $isCurBoard={curBoardState === board.id}
                         >
                           <Link
-                            to={`/board/${board.id - 1}`}
+                            to={`/board/${board.id}`}
                             onClick={() => {
                               setCurBoardState(board.id);
                             }}
