@@ -35,7 +35,7 @@ const SearchBarDiv = styled.div`
 
 const SearchBar = () => {
   const [keyword, setKeyword] = useState<string>("");
-  const { setItem } = useSearch();
+  const { setItem, setContentOp } = useSearch();
   const navigate = useNavigate();
   const onClickSearch = () => {
     if (keyword === "") {
@@ -43,6 +43,7 @@ const SearchBar = () => {
     } else {
       navigate(`/searchBoard/${keyword}`);
       setItem(keyword);
+      setContentOp(0);
       setKeyword("");
     }
   };

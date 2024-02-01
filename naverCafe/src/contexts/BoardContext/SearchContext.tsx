@@ -3,6 +3,7 @@
 //공유하는 값: item(검색창에 입력하는 값), term(startDate, endDate), contentOp(searchCategory), boardOp(boardId)
 
 import { useState, createContext, useContext, ReactNode } from "react";
+import { ArticleType } from "../../Types";
 
 interface SearchState {
   item: string;
@@ -11,12 +12,14 @@ interface SearchState {
   contentOp: number;
   boardOp: number;
   termOp: number;
+  searchRes: ArticleType[];
   setItem: (arg: string) => void;
   setStartDate: (arg: string) => void;
   setEndDate: (arg: string) => void;
   setContentOp: (arg: number) => void;
   setBoardOp: (arg: number) => void;
   setTermOp: (arg: number) => void;
+  setSearchRes: (arg: ArticleType[]) => void;
 }
 
 export const SearchContext = createContext<SearchState>({
@@ -26,12 +29,14 @@ export const SearchContext = createContext<SearchState>({
   contentOp: 0,
   boardOp: 0,
   termOp: 0,
+  searchRes: [],
   setItem: () => {},
   setStartDate: () => {},
   setEndDate: () => {},
   setContentOp: () => {},
   setBoardOp: () => {},
   setTermOp: () => {},
+  setSearchRes: () => {},
 });
 
 export const SearchContextProvider = ({
@@ -39,22 +44,22 @@ export const SearchContextProvider = ({
 }: {
   children: ReactNode;
 }) => {
-    const date = new Date();
-    const currentDate = new Date(date);
+  const date = new Date();
+  const currentDate = new Date(date);
 
   const pastDate = new Date(
     currentDate.setFullYear(currentDate.getFullYear() - 200)
   );
-  const startDateInitialValue = pastDate.toISOString().split("T")[0]; // 시간 부분을 제외하고, 날짜 부분만 사용합니다.
+  const startDateInitialValue = pastDate.toISOString().split(".")[0];
 
   const [startDate, setStartDate] = useState(startDateInitialValue);
-  const [endDate, setEndDate] = useState(
-    date.toISOString().split(".")[0]
-  );
+  const [endDate, setEndDate] = useState(date.toISOString().split(".")[0]);
   const [item, setItem] = useState("");
   const [contentOp, setContentOp] = useState(0);
   const [boardOp, setBoardOp] = useState(0);
   const [termOp, setTermOp] = useState(0);
+
+  const [searchRes, setSearchRes] = useState<ArticleType[]>([]);
 
   return (
     <SearchContext.Provider
@@ -65,12 +70,14 @@ export const SearchContextProvider = ({
         contentOp,
         boardOp,
         termOp,
+        searchRes,
         setItem,
         setStartDate,
         setEndDate,
         setContentOp,
         setBoardOp,
         setTermOp,
+        setSearchRes,
       }}
     >
       {children}

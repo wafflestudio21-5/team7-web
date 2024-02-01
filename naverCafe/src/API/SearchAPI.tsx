@@ -34,17 +34,13 @@ export async function searchArticles({
    
     const res = await axios.get(baseURL + url, {
       params: {
-        searchCategory: contentOp,
+        searchCategory: contentOp+1,
         startDate: startDate,
         endDate: endDate,
         wordInclude: wordInclude,
         wordExclude: wordExclude,
       },
     });
-
-    if (!res.data.ok) {
-      throw new Error("Network response was not ok");
-    }
     const data = await res.data.articleBrief;
     return data;
   } catch (err) {

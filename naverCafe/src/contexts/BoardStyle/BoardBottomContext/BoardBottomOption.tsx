@@ -12,6 +12,9 @@ import {
   useSearch,
 } from "../../BoardContext/SearchContext";
 import { useMyProfile } from "../../../API/UserAPI";
+import { searchArticles } from "../../../API/SearchAPI";
+import { ArticleBriefType } from "../../../Types";
+import { usePagination } from "./PaginationContext";
 
 //TotalBoard: 페이지 넘버(페이지네이션) / 검색창 (기간 | 기준 | 검색창 | 검색버튼)
 //CommonBoard: 페이지 넘버(페이지네이션) / 검색창 (기간 | 기준 | 검색창 | 검색버튼)
@@ -243,17 +246,26 @@ export const StyledUl = styled.ul<{
 
 const ListSearch = ({ boardId }: { boardId: number }) => {
   const {
-    item,
-    setItem,
+    setItem, // 검색 버튼 클릭 시 사용할 setItem 함수
     setStartDate,
     setEndDate,
-    contentOp,
-    setContentOp,
-    boardOp,
     setBoardOp,
-    termOp,
+    setContentOp,
     setTermOp,
+    boardOp,
+    contentOp,
+    termOp,
+    startDate,
+    endDate,
+    item,
   } = useSearch();
+
+  const [localBoardOp, setLocalBoardOp] = useState(boardId);
+  const [localContentOp, setLocalContentOp] = useState(contentOp);
+  const [localTermOp, setLocalTermOp] = useState(termOp);
+  const [localStartDate, setLocalStartDate] = useState(startDate);
+  const [localEndDate, setLocalEndDate] = useState(endDate);
+  const [keyword, setKeyword] = useState(item); // 사용자 입력 검색어
 
   const navigate = useNavigate();
 
@@ -262,13 +274,13 @@ const ListSearch = ({ boardId }: { boardId: number }) => {
   const [isTermSelected, setIsTermSelected] = useState(false);
 
   const handleTermOp = (arg: number) => {
-    setTermOp(arg);
+    setLocalTermOp(arg);
     setIsTermSelected(!isTermSelected);
 
     const now = new Date();
-    setStartDate(calculatePastDateISO(TermOption[arg]));
+    setLocalStartDate(calculatePastDateISO(TermOption[arg]));
     console.log(calculatePastDateISO(TermOption[arg]));
-    setEndDate(now.toISOString().split(".")[0]);
+    setLocalEndDate(now.toISOString().split(".")[0]);
   };
 
   //기간 입력
@@ -286,25 +298,65 @@ const ListSearch = ({ boardId }: { boardId: number }) => {
   };
 
   const handleSetBtnClick = () => {
-    setStartDate(firstDate + "T00:00:00");
-    setEndDate(secondDate + "T23:59:59");
+    setLocalStartDate(firstDate + "T00:00:00");
+    setLocalEndDate(secondDate + "T23:59:59");
   };
 
   //제목, 내용
-  const ContentOption = ["제목만", "글작성자", "댓글내용", "댓글작성자"];
+  const ContentOption = [
+    "게시글 + 댓글",
+    "제목만",
+    "글작성자",
+    "댓글내용",
+    "댓글작성자",
+  ];
   const [isContentSelected, setIsContentSelected] = useState(false);
 
   const handleContentOp = (arg: number) => {
-    setContentOp(arg);
+    setLocalContentOp(arg);
     setIsContentSelected(!isContentSelected);
   };
 
   //검색
+  const { setTotPage } = usePagination();
+  const { searchRes, setSearchRes } = useSearch();
+
   const onClickSearch = () => {
-    if (item === "") {
+    if (keyword.trim() === "") {
       alert("검색어를 입력하세요");
-    } else {
-      navigate(`/searchBoard/${item}`);
+      return;
+    }
+
+    // useSearch 컨텍스트의 상태 업데이트
+    setItem(keyword);
+    setBoardOp(localBoardOp);
+    setContentOp(localContentOp);
+    setTermOp(localTermOp);
+    setStartDate(localStartDate);
+    setEndDate(localEndDate);
+
+    // 검색 결과 페이지로 이동
+    navigate(`/searchboard/${keyword}`);
+    handleSearch();
+  };
+
+  const handleSearch = async () => {
+    try {
+      const fetchedSearchRes: ArticleBriefType = await searchArticles({
+        size: 15,
+        page: 1,
+        boardId: boardOp,
+        item: keyword,
+        contentOp,
+        startDate,
+        endDate,
+        wordInclude: "",
+        wordExclude: "",
+      });
+      setSearchRes(fetchedSearchRes.content);
+      setTotPage(fetchedSearchRes.totalPages);
+    } catch (err) {
+      console.log("Error fetching SearchRes in BoardBottomOption");
     }
   };
 
@@ -315,8 +367,24 @@ const ListSearch = ({ boardId }: { boardId: number }) => {
       setContentOp(0);
       setBoardOp(boardId);
       setItem("");
+
+      setLocalBoardOp(boardId);
+      setLocalContentOp(0);
+      setLocalTermOp(0);
+      setLocalStartDate("2024-01-01");
+      setLocalEndDate("2024-02-01");
+      setKeyword("");
     }
   }, [boardId, setBoardOp, setContentOp, setTermOp]);
+
+  useEffect(() => {
+    setLocalBoardOp(boardOp);
+    setLocalContentOp(contentOp);
+    setTermOp(termOp);
+    setLocalStartDate(startDate);
+    setLocalEndDate(endDate);
+    setKeyword(item);
+  }, [searchRes]);
 
   return (
     <StyledListSearch>
@@ -331,7 +399,7 @@ const ListSearch = ({ boardId }: { boardId: number }) => {
             setIsContentSelected(false);
           }}
         >
-          {TermOption[termOp]}
+          {TermOption[localTermOp]}
         </p>
         <StyledUl
           className="select_list"
@@ -378,7 +446,7 @@ const ListSearch = ({ boardId }: { boardId: number }) => {
             setIsTermSelected(false);
           }}
         >
-          {ContentOption[contentOp]}
+          {ContentOption[localContentOp]}
         </p>
         <StyledUl $isSelected={isContentSelected} $isTerm={false}>
           {ContentOption.map((option, index) => (
@@ -393,8 +461,8 @@ const ListSearch = ({ boardId }: { boardId: number }) => {
           <input
             type="text"
             placeholder="검색어를 입력해주세요"
-            value={item}
-            onChange={(e) => setItem(e.target.value)}
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
           ></input>
         </div>
         <button className="btn-search-grean" onClick={() => onClickSearch()}>

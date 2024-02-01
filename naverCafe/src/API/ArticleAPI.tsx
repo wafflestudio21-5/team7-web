@@ -157,3 +157,5 @@ export async function hotArticle(
     return { content: [] };
   }
 }
+
+//공지로등록 (userInfo의 rank 확인)

@@ -19,6 +19,7 @@ import {
   formatDate,
   useSearch,
 } from "../../../contexts/BoardContext/SearchContext";
+import { useLocation } from "react-router-dom";
 
 //BoardBottomOption 의 ListSearch를 재활용하고 싶지만...
 const StyledSearchInput = styled.div`
@@ -303,7 +304,7 @@ const SearchTopDiv = ({ searchBody }: { searchBody: SearchBody }) => {
   };
 
   //제목, 내용
-  const ContentOption = ["제목만", "글작성자", "댓글내용", "댓글작성자"];
+  const ContentOption = ["게시글 + 댓글","제목만", "글작성자", "댓글내용", "댓글작성자"];
   const [isContentSelected, setIsContentSelected] = useState(false);
   const { contentOp, setContentOp } = searchBody; //ContentOption의 인덱스를 저장
 
@@ -312,12 +313,15 @@ const SearchTopDiv = ({ searchBody }: { searchBody: SearchBody }) => {
     setIsContentSelected(!isContentSelected);
   };
 
-  // //초기화
-  // useEffect(() => {
-  //   setTermOp(0);
-  //   setContentOp(0);
-  //   setBoardOp(0);
-  // }, []);
+  //초기화
+  useEffect(() => {
+    //setTermOp(0);
+    setContentOp(0);
+    //setBoardOp(0);
+  }, []);
+  useEffect(() => {
+    setIsDetailClicked(false);
+  }, [contentOp]);
 
   //검색 버튼 클릭
   const handleSearch = async () => {
@@ -468,17 +472,19 @@ const SearchTopDiv = ({ searchBody }: { searchBody: SearchBody }) => {
         <DetailButton
           $isSelected={isDetailClicked}
           onClick={() => {
-            if (contentOp !== 1 && contentOp !== 3) {
+            if (contentOp !== 2 && contentOp !== 4) {
               setIsDetailClicked(!isDetailClicked);
             }
           }}
-          disabled={contentOp === 1 || contentOp === 3}
+          disabled={contentOp === 2 || contentOp === 4}
         >
           상세 검색
         </DetailButton>
       </StyledSearchInput>{" "}
       {/* 논리 연산자까지 고려해서 검색을 해야하는 걸까... 일단 tip layer는 제외 */}
-      <DetailSearchDiv $isSelected={isDetailClicked}>
+      <DetailSearchDiv
+        $isSelected={isDetailClicked && contentOp !== 2 && contentOp !== 4}
+      >
         <div className="input_component">
           <input
             type="text"
@@ -584,7 +590,9 @@ const SearchBoard = () => {
   const [addItem, setAddItem] = useState("");
   const { size, page, setSize, setPage, setTotPage } = usePagination();
 
-  const [searchRes, setSearchRes] = useState<ArticleType[]>([]);
+  const { searchRes, setSearchRes } = useSearch();
+  //const location = useLocation();
+
 
   const searchBody = {
     size,
@@ -640,6 +648,7 @@ const SearchBoard = () => {
     );
     setSize(15);
     setPage(1);
+    setBoardOp(0);
   }, []);
 
   return (
