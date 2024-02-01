@@ -18,7 +18,7 @@ export const CurrentBoardStateProvider = ({
   children: ReactNode;
 }) => {
   //HomeBoard의 id: -2, PopularBoard의 id: -1, TotalBoard의 id: 0으로 설정하였습니다.
-  const [curBoardState, setCurBoardState] = useState(-1);
+  const [curBoardState, setCurBoardState] = useState(-2);
   return (
     <CurrentBoardContext.Provider value={{ curBoardState, setCurBoardState }}>
       {children}

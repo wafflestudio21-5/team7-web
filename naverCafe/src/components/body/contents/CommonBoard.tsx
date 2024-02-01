@@ -18,8 +18,10 @@ import { useNoticeContext } from "../../../contexts/BoardContext/NoticeContext";
 import { ArticleBriefType, ArticleType, BoardType } from "../../../Types";
 import { CurrentBoardContext } from "../../../contexts/BoardContext/CurrentBoardContext";
 import { ViewOptionContext } from "../../../contexts/BoardContext/ViewOptionContext";
+import { useMyProfile } from "../../../API/UserAPI";
 
 const CommonBoard = ({ board }: { board: BoardType }) => {
+  const { myProfile } = useMyProfile();
   const { setIsNoticeOff } = useNoticeContext();
   const { setViewOp } = useContext(ViewOptionContext);
   const { refetch } = useGetLikeBoard();
@@ -31,11 +33,13 @@ const CommonBoard = ({ board }: { board: BoardType }) => {
   useEffect(() => {
     setCurBoardState(board.id);
     setIsNoticeOff(false);
-    refetch();
     setSize(15);
     setPage(1);
     setSort("");
     setViewOp(2);
+    if (myProfile) {
+      refetch();
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [board]);
 

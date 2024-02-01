@@ -1,7 +1,6 @@
 // SearchBar에 특정 검색어로 검색했을 때 뜨는 게시판
 
 import styled from "styled-components";
-import { aList } from "../../../Constants";
 import { boardAttribute } from "../../../contexts/BoardContext/BoardAttrContext";
 import { ArticleTable } from "../../../contexts/BoardStyle/ArticleBoardContext/Table";
 import {
@@ -12,6 +11,15 @@ import {
 import { useState, useEffect } from "react";
 import { useWholeBoard } from "../../../API/BoardAPI";
 import { StyledSortListDiv } from "../../../contexts/BoardStyle/BoardTopOptionContext";
+import { usePagination } from "../../../contexts/BoardStyle/BoardBottomContext/PaginationContext";
+import { searchArticles } from "../../../API/SearchAPI";
+import { ArticleBriefType, ArticleType } from "../../../Types";
+import {
+  calculatePastDateISO,
+  formatDate,
+  useSearch,
+} from "../../../contexts/BoardContext/SearchContext";
+import { useLocation } from "react-router-dom";
 
 //BoardBottomOption 의 ListSearch를 재활용하고 싶지만...
 const StyledSearchInput = styled.div`
@@ -23,7 +31,7 @@ const StyledSearchInput = styled.div`
   display: flex;
   align-items: center;
 
-  div:last-child {
+  & > div:last-child {
     margin-left: auto;
     margin-right: 10px;
     vertical-align: middle;
@@ -109,7 +117,9 @@ const StyledSearchInput = styled.div`
   }
 `;
 
-const DetailButton = styled.div<{ $isSelected: boolean }>`
+const DetailButton = styled.button<{ $isSelected: boolean }>`
+  all: unset;
+  margin-left: auto;
   &:hover {
     //text-decoration: underline;
     cursor: pointer;
@@ -127,6 +137,13 @@ const DetailButton = styled.div<{ $isSelected: boolean }>`
     left: 4px;
     position: relative;
   }
+
+  ${({ disabled }) =>
+    disabled &&
+    `
+    color: #b4b4b4;
+    cursor: not-allowed;
+  `}
 `;
 
 const DetailSearchDiv = styled.div<{ $isSelected: boolean }>`
@@ -184,11 +201,55 @@ const DetailSearchDiv = styled.div<{ $isSelected: boolean }>`
   }
 `;
 
-const SearchTopDiv = () => {
+type SearchBody = {
+  size: number;
+  page: number;
+  setTotPage: (arg: number) => void;
+  item: string;
+  setItem: (arg: string) => void;
+  boardOp: number;
+  setBoardOp: (arg: number) => void;
+  contentOp: number;
+  setContentOp: (arg: number) => void;
+  startDate: string;
+  setStartDate: (arg: string) => void;
+  endDate: string;
+  setEndDate: (arg: string) => void;
+  wordInclude: string;
+  setWordInclude: (arg: string) => void;
+  wordExclude: string;
+  setWordExclude: (arg: string) => void;
+  addItem: string;
+  setAddItem: (arg: string) => void;
+  setSearchRes: (arg: ArticleType[]) => void;
+};
+
+const SearchTopDiv = ({ searchBody }: { searchBody: SearchBody }) => {
   const totDivStyle: React.CSSProperties = {
     marginBottom: "35px",
     position: "relative",
   };
+
+  const {
+    size,
+    page,
+    setTotPage,
+    wordInclude,
+    setWordInclude,
+    wordExclude,
+    setWordExclude,
+    item,
+    setItem,
+    startDate,
+    endDate,
+    setStartDate,
+    setEndDate,
+    addItem,
+    setAddItem,
+    setSearchRes,
+  } = searchBody;
+
+  const { termOp, setTermOp } = useSearch();
 
   //상세검색 버튼
   const [isDetailClicked, setIsDetailClicked] = useState(false);
@@ -196,11 +257,34 @@ const SearchTopDiv = () => {
   //기간
   const TermOption = ["전체기간", "1일", "1주", "1개월", "6개월", "1년"];
   const [isTermSelected, setIsTermSelected] = useState(false);
-  const [termOp, setTermOp] = useState(0); //TermOption의 인덱스를 저장
 
   const handleTermOp = (arg: number) => {
     setTermOp(arg);
     setIsTermSelected(!isTermSelected);
+
+    const now = new Date();
+    setStartDate(calculatePastDateISO(TermOption[arg]));
+    console.log(calculatePastDateISO(TermOption[arg]));
+    setEndDate(now.toISOString().split(".")[0]);
+  };
+
+  //기간 입력
+  const [firstDate, setFirstDate] = useState("2024-01-01");
+  const [secondDate, setSecondDate] = useState("2024-02-01");
+
+  const handleFirstDateChange = (e: { target: { value: string } }) => {
+    const value = e.target.value.replace(/\D/g, ""); // 숫자만 추출
+    setFirstDate(formatDate(value));
+  };
+
+  const handleSecondDateChange = (e: { target: { value: string } }) => {
+    const value = e.target.value.replace(/\D/g, ""); // 숫자만 추출
+    setSecondDate(formatDate(value));
+  };
+
+  const handleSetBtnClick = () => {
+    setStartDate(firstDate + "T00:00:00");
+    setEndDate(secondDate + "T23:59:59");
   };
 
   //게시판
@@ -208,7 +292,11 @@ const SearchTopDiv = () => {
   const wholeBoard = boardList?.boards ?? [];
   const BoardOption = [{ id: 0, name: "전체게시판" }, ...wholeBoard];
   const [isBoardSelected, setIsBoardSelected] = useState(false);
-  const [boardOp, setBoardOp] = useState(0);
+  const { boardOp, setBoardOp } = searchBody;
+
+  const boardName = BoardOption[boardOp]
+    ? BoardOption[boardOp].name
+    : "로딩 중...";
 
   const handleBoardOp = (arg: number) => {
     setBoardOp(arg);
@@ -216,9 +304,9 @@ const SearchTopDiv = () => {
   };
 
   //제목, 내용
-  const ContentOption = ["제목만", "글작성자", "댓글내용", "댓글작성자"];
+  const ContentOption = ["게시글 + 댓글","제목만", "글작성자", "댓글내용", "댓글작성자"];
   const [isContentSelected, setIsContentSelected] = useState(false);
-  const [contentOp, setContentOp] = useState(0); //ContentOption의 인덱스를 저장
+  const { contentOp, setContentOp } = searchBody; //ContentOption의 인덱스를 저장
 
   const handleContentOp = (arg: number) => {
     setContentOp(arg);
@@ -227,10 +315,45 @@ const SearchTopDiv = () => {
 
   //초기화
   useEffect(() => {
-    setTermOp(0);
+    //setTermOp(0);
     setContentOp(0);
-    setBoardOp(0);
+    //setBoardOp(0);
   }, []);
+  useEffect(() => {
+    setIsDetailClicked(false);
+  }, [contentOp]);
+
+  //검색 버튼 클릭
+  const handleSearch = async () => {
+    if (item === "") {
+      alert("검색어를 입력하세요");
+    } else {
+      try {
+        const fetchedSearchRes: ArticleBriefType = await searchArticles({
+          size,
+          page,
+          boardId: boardOp,
+          item,
+          contentOp,
+          startDate,
+          endDate,
+          wordInclude,
+          wordExclude,
+        });
+        setSearchRes(fetchedSearchRes.content);
+        setTotPage(fetchedSearchRes.totalPages);
+      } catch (err) {
+        console.log("Error fetching SearchRes in SearchTopDiv");
+      }
+    }
+  };
+
+  //리프레쉬버튼클릭
+  const handleRefresh = () => {
+    setWordInclude("");
+    setWordExclude("");
+    setAddItem("");
+  };
 
   return (
     <div style={totDivStyle}>
@@ -266,15 +389,19 @@ const SearchTopDiv = () => {
                   type="text"
                   className="input_1"
                   maxLength={10}
-                  value="2017-12-28"
+                  value={firstDate}
+                  onChange={handleFirstDateChange}
                 />
                 <input
                   type="text"
                   className="input_2"
                   maxLength={10}
-                  value="2018-01-03"
+                  value={secondDate}
+                  onChange={handleSecondDateChange}
                 />
-                <button className="btn_set">설정</button>
+                <button className="btn_set" onClick={handleSetBtnClick}>
+                  설정
+                </button>
               </div>
             </li>
           </StyledUl>
@@ -293,7 +420,7 @@ const SearchTopDiv = () => {
               setIsContentSelected(false);
             }}
           >
-            {BoardOption[boardOp].name}
+            {boardName}
           </p>
           <StyledUl $isSelected={isBoardSelected} $isTerm={true}>
             {BoardOption.map((option, index) => (
@@ -330,30 +457,59 @@ const SearchTopDiv = () => {
 
         <div className="input_search_area">
           <div className="input_component">
-            <input type="text" placeholder="검색어를 입력해주세요" />
+            <input
+              type="text"
+              placeholder="검색어를 입력해주세요"
+              value={item}
+              onChange={(e) => setItem(e.target.value)}
+            />
           </div>
-          <button className="btn-search-grean">검색</button>
+          <button className="btn-search-grean" onClick={handleSearch}>
+            검색
+          </button>
         </div>
 
         <DetailButton
           $isSelected={isDetailClicked}
-          onClick={() => setIsDetailClicked(!isDetailClicked)}
+          onClick={() => {
+            if (contentOp !== 2 && contentOp !== 4) {
+              setIsDetailClicked(!isDetailClicked);
+            }
+          }}
+          disabled={contentOp === 2 || contentOp === 4}
         >
           상세 검색
         </DetailButton>
       </StyledSearchInput>{" "}
       {/* 논리 연산자까지 고려해서 검색을 해야하는 걸까... 일단 tip layer는 제외 */}
-      <DetailSearchDiv $isSelected={isDetailClicked}>
+      <DetailSearchDiv
+        $isSelected={isDetailClicked && contentOp !== 2 && contentOp !== 4}
+      >
         <div className="input_component">
-          <input type="text" placeholder="다음 단어 모두 포함" />
+          <input
+            type="text"
+            placeholder="다음 단어 모두 포함"
+            value={wordInclude}
+            onChange={(e) => setWordInclude(e.target.value)}
+          />
         </div>
         <div className="input_component">
-          <input type="text" placeholder="다음 단어 제외" />
+          <input
+            type="text"
+            placeholder="다음 단어 제외"
+            value={wordExclude}
+            onChange={(e) => setWordExclude(e.target.value)}
+          />
         </div>
         <div className="input_component">
-          <input type="text" placeholder="다음 단어 중 1개 이상 포함" />
+          <input
+            type="text"
+            placeholder="다음 단어 중 1개 이상 포함"
+            value={addItem}
+            onChange={(e) => setAddItem(e.target.value)}
+          />
         </div>
-        <button/>
+        <button onClick={handleRefresh} />
       </DetailSearchDiv>
     </div>
   );
@@ -380,10 +536,11 @@ const SearchListDiv = () => {
     "50개씩",
   ];
   const [sortOp, setSortOp] = useState(2); //SortOption의 인덱스를 저장
+  const { setSize } = usePagination();
 
   const handleSortOp = (arg: number) => {
-    //const sortNum = SortOption[arg].match(/\d+/);
-    //setSize(parseInt(sortNum![0], 10));
+    const sortNum = SortOption[arg].match(/\d+/);
+    setSize(parseInt(sortNum![0], 10));
     setSortOp(arg);
     setIsSortSelected(!isSortSelected);
   };
@@ -415,12 +572,94 @@ const SearchListDiv = () => {
 };
 
 const SearchBoard = () => {
+  const {
+    item,
+    setItem,
+    boardOp,
+    setBoardOp,
+    contentOp,
+    setContentOp,
+    startDate,
+    setStartDate,
+    endDate,
+    setEndDate,
+  } = useSearch();
+  const [wordInclude, setWordInclude] = useState("");
+  const [wordExclude, setWordExclude] = useState("");
+
+  const [addItem, setAddItem] = useState("");
+  const { size, page, setSize, setPage, setTotPage } = usePagination();
+
+  const { searchRes, setSearchRes } = useSearch();
+  //const location = useLocation();
+
+
+  const searchBody = {
+    size,
+    page,
+    setTotPage,
+    item,
+    setItem,
+    boardOp,
+    setBoardOp,
+    contentOp,
+    setContentOp,
+    startDate,
+    setStartDate,
+    endDate,
+    setEndDate,
+    wordInclude,
+    setWordExclude,
+    wordExclude,
+    setWordInclude,
+    addItem,
+    setAddItem,
+    setSearchRes,
+  };
+
+  useEffect(() => {
+    async function fetchSearchResult() {
+      try {
+        const fetchedSearchRes: ArticleBriefType = await searchArticles({
+          size,
+          page,
+          boardId: boardOp,
+          item: addItem ? `${item},${addItem}` : item,
+          contentOp,
+          startDate,
+          endDate,
+          wordInclude,
+          wordExclude,
+        });
+        setSearchRes(fetchedSearchRes.content);
+        setTotPage(fetchedSearchRes.totalPages);
+      } catch (err) {
+        console.log("Error fetching SearchRes");
+      }
+    }
+
+    fetchSearchResult();
+  }, [size, page, setTotPage]);
+
+  useEffect(() => {
+    console.log(`item: ${item}, boardId: ${boardOp}`);
+    console.log(
+      `contentOp: ${contentOp}, startDate: ${startDate}, endDate: ${endDate}`
+    );
+    setSize(15);
+    setPage(1);
+    setBoardOp(0);
+  }, []);
+
   return (
     <div>
-      <SearchTopDiv />
+      <SearchTopDiv searchBody={searchBody} />
       <SearchListDiv />
-      <ArticleTable board={boardAttribute.SearchBoard} articleList={aList} />
-      <BoardBottomOption boardId={0} noPost />
+      <ArticleTable
+        board={boardAttribute.SearchBoard}
+        articleList={searchRes}
+      />
+      <BoardBottomOption boardId={boardOp} noPost />
     </div>
   );
 };

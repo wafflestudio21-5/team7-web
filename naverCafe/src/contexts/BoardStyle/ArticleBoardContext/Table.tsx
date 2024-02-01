@@ -9,6 +9,7 @@ import { ViewOptionContext } from "../../BoardContext/ViewOptionContext";
 import { useNavigate } from "react-router-dom";
 import { notiArticle } from "../../../API/ArticleAPI";
 import { usePagination } from "../BoardBottomContext/PaginationContext";
+import { useMyProfile } from "../../../API/UserAPI";
 
 const StyledTable = styled.table<{ $brdName: boolean }>`
   width: 100%;
@@ -142,7 +143,15 @@ const StyledThead = styled.thead`
   }
 `;
 
-const StyledTbody = styled.tbody``;
+const StyledTbody = styled.tbody`
+  & > .noArticle {
+    color: #333;
+    text-align: center;
+    padding: 100px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 13px;
+  }
+`;
 
 export const StyledTr = styled.tr`
   td {
@@ -574,6 +583,7 @@ export const ArticleTable = ({
   articleList: ArticleType[];
   isLike?: boolean;
 }) => {
+  const { myProfile } = useMyProfile();
   const navigate = useNavigate();
   const { isNoticeOff } = useNoticeContext();
   const [noticeList, setNoticeList] = useState<ArticleType[]>([]);
@@ -664,76 +674,87 @@ export const ArticleTable = ({
               ></NoticeTr>
             ))
           : null}
-        {viewOp === 0 ? (
-          <CardViewUl
-            articleList={articleList}
-            DateOnly={DateOnly}
-            isTotalBoard={board.type === "total"}
-          ></CardViewUl>
-        ) : (
-          articleList.map((article: ArticleType, index: number) => (
-            <StyledTr key={index}>
-              <td
-                className={
-                  board.firstCol === "boardName" ? "td_article" : undefined
-                }
-              >
-                <div className={board.firstCol}>
-                  {/* 아티클마다 첫번째 정보 */}
-                  <FirstCol
-                    firstCol={board.firstCol}
-                    board={article.board}
-                    ranking={index}
-                    articleId={article.id}
-                  ></FirstCol>
-                </div>
-              </td>
-              <td>
-                <div className="title">
-                  <div className="board_list">
-                    <div className="inner_list">
-                      <span
-                        className="article_title"
-                        onClick={() => navigate(`/articles/${article.id}`)}
-                      >
-                        {article.title}
-                      </span>
-                      <span></span>
+        {articleList &&
+          (viewOp === 0 ? (
+            <CardViewUl
+              articleList={articleList}
+              DateOnly={DateOnly}
+              isTotalBoard={board.type === "total"}
+            ></CardViewUl>
+          ) : (
+            articleList.map((article: ArticleType, index: number) => (
+              <StyledTr key={index}>
+                <td
+                  className={
+                    board.firstCol === "boardName" ? "td_article" : undefined
+                  }
+                >
+                  <div className={board.firstCol}>
+                    {/* 아티클마다 첫번째 정보 */}
+                    <FirstCol
+                      firstCol={board.firstCol}
+                      board={article.board}
+                      ranking={index}
+                      articleId={article.id}
+                    ></FirstCol>
+                  </div>
+                </td>
+                <td>
+                  <div className="title">
+                    <div className="board_list">
+                      <div className="inner_list">
+                        <span
+                          className="article_title"
+                          onClick={() => navigate(`/articles/${article.id}`)}
+                        >
+                          {article.title}
+                        </span>
+                        <span></span>
 
-                      <span
-                        className="comment"
-                        onClick={() => navigate(`/articles/${article.id}`)}
-                      >
-                        {" ["}
-                        <em>{article.commentCount}</em>
-                        {"] "}
-                      </span>
+                        {article.commentCount !== 0 ? (
+                          <span
+                            className="comment"
+                            onClick={() => navigate(`/articles/${article.id}`)}
+                          >
+                            {" ["}
+                            <em>{article.commentCount}</em>
+                            {"] "}
+                          </span>
+                        ) : null}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </td>
-              <td className="td_author">
-                <div className="ArticleBoardAuthorInfo">
-                  <button>
-                    <span
-                      className="nickname"
-                      onClick={() => navigate(`/users/${article.author.id}`)}
-                    >
-                      {article.author.nickname}
-                    </span>
-                  </button>
-                </div>
-                {/* <div className="popup">
-                  <button>게시글보기</button>
-                </div> */}
-              </td>
-              <td className="td_date">{DateOnly(article.createdAt)}.</td>
-              <td className="td_view">{article.viewCount}</td>
-              {board.likeCol || isLike ? (
-                <td className="td_likes">{article.likeCount}</td>
-              ) : null}
-            </StyledTr>
-          ))
+                </td>
+                <td className="td_author">
+                  <div className="ArticleBoardAuthorInfo">
+                    <button>
+                      <span
+                        className="nickname"
+                        onClick={() => {
+                          if (myProfile) {
+                            navigate(`/users/${article.author.id}`);
+                          } else {
+                            navigate(`/login`);
+                          }
+                        }}
+                      >
+                        {article.author.nickname}
+                      </span>
+                    </button>
+                  </div>
+                </td>
+                <td className="td_date">{DateOnly(article.createdAt)}.</td>
+                <td className="td_view">{article.viewCount}</td>
+                {board.likeCol || isLike ? (
+                  <td className="td_likes">{article.likeCount}</td>
+                ) : null}
+              </StyledTr>
+            ))
+          ))}
+        {articleList.length === 0 && (
+          <td className="noArticle" colSpan={board.likeCol ? 6 : 5}>
+            등록된 게시글이 없습니다.
+          </td>
         )}
       </StyledTbody>
     </StyledTable>
