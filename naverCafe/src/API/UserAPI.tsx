@@ -78,6 +78,7 @@ export function useMyProfile() {
     image: string | null;
   } | null>(null);
   const refetchMyProfile = useCallback(async () => {
+    console.log("refetched!!!");
     const res = await axios.get(baseURL + "/api/v1/users/user-profile", {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("accessToken")}`,

@@ -1,8 +1,9 @@
 import styled, { css } from "styled-components";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import NotCheckedModal from "./NotCheckedModal";
 import { deleteArticle, deleteLike } from "../../../../API/ArticleAPI";
+import { useMyProfile } from "../../../../API/UserAPI";
 
 const Wrapper = styled.div<{
   $isMyInfo: boolean;
@@ -115,10 +116,12 @@ const UserBottomButtons = ({
   refetchUserLikedArticles,
   setIsFirstRendering,
 }: PropsUserBottomButtons) => {
+  const { myProfile } = useMyProfile();
   const [isCheckAllArticleClicked, setIsCheckAllArticleClicked] =
     useState<boolean>(false);
   const [isNotCheckedModalOpen, setIsNotCheckedModalOpen] =
     useState<boolean>(false);
+  const navigate = useNavigate();
 
   const handleCheckAllArticles = () => {
     if (isCheckAllArticleClicked) {
@@ -222,8 +225,22 @@ const UserBottomButtons = ({
             <button onClick={() => handleDeleteArticles()}>삭제</button>
           </div>
           <div className="writeArticle">
-            <button>
-              <Link to={"/write"}>글쓰기</Link>
+            <button
+              onClick={() => {
+                if (!myProfile) {
+                  if (
+                    confirm(
+                      "이 기능은 로그인해야만 사용할 수 있습니다.\n로그인하시겠습니까?"
+                    ) === true
+                  ) {
+                    navigate("/login");
+                  }
+                } else {
+                  navigate("/write");
+                }
+              }}
+            >
+              글쓰기
             </button>
           </div>
         </div>
@@ -235,9 +252,7 @@ const UserBottomButtons = ({
       <Wrapper $isMyInfo={isMyInfo}>
         <div className="right">
           <div className="writeArticle">
-            <button>
-              <Link to={"/write"}>글쓰기</Link>
-            </button>
+            <button>글쓰기</button>
           </div>
         </div>
         <div className="pageButtons">{pageButtons}</div>
@@ -248,7 +263,23 @@ const UserBottomButtons = ({
       <Wrapper $isMyInfo={isMyInfo}>
         <div className="right">
           <div className="writeArticle">
-            <button>글쓰기</button>
+            <button
+              onClick={() => {
+                if (!myProfile) {
+                  if (
+                    confirm(
+                      "이 기능은 로그인해야만 사용할 수 있습니다.\n로그인하시겠습니까?"
+                    ) === true
+                  ) {
+                    navigate("/login");
+                  }
+                } else {
+                  navigate("/write");
+                }
+              }}
+            >
+              글쓰기
+            </button>
           </div>
         </div>
         <div className="pageButtons">{pageButtons}</div>
