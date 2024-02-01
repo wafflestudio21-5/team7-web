@@ -4,12 +4,13 @@ import { ArticleType, type Cafe } from "./Types";
 
 export const baseURL =
   "http://ec2-15-165-161-107.ap-northeast-2.compute.amazonaws.com:8080";
+// "http://localhost:8080";
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const waffleCafe: Cafe = {
-  name: "와플카페",
-  url: "https://cafe.naver.com/wafflecafe",
-  manager: "매니저",
+  name: "와플 카페 Waffle Cafe",
+  url: "https://wafflecafe.shop/",
+  manager: "와플 매니저",
   createdAt: "2024.01.13 개설",
   location: "서울특별시 관악구",
   description: "와플스튜디오 team7의 토이프로젝트 카페입니다.",
@@ -17,7 +18,6 @@ export const waffleCafe: Cafe = {
 
 //게시판은 거의 상수처럼 사용되기 때문에 추가했습니다.
 export const BoardList = () => {
-  console.log("boardList rendered");
   const { boardList } = useWholeBoard();
   return boardList;
 };

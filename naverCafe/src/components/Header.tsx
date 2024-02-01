@@ -28,7 +28,7 @@ const TopBarDiv = styled.div`
   .link,
   .menu {
     position: relative;
-    left: 595px;
+    left: 658px;
     /* 모든 디자인 마친 뒤 left 속성 변경해야 할 것 같습니다. */
   }
   .link::after {
@@ -171,13 +171,6 @@ const Header = () => {
           <a href="">채팅</a>
         </div>
         <div className="menu">
-          <span className="userInfo">
-            <span className="userId">userIDIDIDI </span>
-            <img
-              src="https://cafe.pstatic.net/cafe4/hidden.gif"
-              alt="유저 정보"
-            />
-          </span>
           <span className="naverTalk" />
           <span className="other" />
         </div>

@@ -9,6 +9,8 @@ import { BoardType, UserInfoType } from "../../Types";
 import { useMyProfile } from "../../API/UserAPI";
 import { getUserInfo } from "../../API/UserAPI";
 
+import WaffleManagerLogo from "../../assets/waffleManagerLogo.svg";
+
 const Wrapper = styled.div`
   display: inline-block;
   width: 200px;
@@ -72,6 +74,13 @@ const CafeInfo = styled.div`
       grid-template-columns: 58px 122px;
       padding-bottom: 12px;
       border-bottom: 1px solid #ebebeb;
+
+      /* .photo {
+        img {
+          border-radius: 50%;
+          border: 1px solid;
+        }
+      } */
 
       .managerInfo {
         // manager의 프로필 사진, 이름, 개설날짜, 카페 소개 링크가 담긴 div 입니다.
@@ -164,7 +173,7 @@ const MyActivity = styled.div`
         z-index: 1;
         border-radius: 50%;
         position: absolute;
-        bottom: 0;
+        top: 41.25px;
         right: 0px;
         cursor: pointer;
       }
@@ -587,10 +596,7 @@ const SideBar = () => {
             <div className="manager">
               <div className="managerProfile">
                 <div className="photo">
-                  <img
-                    src="https://ssl.pstatic.net/static/cafe/cafe_pc/default/cafe_thumb_noimg_55.png"
-                    alt="카페 메니저 사진"
-                  />
+                  <img src={WaffleManagerLogo} alt="카페 메니저 사진" />
                 </div>
                 <div className="managerInfo">
                   <p>{waffleCafe.manager}</p>
