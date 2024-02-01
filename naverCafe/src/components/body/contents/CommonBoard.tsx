@@ -44,6 +44,10 @@ const CommonBoard = ({ board }: { board: BoardType }) => {
   }, [board]);
 
   useEffect(() => {
+    setPage(1);
+  }, [size]);
+
+  useEffect(() => {
     async function fetchArticles() {
       try {
         const fetchedArticles:ArticleBriefType = await getArticleList({

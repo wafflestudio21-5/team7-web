@@ -48,6 +48,10 @@ const TotalBoard = () => {
   }, []);
 
   useEffect(() => {
+    setPage(1);
+  }, [size]);
+
+  useEffect(() => {
     async function fetchWholeArticle() {
       try {
         const fetchedWholeArticles: ArticleBriefType = await wholeArticle(size, page);

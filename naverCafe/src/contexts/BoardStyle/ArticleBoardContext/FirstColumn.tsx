@@ -33,7 +33,7 @@ export const FirstCol = (props: {
     case "boardName":
       return (
         <StyledBoardName
-          onClick={() => navigate(`/board/${props.board.id - 1}`)}
+          onClick={() => navigate(`/board/${props.board.id}`)}
         >
           {props.board.name}
         </StyledBoardName>
