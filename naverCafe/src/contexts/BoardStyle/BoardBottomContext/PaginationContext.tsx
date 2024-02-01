@@ -15,7 +15,7 @@ interface PaginationState {
 
 export const PaginationContext = createContext<PaginationState>({
   size: 15,
-  page: 0,
+  page: 1,
   sort: "",
   totPage: 1,
   setSize: () => {},

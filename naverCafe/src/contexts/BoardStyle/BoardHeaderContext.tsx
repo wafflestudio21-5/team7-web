@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { styled } from "styled-components";
 import { likeBoard, unlikeBoard, useGetLikeBoard } from "../../API/BoardAPI";
 import { BoardType } from "../../Types";
+import { useMyProfile } from "../../API/UserAPI";
+import { useNavigate } from "react-router-dom";
 
 export const Board = styled.div`
   width: 860px;
@@ -102,43 +104,51 @@ export const PopularBoardHeader = () => {
 };
 
 export const CommonBoardHeader = ({ board }: { board: BoardType }) => {
+  const { myProfile } = useMyProfile();
+  const navigate = useNavigate();
   const { favList, refetch } = useGetLikeBoard();
   const [isFav, setIsFav] = useState(
     favList && favList.boards.some((b) => b.id === board.id)
   );
 
   const handleFavBoard = async () => {
-    const newFavStatus = !isFav;
+    if (myProfile) {
+      const newFavStatus = !isFav;
 
-    console.log(`isFav val: ${isFav}`);
-    console.log(`newFavStat val: ${newFavStatus}`);
+      console.log(`isFav val: ${isFav}`);
+      console.log(`newFavStat val: ${newFavStatus}`);
 
-    if (isFav) {
-      await unlikeBoard(board.id);
+      if (isFav) {
+        await unlikeBoard(board.id);
+      } else {
+        await likeBoard(board.id);
+      }
+      await refetch();
+      setIsFav(newFavStatus); //로컬에서 바로 토글 상태를 반영하기 위함
     } else {
-      await likeBoard(board.id);
+      navigate("/login");
     }
-    await refetch();
-    setIsFav(newFavStatus); //로컬에서 바로 토글 상태를 반영하기 위함
   };
 
   useEffect(() => {
-    //refetch();
-    setIsFav(favList && favList.boards.some((b) => b.id === board.id));
-    //console.log(`board: `, board, `favList: `, favList, `isFav: ${isFav}`); //isFav는 비동기적 처리로 인해 이전의 값을 출력한다.
+    if (myProfile) {
+      //refetch();
+      setIsFav(favList && favList.boards.some((b) => b.id === board.id));
+      //console.log(`board: `, board, `favList: `, favList, `isFav: ${isFav}`); //isFav는 비동기적 처리로 인해 이전의 값을 출력한다.
+    }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [board]);
 
   useEffect(() => {
-    setIsFav(favList && favList.boards.some((b) => b.id === board.id));
-    // refetch();
-    console.log(`board: `, board, `favList: `, favList, `isFav: ${isFav}`); //isFav는 비동기적 처리로 인해 이전의 값을 출력한다.
+    if (myProfile) {
+      setIsFav(favList && favList.boards.some((b) => b.id === board.id));
+      // refetch();
+      console.log(`board: `, board, `favList: `, favList, `isFav: ${isFav}`); //isFav는 비동기적 처리로 인해 이전의 값을 출력한다.
+    }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    refetch();
-  }, [refetch]);
 
   return (
     <StyledCommonBoardHeader $isFavorite={isFav ? isFav : false}>

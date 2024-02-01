@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import {
   Order,
@@ -6,6 +6,15 @@ import {
 } from "../../../components/body/contents/PopularBoard";
 import { Pagination } from "./Pagination";
 import { useEffect, useState } from "react";
+import {
+  calculatePastDateISO,
+  formatDate,
+  useSearch,
+} from "../../BoardContext/SearchContext";
+import { useMyProfile } from "../../../API/UserAPI";
+import { searchArticles } from "../../../API/SearchAPI";
+import { ArticleBriefType } from "../../../Types";
+import { usePagination } from "./PaginationContext";
 
 //TotalBoard: 페이지 넘버(페이지네이션) / 검색창 (기간 | 기준 | 검색창 | 검색버튼)
 //CommonBoard: 페이지 넘버(페이지네이션) / 검색창 (기간 | 기준 | 검색창 | 검색버튼)
@@ -15,7 +24,7 @@ const StyledBoardBottomOption = styled.div``;
 const StyledPostBtn = styled.div`
   margin-top: 9px;
   text-align: right;
-  font-size:13px;
+  font-size: 13px;
   .write {
     &::before {
       display: inline-block;
@@ -164,7 +173,11 @@ export const StyledSelectDiv = styled.div<{ $isSelected: boolean }>`
   }
 `;
 
-export const StyledUl = styled.ul<{ $isSelected: boolean; $isTerm: boolean;  $isBoard?:boolean}>`
+export const StyledUl = styled.ul<{
+  $isSelected: boolean;
+  $isTerm: boolean;
+  $isBoard?: boolean;
+}>`
   display: ${(prop) => (prop.$isSelected ? "block" : "none")};
   overflow-y: auto;
   position: absolute;
@@ -232,33 +245,146 @@ export const StyledUl = styled.ul<{ $isSelected: boolean; $isTerm: boolean;  $is
 `;
 
 const ListSearch = ({ boardId }: { boardId: number }) => {
-  //미구현: 검색창에 넘겨주기 (term, content option 넘겨줘서 해당 게시판 전체 게시물 리스트에서 search)
+  const {
+    setItem, // 검색 버튼 클릭 시 사용할 setItem 함수
+    setStartDate,
+    setEndDate,
+    setBoardOp,
+    setContentOp,
+    setTermOp,
+    boardOp,
+    contentOp,
+    termOp,
+    startDate,
+    endDate,
+    item,
+  } = useSearch();
+
+  const [localBoardOp, setLocalBoardOp] = useState(boardId);
+  const [localContentOp, setLocalContentOp] = useState(contentOp);
+  const [localTermOp, setLocalTermOp] = useState(termOp);
+  const [localStartDate, setLocalStartDate] = useState(startDate);
+  const [localEndDate, setLocalEndDate] = useState(endDate);
+  const [keyword, setKeyword] = useState(item); // 사용자 입력 검색어
+
+  const navigate = useNavigate();
 
   //기간
   const TermOption = ["전체기간", "1일", "1주", "1개월", "6개월", "1년"];
   const [isTermSelected, setIsTermSelected] = useState(false);
-  const [termOp, setTermOp] = useState(0); //TermOption의 인덱스를 저장
 
   const handleTermOp = (arg: number) => {
-    setTermOp(arg);
+    setLocalTermOp(arg);
     setIsTermSelected(!isTermSelected);
+
+    const now = new Date();
+    setLocalStartDate(calculatePastDateISO(TermOption[arg]));
+    console.log(calculatePastDateISO(TermOption[arg]));
+    setLocalEndDate(now.toISOString().split(".")[0]);
+  };
+
+  //기간 입력
+  const [firstDate, setFirstDate] = useState("2024-01-01");
+  const [secondDate, setSecondDate] = useState("2024-02-01");
+
+  const handleFirstDateChange = (e: { target: { value: string } }) => {
+    const value = e.target.value.replace(/\D/g, ""); // 숫자만 추출
+    setFirstDate(formatDate(value));
+  };
+
+  const handleSecondDateChange = (e: { target: { value: string } }) => {
+    const value = e.target.value.replace(/\D/g, ""); // 숫자만 추출
+    setSecondDate(formatDate(value));
+  };
+
+  const handleSetBtnClick = () => {
+    setLocalStartDate(firstDate + "T00:00:00");
+    setLocalEndDate(secondDate + "T23:59:59");
   };
 
   //제목, 내용
-  const ContentOption = ["제목만", "글작성자", "댓글내용", "댓글작성자"];
+  const ContentOption = [
+    "게시글 + 댓글",
+    "제목만",
+    "글작성자",
+    "댓글내용",
+    "댓글작성자",
+  ];
   const [isContentSelected, setIsContentSelected] = useState(false);
-  const [contentOp, setContentOp] = useState(0); //ContentOption의 인덱스를 저장
 
   const handleContentOp = (arg: number) => {
-    setContentOp(arg);
+    setLocalContentOp(arg);
     setIsContentSelected(!isContentSelected);
+  };
+
+  //검색
+  const { setTotPage } = usePagination();
+  const { searchRes, setSearchRes } = useSearch();
+
+  const onClickSearch = () => {
+    if (keyword.trim() === "") {
+      alert("검색어를 입력하세요");
+      return;
+    }
+
+    // useSearch 컨텍스트의 상태 업데이트
+    setItem(keyword);
+    setBoardOp(localBoardOp);
+    setContentOp(localContentOp);
+    setTermOp(localTermOp);
+    setStartDate(localStartDate);
+    setEndDate(localEndDate);
+
+    // 검색 결과 페이지로 이동
+    navigate(`/searchboard/${keyword}`);
+    handleSearch();
+  };
+
+  const handleSearch = async () => {
+    try {
+      const fetchedSearchRes: ArticleBriefType = await searchArticles({
+        size: 15,
+        page: 1,
+        boardId: boardOp,
+        item: keyword,
+        contentOp,
+        startDate,
+        endDate,
+        wordInclude: "",
+        wordExclude: "",
+      });
+      setSearchRes(fetchedSearchRes.content);
+      setTotPage(fetchedSearchRes.totalPages);
+    } catch (err) {
+      console.log("Error fetching SearchRes in BoardBottomOption");
+    }
   };
 
   //게시판이 바뀔 때마다 초기화
   useEffect(() => {
-    setTermOp(0);
-    setContentOp(0);
-  }, [boardId]);
+    if (boardOp !== boardId) {
+      setTermOp(0);
+      setContentOp(0);
+      setBoardOp(boardId);
+      setItem("");
+
+      setLocalBoardOp(boardId);
+      setLocalContentOp(0);
+      setLocalTermOp(0);
+      setLocalStartDate("2024-01-01");
+      setLocalEndDate("2024-02-01");
+      setKeyword("");
+    }
+  }, [boardId, setBoardOp, setContentOp, setTermOp]);
+
+  useEffect(() => {
+    setLocalBoardOp(boardOp);
+    setLocalContentOp(contentOp);
+    setTermOp(termOp);
+    setLocalStartDate(startDate);
+    setLocalEndDate(endDate);
+    setKeyword(item);
+  }, [searchRes]);
 
   return (
     <StyledListSearch>
@@ -273,7 +399,7 @@ const ListSearch = ({ boardId }: { boardId: number }) => {
             setIsContentSelected(false);
           }}
         >
-          {TermOption[termOp]}
+          {TermOption[localTermOp]}
         </p>
         <StyledUl
           className="select_list"
@@ -292,15 +418,19 @@ const ListSearch = ({ boardId }: { boardId: number }) => {
                 type="text"
                 className="input_1"
                 maxLength={10}
-                value="2017-12-28"
+                value={firstDate}
+                onChange={handleFirstDateChange}
               />
               <input
                 type="text"
                 className="input_2"
                 maxLength={10}
-                value="2018-01-03"
+                value={secondDate}
+                onChange={handleSecondDateChange}
               />
-              <button className="btn_set">설정</button>
+              <button className="btn_set" onClick={handleSetBtnClick}>
+                설정
+              </button>
             </div>
           </li>
         </StyledUl>
@@ -316,7 +446,7 @@ const ListSearch = ({ boardId }: { boardId: number }) => {
             setIsTermSelected(false);
           }}
         >
-          {ContentOption[contentOp]}
+          {ContentOption[localContentOp]}
         </p>
         <StyledUl $isSelected={isContentSelected} $isTerm={false}>
           {ContentOption.map((option, index) => (
@@ -328,18 +458,32 @@ const ListSearch = ({ boardId }: { boardId: number }) => {
       </StyledSelectDiv>
       <div className="input_search_area">
         <div className="input_component">
-          <input type="text" placeholder="검색어를 입력해주세요"></input>
+          <input
+            type="text"
+            placeholder="검색어를 입력해주세요"
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+          ></input>
         </div>
-        <button className="btn-search-grean">검색</button>
+        <button className="btn-search-grean" onClick={() => onClickSearch()}>
+          검색
+        </button>
       </div>
     </StyledListSearch>
   );
 };
 
-export const BoardBottomOption = ({ boardId, noPost }: { boardId: number; noPost?: boolean; }) => {
+export const BoardBottomOption = ({
+  boardId,
+  noPost,
+}: {
+  boardId: number;
+  noPost?: boolean;
+}) => {
+  const { myProfile } = useMyProfile();
   return (
     <StyledBoardBottomOption>
-      {noPost ? null : <PostBtn />}
+      {noPost || !myProfile ? null : <PostBtn />}
       <Pagination />
       <ListSearch boardId={boardId} />
     </StyledBoardBottomOption>

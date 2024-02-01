@@ -131,14 +131,14 @@ export const NoticeTr = ({
               >
                 {notice.title}
               </span>
-              <span
+              {notice.commentCount !== 0 ? <span
                 className="comment"
                 onClick={() => navigate(`/articles/${notice.id}`)}
               >
                 {" ["}
                 <em>{notice.commentCount}</em>
                 {"] "}
-              </span>
+              </span> : null}
             </div>
           </div>
         </div>
