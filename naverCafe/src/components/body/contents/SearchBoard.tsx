@@ -19,7 +19,6 @@ import {
   formatDate,
   useSearch,
 } from "../../../contexts/BoardContext/SearchContext";
-import { useLocation } from "react-router-dom";
 
 //BoardBottomOption 의 ListSearch를 재활용하고 싶지만...
 const StyledSearchInput = styled.div`
@@ -304,7 +303,13 @@ const SearchTopDiv = ({ searchBody }: { searchBody: SearchBody }) => {
   };
 
   //제목, 내용
-  const ContentOption = ["게시글 + 댓글","제목만", "글작성자", "댓글내용", "댓글작성자"];
+  const ContentOption = [
+    "게시글 + 댓글",
+    "제목만",
+    "글작성자",
+    "댓글내용",
+    "댓글작성자",
+  ];
   const [isContentSelected, setIsContentSelected] = useState(false);
   const { contentOp, setContentOp } = searchBody; //ContentOption의 인덱스를 저장
 
@@ -592,7 +597,6 @@ const SearchBoard = () => {
 
   const { searchRes, setSearchRes } = useSearch();
   //const location = useLocation();
-
 
   const searchBody = {
     size,
