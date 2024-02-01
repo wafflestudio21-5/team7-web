@@ -1,8 +1,9 @@
 import styled, { css } from "styled-components";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../API/UserAPI";
+import axios from "axios";
 
 const Wrapper = styled.div`
   width: 458px;
@@ -339,6 +340,33 @@ const Login = () => {
 
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const getCodeFromURL = () => {
+      const code = new URL(window.location.href).searchParams.get("code");
+      if (code) {
+        // If code exists in the URL, send a request to exchange it for an access token
+        exchangeCodeForToken(code);
+      }
+    };
+
+    const exchangeCodeForToken = async (code: string) => {
+      try {
+        const tokenResponse = await axios.get(
+          `http://localhost:8080/api/v1/auth/socialSignin/naver?code=${code}`
+        );
+        const tokenData = await tokenResponse.data;
+        // Save the access token to localStorage
+        localStorage.setItem("accessToken", tokenData.access_token);
+        // Clear the URL query string to remove the code parameter
+        window.history.replaceState({}, document.title, "/");
+      } catch (error) {
+        console.error("Error exchanging code for token:", error);
+      }
+    };
+
+    getCodeFromURL();
+  }, []);
+
   const handleLogin = async () => {
     setIsErrorOnBoth(false);
     if (inputUsername.length == 0) {
@@ -454,7 +482,7 @@ const Login = () => {
           ) : (
             <SocialLogin>
               <button>
-                <a href="https://nid.naver.com/oauth2.0/authorize?client_id=OemkbWdkEHFr93oA3sxR&redirect_uri=http://localhost:8080/api/v1/auth/socialSignin/naver&response_type=code&state=STATE_STRING">
+                <a href="https://nid.naver.com/oauth2.0/authorize?client_id=OemkbWdkEHFr93oA3sxR&redirect_uri=http://localhost:5173&response_type=code&state=STATE_STRING">
                   Naver 아이디로 로그인
                 </a>
               </button>

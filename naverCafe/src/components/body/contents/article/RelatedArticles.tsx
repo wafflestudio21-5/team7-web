@@ -1,8 +1,9 @@
 import styled from "styled-components";
 import { Link } from "react-router-dom";
-import { useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import newArticleIcon from "../../../../assets/relatedArticle-newArticleIcon.svg";
-import { useArticleList } from "../../../../API/BoardAPI";
+import { getArticleList } from "../../../../API/BoardAPI";
+import { ArticleBriefType, ArticleType } from "../../../../Types";
 
 const Wrapper = styled.div`
   position: relative;
@@ -12,6 +13,31 @@ const Wrapper = styled.div`
     margin: 0 0 11px;
     font-size: 17px;
     text-align: left;
+  }
+  & > .pageButtons {
+    display: flex;
+    justify-content: center;
+    position: relative;
+    button {
+      background-color: inherit;
+      border: none;
+      font-size: 13px;
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      box-sizing: border-box;
+      margin: 0 4px;
+    }
+    button:hover {
+      background-color: #f0f0f0;
+    }
+    & > li > .active {
+      font-weight: 700;
+      background-color: #e5e7ea;
+      &:hover {
+        background-color: #d8d9dc;
+      }
+    }
   }
 `;
 const RelatedArticle = styled.li<{ $isArticleFocused: boolean }>`
@@ -60,88 +86,6 @@ const RelatedArticle = styled.li<{ $isArticleFocused: boolean }>`
     }
   }
 `;
-// const ArticleListContainer = styled.div<{
-//   $articleListOnActive: number | null;
-// }>`
-//   & > .buttons {
-//     button {
-//       background-color: inherit;
-//       border: none;
-//       font-size: 13px;
-//       width: 24px;
-//       height: 24px;
-//       border-radius: 4px;
-//       box-sizing: border-box;
-//       margin: 0 4px;
-//     }
-//   }
-
-//   ${(props) => {
-//     if (props.$articleListOnActive === 1) {
-//       return css`
-//         & > .buttons {
-//           button {
-//             &:not(.firstButton):hover {
-//               background-color: #f0f0f0;
-//             }
-//           }
-//           & > .firstButton {
-//             font-weight: 700;
-//             background-color: #e5e7ea;
-//             &:hover {
-//               background-color: #d8d9dc;
-//             }
-//           }
-//         }
-//         & > .relatedArticleList:not(.first) {
-//           display: none;
-//         }
-//       `;
-//     } else if (props.$articleListOnActive === 2) {
-//       return css`
-//         & > .buttons {
-//           button {
-//             &:not(.secondButton):hover {
-//               background-color: #f0f0f0;
-//             }
-//           }
-//           & > .secondButton {
-//             font-weight: 700;
-//             background-color: #e5e7ea;
-//             &:hover {
-//               background-color: #d8d9dc;
-//             }
-//           }
-//         }
-//         & > .relatedArticleList:not(.second) {
-//           display: none;
-//         }
-//       `;
-//     } else if (props.$articleListOnActive === 3) {
-//       return css`
-//         & > .buttons {
-//           button {
-//             &:not(.thirdButton):hover {
-//               background-color: #f0f0f0;
-//             }
-//           }
-//           & > .thirdButton {
-//             font-weight: 700;
-//             background-color: #e5e7ea;
-//             &:hover {
-//               background-color: #d8d9dc;
-//             }
-//           }
-//         }
-//         & > .relatedArticleList:not(.third) {
-//           display: none;
-//         }
-//       `;
-//     } else {
-//       return css``;
-//     }
-//   }}
-// `;
 
 // 로컬에서 테스트를 위한 데이터입니다.
 // const exampleArticleList = {
@@ -359,11 +303,64 @@ const RelatedArticles = ({
   boardName,
   scrollToTop,
 }: PropsRelatedArticles) => {
-  const { articleList } = useArticleList({ boardId: boardId });
-  console.log(articleList);
-  // const [onActiveButtonNumber, setOnActiveButtonNumber] = useState<
-  //   number | null
-  // >(1);
+  const [pageNumber, setPageNumber] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+
+  // pageNumber가 바뀔 때 articleList를 설정합니다.
+  const [articleList, setArticleList] = useState<ArticleBriefType | null>(null);
+  useEffect(() => {
+    getArticleList({ boardId: boardId, page: pageNumber, size: 5 }).then(
+      (res) => {
+        setArticleList(res);
+        setTotalPages(res.totalPages);
+      }
+    );
+  }, [pageNumber]);
+
+  // 맨 처음, 보고 있는 article이 포함된 page를 찾습니다.
+  const findArticlePage = useCallback(async () => {
+    for (let i = 0; i < totalPages; i++) {
+      const data = await getArticleList({
+        boardId: boardId,
+        page: i + 1,
+        size: 5,
+      });
+      if (
+        data.content.filter(
+          (article: ArticleType) => article.id === Number(articleId)
+        ).length !== 0
+      ) {
+        return i + 1;
+      } else {
+        continue;
+      }
+    }
+  }, [totalPages, articleId]);
+
+  useEffect(() => {
+    findArticlePage().then((res) => {
+      if (res) {
+        setPageNumber(res);
+      }
+    });
+  }, [totalPages, articleId]);
+
+  // pagination button 들입니다.
+  const pageButtons = Array.from({ length: totalPages }).map((_, index) => {
+    return totalPages === 1 ? null : (
+      <li key={index} className="pageButtonWrap">
+        <button
+          className={
+            pageNumber === index + 1 ? "pageButton active" : "pageButton"
+          }
+          onClick={() => setPageNumber(index + 1)}
+        >
+          {index + 1}
+        </button>
+      </li>
+    );
+  });
+
   // article이 새로운 article인지 아닌지 판단하는 함수입니다.
   const isNewArticle = (createdAt: string) => {
     const dateNow = new Date();
@@ -380,9 +377,10 @@ const RelatedArticles = ({
       return false;
     }
   };
+
   // 페이지네이션 관련 리팩토링...
   const relatedArticleList = useMemo(() => {
-    return articleList?.articleBrief.map((article) => (
+    return articleList?.content.map((article) => (
       <RelatedArticle
         $isArticleFocused={Number(articleId) === article.id ? true : false}
         key={article.id}
@@ -425,126 +423,11 @@ const RelatedArticles = ({
     ));
   }, [articleId, articleList, scrollToTop]);
 
-  // const handleRelatedArticleList = () => {
-  //   // 최종적으로 리턴할 article 배열이 담긴 JSX.Element 입니다.
-  //   const newRelatedArticles = (upperLimitIndex: number) => {
-  //     if (relatedArticleList) {
-  //       if (upperLimitIndex >= 10) {
-  //         return (
-  //           <ArticleListContainer $articleListOnActive={onActiveButtonNumber}>
-  //             <ul className="relatedArticleList third">
-  //               {relatedArticleList
-  //                 .slice(
-  //                   upperLimitIndex - 14 < 0 ? 0 : upperLimitIndex - 14,
-  //                   upperLimitIndex - 9
-  //                 )
-  //                 .reverse()}
-  //             </ul>
-  //             <ul className="relatedArticleList second">
-  //               {relatedArticleList
-  //                 .slice(upperLimitIndex - 9, upperLimitIndex - 4)
-  //                 .reverse()}
-  //             </ul>
-  //             <ul className="relatedArticleList first">
-  //               {relatedArticleList
-  //                 .slice(upperLimitIndex - 4, upperLimitIndex + 1)
-  //                 .reverse()}
-  //             </ul>
-  //             <div className="buttons">
-  //               <button
-  //                 className="firstButton"
-  //                 onClick={() => setOnActiveButtonNumber(1)}
-  //               >
-  //                 1
-  //               </button>
-  //               <button
-  //                 className="secondButton"
-  //                 onClick={() => setOnActiveButtonNumber(2)}
-  //               >
-  //                 2
-  //               </button>
-  //               <button
-  //                 className="thirdButton"
-  //                 onClick={() => setOnActiveButtonNumber(3)}
-  //               >
-  //                 3
-  //               </button>
-  //             </div>
-  //           </ArticleListContainer>
-  //         );
-  //       } else if (5 <= upperLimitIndex && upperLimitIndex < 10) {
-  //         return (
-  //           <ArticleListContainer $articleListOnActive={onActiveButtonNumber}>
-  //             <ul className="relatedArticleList second">
-  //               {relatedArticleList.slice(0, upperLimitIndex - 4).reverse()}
-  //             </ul>
-  //             <ul className="relatedArticleList first">
-  //               {relatedArticleList
-  //                 .slice(upperLimitIndex - 4, upperLimitIndex + 1)
-  //                 .reverse()}
-  //             </ul>
-  //             <div className="buttons">
-  //               <button
-  //                 className="firstButton"
-  //                 onClick={() => setOnActiveButtonNumber(1)}
-  //               >
-  //                 1
-  //               </button>
-  //               <button
-  //                 className="secondButton"
-  //                 onClick={() => setOnActiveButtonNumber(2)}
-  //               >
-  //                 2
-  //               </button>
-  //             </div>
-  //           </ArticleListContainer>
-  //         );
-  //       } else {
-  //         return (
-  //           <ArticleListContainer $articleListOnActive={onActiveButtonNumber}>
-  //             <ul className="relatedArticleList first">
-  //               {relatedArticleList
-  //                 .slice(
-  //                   upperLimitIndex - 4 < 0 ? 0 : upperLimitIndex - 4,
-  //                   upperLimitIndex === 2
-  //                     ? 5
-  //                     : upperLimitIndex === 3
-  //                     ? 5
-  //                     : upperLimitIndex + 1
-  //                 )
-  //                 .reverse()}
-  //             </ul>
-  //           </ArticleListContainer>
-  //         );
-  //       }
-  //     }
-  //   };
-  //   if (articleId) {
-  //     // 현재 보고 있는 article이 전체 article list에서 몇번째 index에 있는지 조사합니다.
-  //     const articleIndex = articleList?.articleBrief.findIndex(
-  //       (article) => article.id === Number(articleId)
-  //     );
-  //     if (articleIndex) {
-  //       if (articleList?.articleBrief[articleIndex + 2] !== undefined) {
-  //         return newRelatedArticles(articleIndex + 2);
-  //       } else if (articleList?.articleBrief[articleIndex + 1] !== undefined) {
-  //         return newRelatedArticles(articleIndex + 1);
-  //       } else {
-  //         return newRelatedArticles(articleIndex);
-  //       }
-  //     } else {
-  //       return null;
-  //     }
-  //   }
-  //   // 보여줄 related article index의 '상한'(더욱 최신글)을 조사하고, 이에 따라 pagination button 개수와 보여줄 article을 정합니다.
-  // };
-
-  // pagination refactoring
-
   return (
     <Wrapper>
       <h2>"{boardName}" 게시판 글</h2>
       <div>{relatedArticleList}</div>
+      <ul className="pageButtons">{pageButtons}</ul>
     </Wrapper>
   );
 };

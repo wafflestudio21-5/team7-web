@@ -38,7 +38,7 @@ export type ArticleBriefType = {
   last: boolean;
   size: number;
   number: number;
-  sort: { empty: boolean; unsorted: boolean; sorted: boolean; };
+  sort: { empty: boolean; unsorted: boolean; sorted: boolean };
   numberOfElements: number;
   first: boolean;
   empty: boolean;
@@ -46,7 +46,7 @@ export type ArticleBriefType = {
 export type ArticleType = {
   id: number;
   title: string;
-  content: string;
+  content?: string;
   createdAt: string;
   viewCount: number;
   likeCount: number;
@@ -60,7 +60,7 @@ export type ArticleType = {
     visitCount: number;
     articlesCount: number;
     commentsCount: number;
-    accessToken?: string;
+    accessToken: string;
   };
   board: {
     id: number;
@@ -90,6 +90,34 @@ export type CommentType = {
     isSecret: boolean;
   }[];
   isSecret: boolean;
+};
+export type CommentBriefType = {
+  id: number;
+  articleId: number;
+  content: string;
+  nickname: string;
+  lastModified: string;
+  articleTitle: string;
+  articleCommentCnt: number;
+};
+
+export type CommentedArticleType = {
+  id: number;
+  title: string;
+  createdAt: string;
+  viewCnt: number;
+  commentCnt: number;
+  authorNickname: string;
+};
+export type UserInfoType = {
+  nickname: string;
+  rank: string;
+  introduction: string | null;
+  visitCount: number;
+  myArticleCount: number;
+  myCommentCount: number;
+  registerDate: string;
+  image: string | null;
 };
 
 //GET (activity)

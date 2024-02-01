@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { Link } from "react-router-dom";
+import { CommentedArticleType } from "../../../../../Types";
 
 const Wrapper = styled.li`
   display: grid;
@@ -63,40 +64,26 @@ const Wrapper = styled.li`
 `;
 
 interface PropsUserCommentedArticle {
-  article: {
-    id: number;
-    content: string;
-    last_modified: string;
-    title: string;
-    viewCount: number;
-    commentCount: number;
-  };
+  article: CommentedArticleType;
 }
 const UserCommentedArticle = ({ article }: PropsUserCommentedArticle) => {
-  // comment의 checkBox는 기능 구현이 너무 복잡할 것 같아 일단 보류하겠습니다.
-  //   const [isCheckBoxClicked, setIsCheckBoxClicked] = useState<boolean>(false);
   return (
     <Wrapper>
-      {/* 아래는 checkBox에 대한 코드입니다. 일단 주석 처리해두겠습니다. */}
-      {/* <div
-        className={isCheckBoxClicked ? "checkBoxClicked" : "checkBoxNotClicked"}
-      >
-        <span onClick={() => setIsCheckBoxClicked(!isCheckBoxClicked)} />
-      </div> */}
       <div className="left">
         <div className="articleId">{article.id}</div>
         <div className="title">
           <Link to={`/articles/${article.id}`}>{article.title}</Link>
-          <em>{`[${article.commentCount}]`}</em>
+          <em>{`[${article.commentCnt}]`}</em>
         </div>
       </div>
       <div className="right">
         <div className="date">
-          {article.last_modified
+          {article.createdAt
             .replace(/-/g, ".")
-            .replace(/T\d\d:\d\d:\d\d/, ". ")}
+            .replace(/T\d\d:\d\d:\d\d/, ". ")
+            .replace(/.\d\d\d\d\d\d/, "")}
         </div>
-        <div className="viewCount">{article.viewCount}</div>
+        <div className="viewCount">{article.viewCnt}</div>
       </div>
     </Wrapper>
   );

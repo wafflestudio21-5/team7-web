@@ -1,19 +1,18 @@
 import styled, { css } from "styled-components";
-import { useUserContext } from "../../../../contexts/UserContext";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import NotCheckedModal from "./NotCheckedModal";
+import { deleteArticle, deleteLike } from "../../../../API/ArticleAPI";
 
 const Wrapper = styled.div<{
-  $myInfoUserId: string;
-  $userInfoUserId: string;
+  $isMyInfo: boolean;
 }>`
   height: 34px;
   margin: 10px 0 20px 4px;
   position: relative;
   .auth {
     ${(props) => {
-      if (props.$myInfoUserId !== props.$userInfoUserId) {
+      if (!props.$isMyInfo) {
         return css`
           display: none;
         `;
@@ -62,30 +61,60 @@ const Wrapper = styled.div<{
       margin-left: 10px;
     }
   }
+  & > .pageButtons {
+    display: flex;
+    justify-content: center;
+    position: relative;
+    top: 58px;
+    button {
+      background-color: inherit;
+      border: none;
+      font-size: 13px;
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      box-sizing: border-box;
+      margin: 0 4px;
+    }
+    button:hover {
+      background-color: #f0f0f0;
+    }
+    & > li > .active {
+      font-weight: 700;
+      background-color: #e5e7ea;
+      &:hover {
+        background-color: #d8d9dc;
+      }
+    }
+  }
 `;
 
 interface PropsUserBottomButtons {
   id: number;
-  userInfo: {
-    userId: string;
-    username: string;
-    userNickname: string;
-    rank: number;
-    visit_count: number;
-    my_article_count: number;
-  };
+  isMyInfo: boolean;
   checkedArticleIdList: number[];
   setCheckedArticleIdList: (value: number[]) => void;
   articleIdList: number[];
+  pageNumber: number;
+  setPageNumber: (value: number) => void;
+  totalPages: number;
+  refetchUserArticles?: () => Promise<void>;
+  refetchUserLikedArticles?: () => Promise<void>;
+  setIsFirstRendering?: (value: boolean) => void;
 }
 const UserBottomButtons = ({
   id,
-  userInfo,
+  isMyInfo,
   checkedArticleIdList,
   setCheckedArticleIdList,
   articleIdList,
+  pageNumber,
+  setPageNumber,
+  totalPages,
+  refetchUserArticles,
+  refetchUserLikedArticles,
+  setIsFirstRendering,
 }: PropsUserBottomButtons) => {
-  const myInfo = useUserContext();
   const [isCheckAllArticleClicked, setIsCheckAllArticleClicked] =
     useState<boolean>(false);
   const [isNotCheckedModalOpen, setIsNotCheckedModalOpen] =
@@ -111,28 +140,69 @@ const UserBottomButtons = ({
     }
   }, [articleIdList, checkedArticleIdList]);
 
-  const handleDeleteArticles = () => {
+  const handleDeleteArticles = async () => {
     if (checkedArticleIdList.length === 0) {
       setIsNotCheckedModalOpen(true);
     } else {
-      if (id === 0) {
+      if (id === 0 && refetchUserArticles && setIsFirstRendering) {
         alert("게시글을 삭제하시겠습니까?");
-        //   checkedArticleIdList?.map((articleId) => {
-        //     // delete요청
-        //   });
-      } else if (id === 3) {
+        // await Promise.all을 해주어야지 article 삭제 작업이 완전히 완료될 때까지 기다렸다가 다음 코드가 실행됨
+        // 만약 그냥 map(async () => await ~~) 이라면, 삭제 작업 각각은 비동기처리가 되기에, 아래의 await refetch 함수가 동기적으로 먼저 처리되게 됨
+        // 그렇기에, refetch(비동기의 동기적 처리) => article 삭제(비동기) 순이 되므로, await Promise.all()을 해주는 것이 맞음
+        await Promise.all(
+          checkedArticleIdList.map((articleId) => {
+            return deleteArticle(articleId);
+          })
+          // map 함수의 callback으로 async-await 함수가 들어가도 되는 이유: async 함수는 promise를 리턴하기 때문 -> await Promise.all은 배열의 모든 promise가 처리될 때까지 기다리기에 모든 작업을 기다려준다.
+          // async 함수인데, await을 붙이지 않은 그냥 deleteArticle()만 실행했을 때 안되는 이유: map의 callback함수가 () => void이므로, promise를 반환하는 것이 아닌, void를 반환하기 때문 => promise.all이 인식을 못함
+          // async - await callback과 같은 효과로, 그냥 promise를 반환하는 callback
+        );
+        setCheckedArticleIdList([]);
+        setPageNumber(1);
+        setIsFirstRendering(true);
+        await refetchUserArticles();
+      } else if (id === 3 && refetchUserLikedArticles && setIsFirstRendering) {
         alert("좋아요를 취소하시겠습니까?");
-        //   checkedArticleIdList?.map((articleId) => {
-        //     // delete요청
-        //   });
+        await Promise.all(
+          checkedArticleIdList.map((articleId) => {
+            return deleteLike(articleId);
+          })
+        );
+        setCheckedArticleIdList([]);
+        setPageNumber(1);
+        setIsFirstRendering(true);
+        await refetchUserLikedArticles();
       }
       setCheckedArticleIdList([]);
     }
   };
 
+  // pagination buttons입니다.
+  const pageButtons =
+    totalPages === 1
+      ? null
+      : Array.from({ length: totalPages }, (_, index) => (
+          <li key={index}>
+            <button
+              className={
+                pageNumber === index + 1
+                  ? "pageButton active"
+                  : "pageButton inactive"
+              }
+              onClick={() => {
+                setPageNumber(index + 1);
+                setCheckedArticleIdList([]);
+              }}
+            >
+              {index + 1}
+            </button>
+          </li>
+        ));
+  console.log(totalPages);
+
   if (id === 0) {
     return (
-      <Wrapper $myInfoUserId={myInfo.userId} $userInfoUserId={userInfo.userId}>
+      <Wrapper $isMyInfo={isMyInfo}>
         {isNotCheckedModalOpen ? (
           <NotCheckedModal
             setIsNotCheckedModalOpen={setIsNotCheckedModalOpen}
@@ -157,11 +227,12 @@ const UserBottomButtons = ({
             </button>
           </div>
         </div>
+        <div className="pageButtons">{pageButtons}</div>
       </Wrapper>
     );
   } else if (id === 1) {
     return (
-      <Wrapper $myInfoUserId={myInfo.userId} $userInfoUserId={userInfo.userId}>
+      <Wrapper $isMyInfo={isMyInfo}>
         <div className="right">
           <div className="writeArticle">
             <button>
@@ -169,21 +240,23 @@ const UserBottomButtons = ({
             </button>
           </div>
         </div>
+        <div className="pageButtons">{pageButtons}</div>
       </Wrapper>
     );
   } else if (id === 2) {
     return (
-      <Wrapper $myInfoUserId={myInfo.userId} $userInfoUserId={userInfo.userId}>
+      <Wrapper $isMyInfo={isMyInfo}>
         <div className="right">
           <div className="writeArticle">
             <button>글쓰기</button>
           </div>
         </div>
+        <div className="pageButtons">{pageButtons}</div>
       </Wrapper>
     );
   } else {
     return (
-      <Wrapper $myInfoUserId={myInfo.userId} $userInfoUserId={userInfo.userId}>
+      <Wrapper $isMyInfo={isMyInfo}>
         {isNotCheckedModalOpen ? (
           <NotCheckedModal
             setIsNotCheckedModalOpen={setIsNotCheckedModalOpen}
@@ -206,6 +279,7 @@ const UserBottomButtons = ({
             <button>글쓰기</button>
           </div>
         </div>
+        <div className="pageButtons">{pageButtons}</div>
       </Wrapper>
     );
   }
