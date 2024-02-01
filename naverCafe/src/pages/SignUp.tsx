@@ -366,7 +366,7 @@ type FinalError = {
 const SignUp = () => {
   const [userName, setUserName] = useState<string>("");
   const [userPassword, setUserPassword] = useState<string>("");
-  const [userEmail, setUserEmail] = useState<string|null>(null);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
   const [name, setName] = useState<string>("");
   const [userBirth, setUserBirth] = useState<string>("");
   const [userPhoneNumber, setUserPhoneNumber] = useState<string>("");
@@ -416,7 +416,7 @@ const SignUp = () => {
 
   const correctId = /^[a-z0-9_-]{5,20}$/;
   const correctPassword =
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,16}$/;
+    /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()\-_+=])[a-zA-Z\d!@#$%^&*()\-_+=]{8,16}$/;
   const correctEmail = /^[a-zA-Z0-9_]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   const correctName = /^[가-힣A-Za-z]+$/;
   const correctBirth =
