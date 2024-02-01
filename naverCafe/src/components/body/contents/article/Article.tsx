@@ -2,13 +2,16 @@ import styled, { css } from "styled-components";
 import { useParams, Link, useLocation } from "react-router-dom";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import CommentBox from "./comment/CommentBox";
-import RelatedArticles from "./RelatedArticles";
+import upIcon from "../../../../assets/article-upIcon.svg";
 import commentIcon from "../../../../assets/article-commentIcon.svg";
 import shareIcon from "../../../../assets/article-shareIcon.svg";
 import writeArticleIcon from "../../../../assets/article-writeArticleIcon.svg";
 import upTriangle from "../../../../assets/article-upTriangleIcon.svg";
+
+import CommentBox from "./comment/CommentBox";
 import ShareModal from "./ShareModal";
+import RelatedArticles from "./RelatedArticles";
+
 import {
   addLike,
   deleteArticle,
@@ -38,13 +41,10 @@ const ArticleTopButtons = styled.div`
   padding: 0 0 14px;
   box-sizing: border-box;
   position: relative;
-  .auth {
-  }
-
   button {
     min-width: 46px;
     height: 36px;
-    padding: 0 12px;
+    padding: 0 12px 0 6px;
     font-size: 13px;
     line-height: 36px;
     border: 1px solid transparent;
@@ -52,7 +52,19 @@ const ArticleTopButtons = styled.div`
     background: #eff0f2;
     color: #000;
     font-weight: 700;
+    position: relative;
     cursor: pointer;
+    & > img {
+      width: 20px;
+      position: relative;
+      top: 5px;
+    }
+    &.nextArticle img {
+      rotate: calc(180deg);
+    }
+    &.articleList {
+      padding: 0 12px;
+    }
     & > a {
       width: 100%;
     }
@@ -322,51 +334,6 @@ const AdvertArea = styled.div`
   border: 1px solid #ebecef;
 `;
 
-// 로컬에서 테스트하기 위한 데이터입니다.
-// const exampleArticle = {
-//   id: 1,
-//   title: "안녕하세요",
-//   content: "이것은 내용입니다.",
-//   created_at: "2024-01-14T12:00:00",
-//   view_cnt: 23,
-//   like_cnt: 1,
-//   user: {
-//     username: "조현우",
-//     user_id: "subakbro123",
-//   },
-//   board: {
-//     board_id: 3,
-//     board_name: "자유게시판",
-//   },
-//   allow_comments: true,
-//   is_notification: false,
-// };
-// const exampleComment = {
-//   comments: [
-//     {
-//       id: 1,
-//       content: "안녕하세요 반갑습니다.",
-//       created_at: "2024-01-14T12:30:45",
-//       username: "dodo",
-//       reComments: [
-//         {
-//           id: 101,
-//           content: "댓글 달아주셔서 감사합니다.",
-//           created_at: "2024-01-14T12:35:00",
-//           username: "subakbro123",
-//         },
-//       ],
-//     },
-//     {
-//       id: 2,
-//       content: "잘 부탁드립니다.",
-//       created_at: "2024-01-14T12:45:55",
-//       username: "testAccount",
-//       reComments: [],
-//     },
-//   ],
-// };
-
 const Article = () => {
   const { articleId } = useParams();
   const navigate = useNavigate();
@@ -387,7 +354,7 @@ const Article = () => {
     if (article && myProfile) {
       return myProfile?.nickname === article?.article.author.nickname;
     } else {
-      return null;
+      return false;
     }
   }, [article, myProfile]);
   // TOP 버튼을 눌렀을 때 위로 스크롤합니다.
@@ -419,18 +386,28 @@ const Article = () => {
 
   // 좋아요 기능을 다룹니다.
   const handleLikes = async () => {
-    if (isArticleLiked) {
-      // 이미 좋아요 -> 좋아요 취소 인 경우
-      setIsArticleLiked(false);
-      await deleteLike(Number(articleId));
-      // 추가로 좋아요 -1 -> article의 refetch로서..
-      await refetchArticle();
+    if (myProfile === null) {
+      if (
+        confirm(
+          "이 기능은 로그인해야만 사용할 수 있습니다.\n로그인하시겠습니까?"
+        ) === true
+      ) {
+        navigate("/login");
+      }
     } else {
-      // 새롭게 좋아요를 누르는 경우
-      setIsArticleLiked(true);
-      await addLike(Number(articleId));
-      // 추가로 좋아요 +1 -> article의 refetch로서 전체 데이터 업데이트
-      await refetchArticle();
+      if (isArticleLiked) {
+        // 이미 좋아요 -> 좋아요 취소 인 경우
+        setIsArticleLiked(false);
+        await deleteLike(Number(articleId));
+        // 추가로 좋아요 -1 -> article의 refetch로서..
+        await refetchArticle();
+      } else {
+        // 새롭게 좋아요를 누르는 경우
+        setIsArticleLiked(true);
+        await addLike(Number(articleId));
+        // 추가로 좋아요 +1 -> article의 refetch로서 전체 데이터 업데이트
+        await refetchArticle();
+      }
     }
   };
 
@@ -457,13 +434,7 @@ const Article = () => {
       .catch((err) => console.error(err));
   };
 
-  if (
-    article &&
-    article.article.content &&
-    articleId &&
-    comments &&
-    isMyArticle !== null
-  ) {
+  if (article && article.article.content && articleId && comments) {
     return (
       <Wrapper $isMyArticle={isMyArticle}>
         <ArticleTopButtons ref={TopButtonsRef}>
@@ -493,14 +464,19 @@ const Article = () => {
             </button>
           </div>
           <div className="right">
-            <button className="prevArticle">
-              {" "}
-              <Link to={"/"}>이전글</Link>
-            </button>
-            <button className="nextArticle">
-              <Link to={"/"}>다음글</Link>
-            </button>
-            <button className="ArticleList">
+            {article.prevId ? (
+              <button className="prevArticle">
+                <img src={upIcon} alt="이전글" />
+                <Link to={`/articles/${article.prevId}`}>이전글</Link>
+              </button>
+            ) : null}
+            {article.nextId ? (
+              <button className="nextArticle">
+                <img src={upIcon} alt="다음글" />
+                <Link to={`/articles/${article.nextId}`}>다음글</Link>
+              </button>
+            ) : null}
+            <button className="articleList">
               <Link to={`/board/${article?.article.board.id}`}>목록</Link>
             </button>
           </div>
@@ -620,26 +596,29 @@ const Article = () => {
             </div>
           </ArticleFooter>
           <div className="comments" ref={CommentsRef}>
-            <CommentBox
-              articleId={articleId}
-              comments={comments.comments}
-              refetchComments={refetchComments}
-            />
+            {myProfile ? (
+              <CommentBox
+                articleId={articleId}
+                comments={comments.comments}
+                refetchComments={refetchComments}
+              />
+            ) : null}
           </div>
         </ArticleBox>
         <ArticleBottomButtons>
           <div className="left">
-            <button
-              className="writeArticle"
-              onClick={() => {
-                navigate("/write");
-              }}
-            >
-              <img src={writeArticleIcon} alt="글쓰기 아이콘" />
-              <span>글쓰기</span>
-            </button>
-            {/* <button className="reArticle">답글</button> */}
-            {/* 답글 기능은 없는 거 같아 일단 제외하겠습니다. */}
+            {myProfile ? (
+              <button
+                className="writeArticle"
+                onClick={() => {
+                  navigate("/write");
+                }}
+              >
+                <img src={writeArticleIcon} alt="글쓰기 아이콘" />
+                <span>글쓰기</span>
+              </button>
+            ) : null}
+
             <button
               className="edit auth"
               onClick={() => {

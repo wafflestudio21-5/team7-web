@@ -189,7 +189,10 @@ const UserBottomButtons = ({
                   ? "pageButton active"
                   : "pageButton inactive"
               }
-              onClick={() => setPageNumber(index + 1)}
+              onClick={() => {
+                setPageNumber(index + 1);
+                setCheckedArticleIdList([]);
+              }}
             >
               {index + 1}
             </button>

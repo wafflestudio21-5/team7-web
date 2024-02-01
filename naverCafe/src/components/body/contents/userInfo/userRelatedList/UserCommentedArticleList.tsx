@@ -53,7 +53,7 @@ const UserCommentedArticleList = ({
         <div className="list">
           {userCommentedArticleList.length !== 0 ? (
             userCommentedArticleList.map((article) => (
-              <UserCommentedArticle article={article} />
+              <UserCommentedArticle key={article.id} article={article} />
             ))
           ) : (
             <div className="noArticlesMessage">
