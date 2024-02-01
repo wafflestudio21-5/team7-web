@@ -88,26 +88,6 @@ const Wrapper = styled.div<{
   }
 `;
 
-// 로컬에서 테스트를 위한 데이터입니다.
-// const exampleArticle = {
-//   id: 1,
-//   title: "안녕하세요",
-//   content: "이것은 내용입니다.",
-//   created_at: "2024-01-14T12:00:00",
-//   view_cnt: 23,
-//   like_cnt: 1,
-//   user: {
-//     username: "조현우",
-//     user_id: "subakbro123",
-//   },
-//   board: {
-//     board_id: 3,
-//     board_name: "자유게시판",
-//   },
-//   allow_comments: true,
-//   is_notification: false,
-// };
-
 interface PropsCommentWriter {
   articleId: string | undefined;
   setIsCommentWriterOpen?: (value: boolean) => void;

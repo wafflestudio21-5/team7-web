@@ -517,25 +517,6 @@ const SignUp = () => {
   const [isAuthPaperNeverClicked, setIsAuthPaperNeverClicked] =
     useState<boolean>(true);
 
-  // const createAccount = () => {
-  //   return axios
-  //     .post("http://localhost:8080/api/v1/signup", {
-  //       username: userName,
-  //       password: userPassword,
-  //       name: name,
-  //       email: userEmail,
-  //       birthDate: userBirth,
-  //       phoneNumber: userPhoneNumber,
-  //     })
-  //     .then((res) => {
-  //       console.log(res);
-  //       return res;
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //     });
-  // };
-
   //handleCreateAccount에서 전체 input 필드에 대한 유효성 검사를 한번에 진행하는 함수입니다.
   const validateAll = () => {
     return {
@@ -578,9 +559,9 @@ const SignUp = () => {
         username: userName,
         password: userPassword,
         name: name,
-        email: userEmail,
+        email: userEmail ? userEmail : "noEmail@noemail.com",
         birthDate: userBirth,
-        phoneNumber: userPhoneNumber,
+        phoneNumber: userPhoneNumber.replace(/-/g, ""),
       })
         .then(() => {
           navigate("/login");

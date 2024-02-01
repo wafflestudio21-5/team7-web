@@ -59,7 +59,9 @@ const UserCommentList = ({
       <Wrapper>
         <div className="list">
           {userCommentList.length !== 0 ? (
-            userCommentList.map((comment) => <UserComment comment={comment} />)
+            userCommentList.map((comment) => (
+              <UserComment key={comment.id} comment={comment} />
+            ))
           ) : (
             <div className="noArticlesMessage">댓글이 없습니다.</div>
           )}

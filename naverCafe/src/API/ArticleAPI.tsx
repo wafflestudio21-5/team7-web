@@ -66,6 +66,8 @@ export function useArticle(articleId: number) {
   const [article, setArticle] = useState<{
     article: ArticleType;
     isLiked: boolean;
+    prevId: number | null;
+    nextId: number | null;
   } | null>(null);
   const url = `/api/v1/articles/${articleId}`;
   const refetchArticle = useCallback(async () => {
@@ -80,7 +82,7 @@ export function useArticle(articleId: number) {
   useEffect(() => {
     refetchArticle();
     console.log(article);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refetchArticle]);
   return { article, refetchArticle };
 }
@@ -134,7 +136,6 @@ export async function notiArticle(): Promise<ArticleType[]> {
   }
 }
 
-
 //아직 백엔드에서 정렬이 제대로 되어 오지는 않는 것 같지만, 제대로 작동하는 것은 확인하였습니다.
 export async function hotArticle(
   HotSortType: string,
@@ -153,6 +154,6 @@ export async function hotArticle(
     return res.data.articleBrief;
   } catch (err) {
     console.log(err);
-    return {content:[]};
+    return { content: [] };
   }
 }

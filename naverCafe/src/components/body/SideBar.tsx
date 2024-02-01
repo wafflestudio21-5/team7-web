@@ -250,6 +250,9 @@ const Buttons = styled.div`
       text-decoration: underline;
     }
   }
+  button.login {
+    /* background-color: #03c75a; */
+  }
   button:last-child {
     width: 100%;
     height: 38px;
@@ -559,7 +562,23 @@ const SideBar = () => {
       <Wrapper>
         <Tab className={isCafeInfoChecked ? "cafeInfo" : "myActivity"}>
           <button onClick={() => setIsCafeInfoChecked(true)}>카페정보</button>
-          <button onClick={() => setIsCafeInfoChecked(false)}>나의활동</button>
+          <button
+            onClick={() => {
+              if (myProfile === null) {
+                if (
+                  confirm(
+                    "이 기능은 로그인해야만 사용할 수 있습니다.\n로그인하시겠습니까?"
+                  ) === true
+                ) {
+                  navigate("/login");
+                }
+              } else {
+                setIsCafeInfoChecked(false);
+              }
+            }}
+          >
+            나의활동
+          </button>
         </Tab>
         {isCafeInfoChecked ? (
           <CafeInfo>
@@ -591,7 +610,6 @@ const SideBar = () => {
               <p>
                 <span className="peopleLogo" />
                 {cafeInfo.memberCount}
-                <Link to={`/`}>초대</Link>
               </p>
             </div>
           </CafeInfo>
@@ -643,15 +661,18 @@ const SideBar = () => {
         )}
         <Buttons>
           <button
-            className="writePost"
+            className={myProfile ? "writePost" : "login"}
             onClick={() => {
-              navigate("/write");
+              if (myProfile) {
+                navigate("/write");
+              } else {
+                navigate("/login");
+              }
             }}
           >
-            카페 글쓰기
+            {myProfile ? "카페 글쓰기" : "로그인"}
           </button>
           <br />
-          <button className="cafeChat">카페 채팅</button>
         </Buttons>
         <Boards $isFavListChecked={isFavListChecked}>
           <div className="bookmarkedBoard">
