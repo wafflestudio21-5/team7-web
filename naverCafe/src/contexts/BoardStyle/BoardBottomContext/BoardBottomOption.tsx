@@ -11,6 +11,7 @@ import {
   formatDate,
   useSearch,
 } from "../../BoardContext/SearchContext";
+import { useMyProfile } from "../../../API/UserAPI";
 
 //TotalBoard: 페이지 넘버(페이지네이션) / 검색창 (기간 | 기준 | 검색창 | 검색버튼)
 //CommonBoard: 페이지 넘버(페이지네이션) / 검색창 (기간 | 기준 | 검색창 | 검색버튼)
@@ -299,13 +300,13 @@ const ListSearch = ({ boardId }: { boardId: number }) => {
   };
 
   //검색
-    const onClickSearch = () => {
-      if (item === "") {
-        alert("검색어를 입력하세요");
-      } else {
-        navigate(`/searchBoard/${item}`);
-      }
-    };
+  const onClickSearch = () => {
+    if (item === "") {
+      alert("검색어를 입력하세요");
+    } else {
+      navigate(`/searchBoard/${item}`);
+    }
+  };
 
   //게시판이 바뀔 때마다 초기화
   useEffect(() => {
@@ -396,10 +397,7 @@ const ListSearch = ({ boardId }: { boardId: number }) => {
             onChange={(e) => setItem(e.target.value)}
           ></input>
         </div>
-        <button
-          className="btn-search-grean"
-          onClick={() => onClickSearch()}
-        >
+        <button className="btn-search-grean" onClick={() => onClickSearch()}>
           검색
         </button>
       </div>
@@ -414,9 +412,10 @@ export const BoardBottomOption = ({
   boardId: number;
   noPost?: boolean;
 }) => {
+  const { myProfile } = useMyProfile();
   return (
     <StyledBoardBottomOption>
-      {noPost ? null : <PostBtn />}
+      {noPost || !myProfile ? null : <PostBtn />}
       <Pagination />
       <ListSearch boardId={boardId} />
     </StyledBoardBottomOption>

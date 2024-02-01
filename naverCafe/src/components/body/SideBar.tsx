@@ -507,7 +507,9 @@ const SideBar = () => {
   } | null>(null);
 
   useEffect(() => {
-    refetch();
+    if (myProfile) {
+      refetch();
+    }
   }, [curBoardState, isFavListChecked]);
 
   useEffect(() => {
@@ -675,49 +677,53 @@ const SideBar = () => {
           <br />
         </Buttons>
         <Boards $isFavListChecked={isFavListChecked}>
-          <div className="bookmarkedBoard">
-            <p onClick={() => setIsFavListChecked(!isFavListChecked)}>
-              <img
-                src="https://cafe.pstatic.net/cafe4/hidden.gif"
-                alt="즐겨찾기"
-              />
-              즐겨찾는 게시판
-              <img
-                src="https://cafe.pstatic.net/cafe4/hidden.gif"
-                alt="즐겨찾기 더보기"
-              />
-            </p>
-          </div>
-          <div className="bookmarkedBoardList">
-            <ul className="favBoard">
-              {favList ? (
-                favList.boards
-                  .sort((a, b) => a.id - b.id)
-                  .map((favBoard: BoardType, index: number) => (
-                    <li
-                      className="favBoard"
-                      key={index}
-                      onClick={() => navigate(`/board/${favBoard.id - 1}`)}
-                    >
-                      <img
-                        className="list"
-                        src="https://cafe.pstatic.net/cafe4/hidden.gif"
-                      />
-                      {favBoard.name}
+          {myProfile && (
+            <>
+              <div className="bookmarkedBoard">
+                <p onClick={() => setIsFavListChecked(!isFavListChecked)}>
+                  <img
+                    src="https://cafe.pstatic.net/cafe4/hidden.gif"
+                    alt="즐겨찾기"
+                  />
+                  즐겨찾는 게시판
+                  <img
+                    src="https://cafe.pstatic.net/cafe4/hidden.gif"
+                    alt="즐겨찾기 더보기"
+                  />
+                </p>
+              </div>
+              <div className="bookmarkedBoardList">
+                <ul className="favBoard">
+                  {favList && favList.boards.length > 0 ? (
+                    favList.boards
+                      .sort((a, b) => a.id - b.id)
+                      .map((favBoard: BoardType, index: number) => (
+                        <li
+                          className="favBoard"
+                          key={index}
+                          onClick={() => navigate(`/board/${favBoard.id - 1}`)}
+                        >
+                          <img
+                            className="list"
+                            src="https://cafe.pstatic.net/cafe4/hidden.gif"
+                          />
+                          {favBoard.name}
+                        </li>
+                      ))
+                  ) : (
+                    <li>
+                      <p className="favNotice">
+                        게시판 상단의{" "}
+                        <img src="https://cafe.pstatic.net/cafe4/hidden.gif" />
+                        아이콘을
+                        <br /> 클릭하시면 추가됩니다.
+                      </p>
                     </li>
-                  ))
-              ) : (
-                <li>
-                  <p className="favNotice">
-                    게시판 상단의{" "}
-                    <img src="https://cafe.pstatic.net/cafe4/hidden.gif" />
-                    아이콘을
-                    <br /> 클릭하시면 추가됩니다.
-                  </p>
-                </li>
-              )}
-            </ul>
-          </div>
+                  )}
+                </ul>
+              </div>
+            </>
+          )}
           <div className="boards">
             <StyledDiv $isCurBoard={curBoardState === 0}>
               <img

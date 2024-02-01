@@ -39,9 +39,19 @@ export const SearchContextProvider = ({
 }: {
   children: ReactNode;
 }) => {
+    const date = new Date();
+    const currentDate = new Date(date);
+
+  const pastDate = new Date(
+    currentDate.setFullYear(currentDate.getFullYear() - 200)
+  );
+  const startDateInitialValue = pastDate.toISOString().split("T")[0]; // 시간 부분을 제외하고, 날짜 부분만 사용합니다.
+
+  const [startDate, setStartDate] = useState(startDateInitialValue);
+  const [endDate, setEndDate] = useState(
+    date.toISOString().split(".")[0]
+  );
   const [item, setItem] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
   const [contentOp, setContentOp] = useState(0);
   const [boardOp, setBoardOp] = useState(0);
   const [termOp, setTermOp] = useState(0);
@@ -90,7 +100,8 @@ export function calculatePastDateISO(option: string) {
   const currentDate = new Date();
   switch (option) {
     case "전체기간":
-      return ""; // '전체기간'에 대한 특정 날짜는 없으므로 null 또는 적절한 값을 반환
+      currentDate.setFullYear(currentDate.getFullYear() - 200);
+      break;
     case "1일":
       currentDate.setDate(currentDate.getDate() - 1);
       break;

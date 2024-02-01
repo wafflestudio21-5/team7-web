@@ -25,13 +25,13 @@ export async function searchArticles({
   endDate: string;
   wordInclude: string;
   wordExclude: string;
-}) {
-  try {
-    const url =
+}) { const url =
       boardId === 0
         ? `/api/v1/search/${item}?size=${size}&page=${page}`
         : `/api/v1/boards/${boardId}/search/${item}?size=${size}&page=${page}`;
 
+  try {
+   
     const res = await axios.get(baseURL + url, {
       params: {
         searchCategory: contentOp,
@@ -48,6 +48,7 @@ export async function searchArticles({
     const data = await res.data.articleBrief;
     return data;
   } catch (err) {
-    console.log("Fetch error in searchWholeBoard:", err);
+      console.log("Fetch error in searchWholeBoard:", err);
+      console.log(url);
   }
 }

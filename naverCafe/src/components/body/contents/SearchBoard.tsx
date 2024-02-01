@@ -616,7 +616,7 @@ const SearchBoard = () => {
           size,
           page,
           boardId: boardOp,
-          item: `${item},${addItem}`,
+          item: addItem ? `${item},${addItem}` : item,
           contentOp,
           startDate,
           endDate,

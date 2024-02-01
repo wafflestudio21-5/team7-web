@@ -9,6 +9,7 @@ import { ViewOptionContext } from "../../BoardContext/ViewOptionContext";
 import { useNavigate } from "react-router-dom";
 import { notiArticle } from "../../../API/ArticleAPI";
 import { usePagination } from "../BoardBottomContext/PaginationContext";
+import { useMyProfile } from "../../../API/UserAPI";
 
 const StyledTable = styled.table<{ $brdName: boolean }>`
   width: 100%;
@@ -148,7 +149,7 @@ const StyledTbody = styled.tbody`
     text-align: center;
     padding: 100px 0;
     border-bottom: 1px solid #f2f2f2;
-    font-size:13px;
+    font-size: 13px;
   }
 `;
 
@@ -582,6 +583,7 @@ export const ArticleTable = ({
   articleList: ArticleType[];
   isLike?: boolean;
 }) => {
+  const { myProfile } = useMyProfile();
   const navigate = useNavigate();
   const { isNoticeOff } = useNoticeContext();
   const [noticeList, setNoticeList] = useState<ArticleType[]>([]);
@@ -709,14 +711,16 @@ export const ArticleTable = ({
                         </span>
                         <span></span>
 
-                        <span
-                          className="comment"
-                          onClick={() => navigate(`/articles/${article.id}`)}
-                        >
-                          {" ["}
-                          <em>{article.commentCount}</em>
-                          {"] "}
-                        </span>
+                        {article.commentCount !== 0 ? (
+                          <span
+                            className="comment"
+                            onClick={() => navigate(`/articles/${article.id}`)}
+                          >
+                            {" ["}
+                            <em>{article.commentCount}</em>
+                            {"] "}
+                          </span>
+                        ) : null}
                       </div>
                     </div>
                   </div>
@@ -726,7 +730,13 @@ export const ArticleTable = ({
                     <button>
                       <span
                         className="nickname"
-                        onClick={() => navigate(`/users/${article.author.id}`)}
+                        onClick={() => {
+                          if (myProfile) {
+                            navigate(`/users/${article.author.id}`);
+                          } else {
+                            navigate(`/login`);
+                          }
+                        }}
                       >
                         {article.author.nickname}
                       </span>
@@ -741,7 +751,11 @@ export const ArticleTable = ({
               </StyledTr>
             ))
           ))}
-        {articleList.length === 0 && <td className="noArticle" colSpan={board.likeCol ? 6 : 5}>등록된 게시글이 없습니다.</td>}
+        {articleList.length === 0 && (
+          <td className="noArticle" colSpan={board.likeCol ? 6 : 5}>
+            등록된 게시글이 없습니다.
+          </td>
+        )}
       </StyledTbody>
     </StyledTable>
   );

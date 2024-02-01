@@ -15,7 +15,7 @@ export function signup({
   username: string;
   password: string;
   name: string;
-  email: string;
+  email: string | null;
   birthDate: string;
   phoneNumber: string;
 }) {

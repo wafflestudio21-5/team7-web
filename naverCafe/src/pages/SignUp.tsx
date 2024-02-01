@@ -366,7 +366,7 @@ type FinalError = {
 const SignUp = () => {
   const [userName, setUserName] = useState<string>("");
   const [userPassword, setUserPassword] = useState<string>("");
-  const [userEmail, setUserEmail] = useState<string>("");
+  const [userEmail, setUserEmail] = useState<string|null>(null);
   const [name, setName] = useState<string>("");
   const [userBirth, setUserBirth] = useState<string>("");
   const [userPhoneNumber, setUserPhoneNumber] = useState<string>("");
@@ -432,7 +432,7 @@ const SignUp = () => {
   ) => {
     if (fieldName === "email") {
       //이메일은 필수 정보가 아니므로 비어 있어도 괜찮음
-      if (userInfo && !correctEmail.test(userEmail)) {
+      if (userInfo && !correctEmail.test(userEmail!)) {
         return errorEmailMessage[0];
       }
       return null; //이메일이 비어있거나 유효한 경우
@@ -559,7 +559,7 @@ const SignUp = () => {
         username: userName,
         password: userPassword,
         name: name,
-        email: userEmail ? userEmail : "noEmail@noemail.com",
+        email: userEmail ? userEmail : null,
         birthDate: userBirth,
         phoneNumber: userPhoneNumber.replace(/-/g, ""),
       })
@@ -640,14 +640,14 @@ const SignUp = () => {
             className="email"
             $error={error.email ? true : false}
             $correctActive={infoOnClick.email}
-            $length={userEmail.length}
+            $length={userEmail ? userEmail.length : 0}
           >
             <span className="emailLogo" />
             <input
               type="text"
               name="email"
               placeholder="[선택] 비밀번호 분실 시 확인용 이메일"
-              value={userEmail}
+              value={userEmail ? userEmail : ""}
               onChange={(e) => setUserEmail(e.target.value)}
               onBlur={(e) => {
                 handleValidation(e);
