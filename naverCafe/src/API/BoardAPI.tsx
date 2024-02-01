@@ -94,7 +94,9 @@ export function unlikeBoard(boardId: number) {
 //게시판 즐겨찾기 모두 조회
 //초기 fav 리스트
 export function useGetLikeBoard() {
-  const [favList, setFavList] = useState<{ boards: BoardType[] } | null>(null);
+    const [favList, setFavList] = useState<{ boards: BoardType[] }>({
+      boards: [],
+    });
   const url = `/api/v1/boards/likes`;
   const refetch = useCallback(async () => {
     const res = await axios.get(baseURL + url, {
