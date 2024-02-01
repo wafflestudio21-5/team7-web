@@ -495,7 +495,7 @@ const Login = () => {
           ) : (
             <SocialLogin>
               <button className="loginButton">
-                <a href="https://nid.naver.com/oauth2.0/authorize?client_id=OemkbWdkEHFr93oA3sxR&redirect_uri=http://localhost:5173&response_type=code&state=STATE_STRING">
+                <a href="https://nid.naver.com/oauth2.0/authorize?client_id=OemkbWdkEHFr93oA3sxR&redirect_uri=http://ec2-15-165-161-107.ap-northeast-2.compute.amazonaws.com:5173&response_type=code&state=STATE_STRING">
                   Naver로 로그인
                 </a>
               </button>
