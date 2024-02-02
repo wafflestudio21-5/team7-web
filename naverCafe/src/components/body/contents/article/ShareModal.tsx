@@ -114,7 +114,7 @@ const ShareModal = ({
                 setIsPathCopied(true);
               }}
             >
-              {location.pathname}
+              https://cafewaffle.shop{location.pathname}
             </label>
             <button
               id="copyPahtButton"
