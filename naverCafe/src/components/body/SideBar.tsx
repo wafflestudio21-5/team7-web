@@ -898,6 +898,7 @@ const SideBar = () => {
               <li
                 key={index}
                 onClick={() => navigate(`/articles/${indexes[index]}`)}
+                style={{ textOverflow: "ellipsis", whiteSpace:"nowrap" }}
               >
                 <div className="ball">
                   <img src="	https://ssl.pstatic.net/static/cafe/cafe_pc/ico-blank.png" />
