@@ -33,6 +33,7 @@ const StyledNoticeTr = styled.tr`
           padding-top: 4px;
 
           .inner_list {
+            text-align: left;
             .article_title,
             .comment {
               color: #ff4e59;

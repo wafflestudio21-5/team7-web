@@ -170,6 +170,7 @@ export const StyledTr = styled.tr`
         display: flex;
         justify-content: flex-start;
         width: 100%;
+        text-align: left;
 
         .article_title {
           margin-right: 4px;
@@ -234,8 +235,8 @@ export const StyledTr = styled.tr`
 
     .ArticleBoardAuthorInfo {
       position: relative;
-      display:flex;
-      justify-content:flex-start;
+      display: flex;
+      justify-content: flex-start;
 
       button {
         text-align: left;
@@ -673,8 +674,8 @@ export const ArticleTable = ({
                 notice={notice}
                 isLike={board.likeCol}
                 DateOnly={DateOnly}
-              noBtn={board.type === "home"}
-              refreshNotice={fetchNotiArticle}
+                noBtn={board.type === "home"}
+                refreshNotice={fetchNotiArticle}
               ></NoticeTr>
             ))
           : null}
