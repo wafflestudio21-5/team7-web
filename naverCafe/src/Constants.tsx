@@ -9,7 +9,7 @@ export const baseURL = //"";
 // eslint-disable-next-line react-refresh/only-export-components
 export const waffleCafe: Cafe = {
   name: "와플 카페 Waffle Cafe",
-  url: "https://wafflecafe.shop/",
+  url: "https://cafewaffle.shop/",
   manager: "와플 매니저",
   createdAt: "2024.01.13. 개설",
   location: "서울특별시 관악구",
