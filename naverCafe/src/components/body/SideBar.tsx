@@ -5,11 +5,12 @@ import { getCafeInfo } from "../../API/CafeAPI";
 import { waffleCafe } from "../../Constants";
 import { useBoardGroup, useGetLikeBoard } from "../../API/BoardAPI";
 import { CurrentBoardContext } from "../../contexts/BoardContext/CurrentBoardContext";
-import { BoardType, UserInfoType } from "../../Types";
+import { ArticleType, BoardType, UserInfoType } from "../../Types";
 import { useMyProfile } from "../../API/UserAPI";
 import { getUserInfo } from "../../API/UserAPI";
 
 import WaffleManagerLogo from "../../assets/waffleManagerLogo.svg";
+import { wholeArticle } from "../../API/ArticleAPI";
 
 const Wrapper = styled.div`
   display: inline-block;
@@ -237,6 +238,7 @@ const MyActivity = styled.div`
         position: absolute;
         right: 0;
         color: #666666;
+        font-style: normal;
       }
     }
   }
@@ -428,6 +430,36 @@ const RecentComments = styled.div`
     font-weight: bold;
     text-align: left;
   }
+
+  li {
+    font-size: 13px;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    display: block;
+    float: none;
+    width: auto;
+    line-height: 22px;
+    text-align: left;
+
+    &:hover {
+      text-decoration: underline;
+      cursor: pointer;
+    }
+  }
+  .ball {
+    float: left;
+    width: 3px;
+    height: 3px;
+    margin: 9px 8px 0 0;
+  }
+
+  img {
+    border: 0;
+    width: 3px;
+    height: 3px;
+    vertical-align: top;
+  }
 `;
 const CafeSmartBot = styled.div`
   margin-top: 10px;
@@ -438,6 +470,11 @@ const CafeSmartBot = styled.div`
 `;
 const StyledDiv = styled.div<{ $isCurBoard: boolean }>`
   ${(prop) => (prop.$isCurBoard ? "font-weight:bold" : "")};
+  .articleNum {
+    font-weight: 400;
+    display: inline-block;
+    margin-left: 90px;
+  }
 `;
 const StyledGroupTit = styled.div`
   position: relative;
@@ -499,7 +536,25 @@ const StyledUl = styled.ul`
   }
 `;
 
+const RedDot = () => {
+  const style = {
+    width: "7px",
+    height: "7px",
+    backgroundColor: "red",
+    borderRadius: "50%",
+    display: "inline-block",
+    padding: "0",
+    margin: "0 0 1px 5px",
+  };
+  return <div style={style} />;
+};
+
 const SideBar = () => {
+  const [articleNum, setArticleNum] = useState(0);
+  wholeArticle(15, 1).then((res) => {
+    setArticleNum(res.totalElements);
+  });
+
   const [isCafeInfoChecked, setIsCafeInfoChecked] = useState<boolean>(true);
   const { myProfile } = useMyProfile();
   const [myInfo, setMyInfo] = useState<UserInfoType | null>(null);
@@ -514,6 +569,24 @@ const SideBar = () => {
     createdAt: string;
     memberCount: number;
   } | null>(null);
+
+  const [titles, setTitles] = useState<string[]>([]);
+  const [indexes, setIndexes] = useState<number[]>([]);
+
+  async function LatestPosts(): Promise<{
+    titles: string[];
+    indexes: number[];
+  }> {
+    try {
+      const res = await wholeArticle(15, 1);
+      const titles = res.content.map((article: ArticleType) => article.title);
+      const indexes = res.content.map((article: ArticleType) => article.id);
+      return { titles, indexes };
+    } catch (err) {
+      console.error(err);
+      return { titles: [], indexes: [] };
+    }
+  }
 
   useEffect(() => {
     if (myProfile) {
@@ -530,6 +603,13 @@ const SideBar = () => {
       .catch((err) => {
         console.error(err);
       });
+
+    LatestPosts().then((result) => {
+      if (result) {
+        setTitles(result.titles);
+        setIndexes(result.indexes);
+      }
+    });
   }, []);
   useEffect(() => {
     if (myProfile) {
@@ -744,6 +824,7 @@ const SideBar = () => {
               >
                 전체글보기
               </Link>
+              <p className="articleNum">{articleNum}</p>
             </StyledDiv>
             <StyledDiv $isCurBoard={curBoardState === -1}>
               <img
@@ -791,6 +872,8 @@ const SideBar = () => {
                           >
                             {board.name}
                           </Link>
+                          {board.isHot && <RedDot />}
+                          {/* 추가기능: 인기 게시판일 때 게시판 옆에 빨간 점이 뜬다. */}
                         </StyledDiv>
                       </li>
                     ))}
@@ -803,10 +886,21 @@ const SideBar = () => {
           </div>
         </Boards>
         <RecentComments>
-          <p>최신 댓글ㆍ답글</p>
+          <p>최신 게시글</p>
           <ul className="recentCommentList">
             {/* state로서 li 요소를 나타내면 좋을 것 같습니다. */}
             {/* 만약 요소의 개수가 0이라면 다른 text를 담는 것으로 하는 로직이면 좋을 것 같습니다. */}
+            {titles.slice(0, 5).map((title, index) => (
+              <li
+                key={index}
+                onClick={() => navigate(`/articles/${indexes[index]}`)}
+              >
+                <div className="ball">
+                  <img src="	https://ssl.pstatic.net/static/cafe/cafe_pc/ico-blank.png" />
+                </div>
+                {title}
+              </li>
+            ))}
           </ul>
         </RecentComments>
         <CafeSmartBot>

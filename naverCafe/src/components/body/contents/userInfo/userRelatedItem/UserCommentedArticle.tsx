@@ -39,6 +39,7 @@ const Wrapper = styled.li`
         margin-left: 5px;
         position: relative;
         top: -2px;
+        font-style:normal;
       }
     }
   }

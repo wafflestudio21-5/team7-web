@@ -85,6 +85,10 @@ const Wrapper = styled.li`
     width: 754px;
     padding-left: 46px;
   }
+
+  em {
+    font-style: normal;
+  }
 `;
 
 interface PropsComment {

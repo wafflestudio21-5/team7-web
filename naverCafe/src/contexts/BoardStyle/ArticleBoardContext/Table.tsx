@@ -607,16 +607,16 @@ export const ArticleTable = ({
     }
   };
 
-  useEffect(() => {
-    async function fetchNotiArticle() {
-      try {
-        const fetchedNotices: ArticleType[] = await notiArticle();
-        setNoticeList(fetchedNotices);
-      } catch (err) {
-        console.log("Error fetching notices");
-      }
+  const fetchNotiArticle = async () => {
+    try {
+      const fetchedNotices: ArticleType[] = await notiArticle();
+      setNoticeList(fetchedNotices);
+    } catch (err) {
+      console.log("Error fetching notices");
     }
+  };
 
+  useEffect(() => {
     fetchNotiArticle();
 
     setIsSortLike(false);
@@ -671,6 +671,8 @@ export const ArticleTable = ({
                 notice={notice}
                 isLike={board.likeCol}
                 DateOnly={DateOnly}
+              noBtn={board.type === "home"}
+              refreshNotice={fetchNotiArticle}
               ></NoticeTr>
             ))
           : null}

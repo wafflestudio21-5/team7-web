@@ -3,6 +3,9 @@
 import styled from "styled-components";
 import { ArticleType } from "../../../Types";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useBriefMyInfo } from "../../../API/UserAPI";
+import { removeNotice } from "../../../API/ArticleAPI";
 
 const StyledNoticeTr = styled.tr`
   background: #f9f9f8;
@@ -103,21 +106,53 @@ const StyledNoticeTr = styled.tr`
   }
 `;
 
+const StyledRemoveNoticeBtn = styled.div`
+  display: inline-block;
+  background-image: url(https://ssl.pstatic.net/static/cafe/cafe_pc/sp/sp_icon_white_72ca546e.svg);
+  background-repeat: no-repeat;
+  vertical-align: top;
+  background-position: -32px -38px;
+  width: 16px;
+  height: 16px;
+
+  margin-right: 12px;
+  margin: 2px 12px 2px 0;
+`;
+
 export const NoticeTr = ({
   notice,
   isLike,
   DateOnly,
+  noBtn,
+  refreshNotice,
 }: {
   notice: ArticleType;
   isLike: boolean | string | undefined;
   DateOnly: (arg: string) => string;
+    noBtn?: boolean;
+    refreshNotice?: () => void;
 }) => {
   const navigate = useNavigate();
+
+  const { briefMyInfo } = useBriefMyInfo();
+  const [rank, setRank] = useState("USER");
+
+  useEffect(() => {
+    if (briefMyInfo) {
+      setRank(briefMyInfo.rank);
+    }
+  }, []);
+
+  const handleRemoveNotice = async () => {
+    await removeNotice(notice.id);
+    refreshNotice;
+  };
 
   return (
     <StyledNoticeTr>
       <td scope="col" colSpan={2} className="td_article">
         <div className="title">
+          {!noBtn && rank !== "USER" && <StyledRemoveNoticeBtn onClick={handleRemoveNotice}/>}
           <div className="board-tag">
             <strong className="board-tag-txt">
               <span className="inner">공지</span>
@@ -131,14 +166,16 @@ export const NoticeTr = ({
               >
                 {notice.title}
               </span>
-              {notice.commentCount !== 0 ? <span
-                className="comment"
-                onClick={() => navigate(`/articles/${notice.id}`)}
-              >
-                {" ["}
-                <em>{notice.commentCount}</em>
-                {"] "}
-              </span> : null}
+              {notice.commentCount !== 0 ? (
+                <span
+                  className="comment"
+                  onClick={() => navigate(`/articles/${notice.id}`)}
+                >
+                  {" ["}
+                  <em>{notice.commentCount}</em>
+                  {"] "}
+                </span>
+              ) : null}
             </div>
           </div>
         </div>
