@@ -697,7 +697,7 @@ const SideBar = () => {
               </p>
               <p>
                 <span className="peopleLogo" />
-                {cafeInfo.memberCount}
+                {cafeInfo.memberCnt}
               </p>
             </div>
           </CafeInfo>
