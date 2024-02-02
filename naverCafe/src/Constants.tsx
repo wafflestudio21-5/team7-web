@@ -6,6 +6,7 @@ export const baseURL =
   "http://ec2-15-165-161-107.ap-northeast-2.compute.amazonaws.com:8080";
 // "http://localhost:8080";
 
+
 // eslint-disable-next-line react-refresh/only-export-components
 export const waffleCafe: Cafe = {
   name: "와플 카페 Waffle Cafe",
