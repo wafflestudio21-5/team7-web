@@ -5,7 +5,7 @@ import {
   calculatePastDateISO,
   useSearch,
 } from "../../contexts/BoardContext/SearchContext";
-import { start } from "repl";
+
 const Wrapper = styled.div`
   display: inline-block;
   width: 1080px;
