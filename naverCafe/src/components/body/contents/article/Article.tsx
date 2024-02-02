@@ -342,10 +342,14 @@ const Article = () => {
   console.log(article);
   // 좋아요 설정
   const [isArticleLiked, setIsArticleLiked] = useState<boolean>(false);
+  const [isCommentAllowed, setIsCommentAllowed] = useState<boolean>(true);
   useEffect(() => {
     if (article) {
       console.log(article.isLiked);
       setIsArticleLiked(article.isLiked);
+      if (article.article.allowComments !== undefined) {
+        setIsCommentAllowed(article.article.allowComments);
+      }
     }
   }, [article]);
 
@@ -492,7 +496,7 @@ const Article = () => {
             <div className="info">
               <div className="left">
                 <div className="thumbArea">
-                  <Link to={"/"}>
+                  <Link to={`/users/${article?.article.author.nickname}`}>
                     <img
                       src="https://ssl.pstatic.net/static/cafe/cafe_pc/default/cafe_profile_77.png?type=c77_77"
                       alt="작성자 프로필 사진"
@@ -502,7 +506,7 @@ const Article = () => {
                 </div>
                 <div className="authorArea">
                   <div className="authorName">
-                    <Link to={`/users/${article?.article.author.id}`}>
+                    <Link to={`/users/${article?.article.author.nickname}`}>
                       {article?.article.author.nickname}
                     </Link>
                   </div>
@@ -596,13 +600,12 @@ const Article = () => {
             </div>
           </ArticleFooter>
           <div className="comments" ref={CommentsRef}>
-            {myProfile ? (
-              <CommentBox
-                articleId={articleId}
-                comments={comments.comments}
-                refetchComments={refetchComments}
-              />
-            ) : null}
+            <CommentBox
+              articleId={articleId}
+              comments={comments.comments}
+              refetchComments={refetchComments}
+              isCommentAllowed={isCommentAllowed}
+            />
           </div>
         </ArticleBox>
         <ArticleBottomButtons>
@@ -628,7 +631,7 @@ const Article = () => {
                     title: article.article.title,
                     content: article.article.content,
                     board: article.article.board,
-                    allowComments: article.article.allowComments,
+                    allowComments: isCommentAllowed,
                     isNotification: article.article.isNotification,
                   },
                 });

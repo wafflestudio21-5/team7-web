@@ -31,6 +31,7 @@ const Wrapper = styled.div`
 `;
 import EditUserInfo from "./pages/EditUserInfo";
 import NotDefinedPage from "./pages/404Page";
+import WithdrawCafe from "./pages/WithdrawCafe";
 
 function App() {
   const { boardList } = useWholeBoard();
@@ -53,6 +54,11 @@ function App() {
                   <Route
                     path="/users/:nickname/editInfo"
                     element={<EditUserInfo />}
+                  />
+                  {/* 카페 탈퇴 */}
+                  <Route
+                    path="/users/:nickname/withdraw"
+                    element={<WithdrawCafe />}
                   />
 
                   {/* main page 구성 */}

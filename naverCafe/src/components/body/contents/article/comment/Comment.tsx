@@ -95,8 +95,14 @@ interface PropsComment {
   comment: CommentType;
   articleId: string;
   refetchComments: () => Promise<void>;
+  isCommentAllowed: boolean;
 }
-const Comment = ({ comment, articleId, refetchComments }: PropsComment) => {
+const Comment = ({
+  comment,
+  articleId,
+  refetchComments,
+  isCommentAllowed,
+}: PropsComment) => {
   const [isCommentWriterOpen, setIsCommentWriterOpen] =
     useState<boolean>(false);
   const [isMenuModalOpen, setIsMenuModalOpen] = useState<boolean>(false);
@@ -139,19 +145,18 @@ const Comment = ({ comment, articleId, refetchComments }: PropsComment) => {
               <div className="content">{comment.content}</div>
               <div className="commentInfo">
                 <span>
-                  {comment.lastModified
-                    .replace(/-/g, ".")
-                    .replace(/T/, ". ")
-                    .replace(/.\d\d\d\d\d\d/, "")}
+                  {comment.lastModified.replace(/-/g, ".").replace(/T.*/, "")}
                 </span>
                 <span>
-                  <button
-                    onClick={() => {
-                      setIsCommentWriterOpen(!isCommentWriterOpen);
-                    }}
-                  >
-                    답글쓰기
-                  </button>
+                  {isCommentAllowed ? (
+                    <button
+                      onClick={() => {
+                        setIsCommentWriterOpen(!isCommentWriterOpen);
+                      }}
+                    >
+                      답글쓰기
+                    </button>
+                  ) : null}
                 </span>
               </div>
             </div>
@@ -164,11 +169,13 @@ const Comment = ({ comment, articleId, refetchComments }: PropsComment) => {
               <CommentMenuModal
                 setIsEditMode={setIsEditMode}
                 setIsMenuModalOpen={setIsMenuModalOpen}
+                setIsCommentWriterOpen={setIsCommentWriterOpen}
                 articleId={articleId}
                 type="comment"
                 commentId={comment.id}
                 refetchComments={refetchComments}
                 isMyComment={myProfile.nickname === comment.nickname}
+                isCommentAllowed={isCommentAllowed}
               />
             ) : null}
           </div>

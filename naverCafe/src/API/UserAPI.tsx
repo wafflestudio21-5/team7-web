@@ -214,3 +214,12 @@ export function editMyProfile({
     }
   );
 }
+
+// 카페 탈퇴
+export function withdrawCafe() {
+  return axios.delete(baseURL + "/api/v1/users/user", {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+    },
+  });
+}
