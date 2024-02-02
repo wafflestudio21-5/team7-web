@@ -1,10 +1,7 @@
 //일반 게시판 (자유 게시판과 동일한 양식)
 
 import { useContext, useEffect, useState } from "react";
-import {
-  getArticleList,
-  useGetLikeBoard,
-} from "../../../API/BoardAPI";
+import { getArticleList, useGetLikeBoard } from "../../../API/BoardAPI";
 import { boardAttribute } from "../../../contexts/BoardContext/BoardAttrContext";
 import { ArticleTable } from "../../../contexts/BoardStyle/ArticleBoardContext/Table";
 import { BoardBottomOption } from "../../../contexts/BoardStyle/BoardBottomContext/BoardBottomOption";
@@ -28,8 +25,24 @@ const CommonBoard = ({ board }: { board: BoardType }) => {
   const { setCurBoardState } = useContext(CurrentBoardContext);
 
   const [articleList, setArticleList] = useState<ArticleType[]>([]);
-  const { size, page, sort, setSize, setPage, setSort, setTotPage } = usePagination();
+  const { size, page, sort, setSize, setPage, setSort, setTotPage } =
+    usePagination();
   
+  async function fetchArticles() {
+    try {
+      const fetchedArticles: ArticleBriefType = await getArticleList({
+        boardId: board.id,
+        size,
+        page,
+        sort,
+      });
+      setArticleList(fetchedArticles.content);
+      setTotPage(fetchedArticles.totalPages);
+    } catch (err) {
+      console.log("Error fetching article list in CommonBoard");
+    }
+  }
+
   useEffect(() => {
     setCurBoardState(board.id);
     setIsNoticeOff(false);
@@ -40,7 +53,8 @@ const CommonBoard = ({ board }: { board: BoardType }) => {
     if (myProfile) {
       refetch();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    fetchArticles();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [board, myProfile]);
 
   useEffect(() => {
@@ -48,31 +62,19 @@ const CommonBoard = ({ board }: { board: BoardType }) => {
   }, [size]);
 
   useEffect(() => {
-    async function fetchArticles() {
-      try {
-        const fetchedArticles:ArticleBriefType = await getArticleList({
-          boardId: board.id,
-          size,
-          page,
-          sort,
-        });
-        setArticleList(fetchedArticles.content);
-        setTotPage(fetchedArticles.totalPages);
-      } catch (err) {
-        console.log("Error fetching article list in CommonBoard");
-      }
-    }
-
     fetchArticles();
     //console.log(articleList);
-  }, [board, size, page, sort, setTotPage, ]);
+  }, [board, size, page, sort, setTotPage]);
 
   return (
     <>
       <Board>
         <CommonBoardHeader board={board}></CommonBoardHeader>
         <CommonBoardTopOption boardId={board.id}></CommonBoardTopOption>
-        <ArticleTable board={boardAttribute.CommonBoard} articleList={articleList}></ArticleTable>
+        <ArticleTable
+          board={boardAttribute.CommonBoard}
+          articleList={articleList}
+        ></ArticleTable>
         <BoardBottomOption boardId={board.id}></BoardBottomOption>
       </Board>
     </>

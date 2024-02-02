@@ -81,7 +81,7 @@ const TopBarDiv = styled.div`
     display: flex;
     align-items: center;
     .userInfo {
-      width: 56.4px;
+      min-width: 56.4px;
       height: 18px;
       margin-right: 7px;
       .userId {

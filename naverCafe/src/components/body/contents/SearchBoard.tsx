@@ -644,7 +644,7 @@ const SearchBoard = () => {
     }
 
     fetchSearchResult();
-  }, [size, page, setTotPage]);
+  }, [size, page, setTotPage, item, contentOp]);
 
   useEffect(() => {
     console.log(`item: ${item}, boardId: ${boardOp}`);
