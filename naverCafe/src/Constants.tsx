@@ -8,7 +8,7 @@ export const baseURL = //"";
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const waffleCafe: Cafe = {
-  name: "와플 카페 Waffle Cafe",
+  name: "카페 와플 Cafe Waffle",
   url: "https://cafewaffle.shop/",
   manager: "와플 매니저",
   createdAt: "2024.01.13. 개설",

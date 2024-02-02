@@ -550,6 +550,9 @@ const RedDot = () => {
 };
 
 const SideBar = () => {
+  const liStyle = {
+    fontWeight: "800",
+  }
   const [articleNum, setArticleNum] = useState(0);
   wholeArticle(15, 1).then((res) => {
     setArticleNum(res.totalElements);
@@ -788,6 +791,7 @@ const SideBar = () => {
                           className="favBoard"
                           key={index}
                           onClick={() => navigate(`/board/${favBoard.id}`)}
+                          style={curBoardState === favBoard.id ? liStyle : {}}
                         >
                           <img
                             className="list"
