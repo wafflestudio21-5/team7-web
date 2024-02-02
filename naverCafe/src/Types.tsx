@@ -1,6 +1,7 @@
 export type BoardType = {
   id: number;
   name: string;
+  isHot?: boolean;
 };
 
 export type GroupType = {

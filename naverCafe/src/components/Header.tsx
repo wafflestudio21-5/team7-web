@@ -1,4 +1,8 @@
 import styled from "styled-components";
+import { useMyProfile } from "../API/UserAPI";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { setMaxIdleHTTPParsers } from "http";
 
 const Wrapper = styled.div`
   display: inline-block;
@@ -30,6 +34,19 @@ const TopBarDiv = styled.div`
     position: relative;
     left: 595px;
     /* 모든 디자인 마친 뒤 left 속성 변경해야 할 것 같습니다. */
+
+    .login_btn {
+      padding: 1px 0;
+      margin: 0 9px 0 0;
+      color: #444;
+      cursor: pointer;
+      display: inline-block;
+      width: 46px;
+      height: 18px;
+      font-size: 12px;
+      width: 46px;
+      border: 1px solid #d5d5d5;
+    }
   }
   .link::after {
     margin: 1px 8px 0px 6px;
@@ -137,6 +154,9 @@ const CafeIntro = styled.div`
 `;
 
 const Header = () => {
+  const { myProfile } = useMyProfile();
+  const navigate = useNavigate();
+
   return (
     <Wrapper>
       <TopBarDiv>
@@ -165,20 +185,39 @@ const Header = () => {
           <a href="">새글</a>
         </div>
         <div className="link">
-          <a href="">내소식</a>
+          <a
+            href=""
+            onClick={() => {
+              if (!myProfile) {
+                navigate(`/login`);
+              } else {
+                navigate(`/users/${myProfile!.nickname}`);
+              }
+            }}
+          >
+            내소식
+          </a>
         </div>
         <div className="link">
           <a href="">채팅</a>
         </div>
         <div className="menu">
-          <span className="userInfo">
-            <span className="userId">userIDIDIDI </span>
-            <img
-              src="https://cafe.pstatic.net/cafe4/hidden.gif"
-              alt="유저 정보"
-            />
-          </span>
-          <span className="naverTalk" />
+          {myProfile ? (
+            <>
+              <span className="userInfo">
+                <span className="userId">{myProfile!.nickname}</span>
+                <img
+                  src="https://cafe.pstatic.net/cafe4/hidden.gif"
+                  alt="유저 정보"
+                />
+              </span>
+              <span className="naverTalk" />
+            </>
+          ) : (
+            <div className="login_btn" onClick={() => navigate(`/login`)}>
+              로그인
+            </div>
+          )}
           <span className="other" />
         </div>
       </TopBarDiv>
