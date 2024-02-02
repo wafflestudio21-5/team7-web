@@ -65,6 +65,7 @@ const Wrapper = styled.li`
         margin-left: 5px;
         position: relative;
         top: -1.5px;
+        font-style:normal;
       }
     }
   }

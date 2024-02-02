@@ -50,10 +50,10 @@ export const SearchContextProvider = ({
   const pastDate = new Date(
     currentDate.setFullYear(currentDate.getFullYear() - 200)
   );
-  const startDateInitialValue = pastDate.toISOString().split(".")[0];
+  const startDateInitialValue = pastDate.toISOString().split("T")[0]+"T00:00:00";
 
   const [startDate, setStartDate] = useState(startDateInitialValue);
-  const [endDate, setEndDate] = useState(date.toISOString().split(".")[0]);
+  const [endDate, setEndDate] = useState(date.toISOString().split("T")[0]+"T23:59:59");
   const [item, setItem] = useState("");
   const [contentOp, setContentOp] = useState(0);
   const [boardOp, setBoardOp] = useState(0);
@@ -127,5 +127,5 @@ export function calculatePastDateISO(option: string) {
     default:
       throw new Error("올바르지 않은 옵션입니다.");
   }
-  return currentDate.toISOString().split(".")[0];
+  return currentDate.toISOString().split("T")[0]+"T00:00:00";
 }

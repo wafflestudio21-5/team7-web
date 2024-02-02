@@ -1,7 +1,11 @@
 import styled from "styled-components";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSearch } from "../../contexts/BoardContext/SearchContext";
+import {
+  calculatePastDateISO,
+  useSearch,
+} from "../../contexts/BoardContext/SearchContext";
+
 const Wrapper = styled.div`
   display: inline-block;
   width: 1080px;
@@ -35,7 +39,8 @@ const SearchBarDiv = styled.div`
 
 const SearchBar = () => {
   const [keyword, setKeyword] = useState<string>("");
-  const { setItem, setContentOp } = useSearch();
+  const { setItem, setContentOp, setStartDate, setEndDate } =
+    useSearch();
   const navigate = useNavigate();
   const onClickSearch = () => {
     if (keyword === "") {
@@ -45,6 +50,10 @@ const SearchBar = () => {
       setItem(keyword);
       setContentOp(0);
       setKeyword("");
+
+      const now = new Date();
+      setStartDate(calculatePastDateISO("전체기간"));
+      setEndDate(now.toISOString().split(".")[0]);
     }
   };
 

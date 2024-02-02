@@ -85,6 +85,10 @@ const Wrapper = styled.li`
     width: 754px;
     padding-left: 46px;
   }
+
+  em {
+    font-style: normal;
+  }
 `;
 
 interface PropsComment {
@@ -128,7 +132,7 @@ const Comment = ({ comment, articleId, refetchComments }: PropsComment) => {
             </Link>
             <div className="commentBox">
               <div className="authorNickname">
-                <Link to={"/"}>
+                <Link to={`/users/${comment.nickname}`}>
                   <em>{comment.nickname}</em>
                 </Link>
               </div>

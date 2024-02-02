@@ -348,9 +348,9 @@ const ListSearch = ({ boardId }: { boardId: number }) => {
         page: 1,
         boardId: boardOp,
         item: keyword,
-        contentOp,
-        startDate,
-        endDate,
+        contentOp:localContentOp,
+        startDate:localStartDate,
+        endDate:localEndDate,
         wordInclude: "",
         wordExclude: "",
       });

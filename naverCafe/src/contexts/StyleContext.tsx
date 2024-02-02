@@ -8,7 +8,7 @@ export const GlobalStyle = createGlobalStyle`
     line-height: 1.5;
     font-weight: 400;
 
-    color-scheme: light dark;
+    color-scheme: light only; //다크 모드 안되게
     color: rgba(255, 255, 255, 0.87);
     background-color: #242424;
 
@@ -17,7 +17,7 @@ export const GlobalStyle = createGlobalStyle`
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 
-    overflow-x: auto;
+    overflow-x:hidden;
   }
 
   body {

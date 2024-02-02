@@ -2,15 +2,16 @@
 import { useWholeBoard } from "./API/BoardAPI";
 import { ArticleType, type Cafe } from "./Types";
 
-export const baseURL = "";
-// "http://localhost:8080";
+
+export const baseURL = //"";
+"http://localhost:8080";
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const waffleCafe: Cafe = {
-  name: "와플 카페 Waffle Cafe",
-  url: "https://wafflecafe.shop/",
+  name: "카페 와플 Cafe Waffle",
+  url: "https://cafewaffle.shop/",
   manager: "와플 매니저",
-  createdAt: "2024.01.13 개설",
+  createdAt: "2024.01.13. 개설",
   location: "서울특별시 관악구",
   description: "와플스튜디오 team7의 토이프로젝트 카페입니다.",
 };

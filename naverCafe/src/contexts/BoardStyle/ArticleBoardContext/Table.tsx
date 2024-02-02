@@ -170,6 +170,7 @@ export const StyledTr = styled.tr`
         display: flex;
         justify-content: flex-start;
         width: 100%;
+        text-align: left;
 
         .article_title {
           margin-right: 4px;
@@ -186,6 +187,7 @@ export const StyledTr = styled.tr`
           font-weight: 700;
           color: #ff2f3b;
           margin-left: -1px;
+          white-space: nowrap;
 
           &:hover {
             text-decoration: underline;
@@ -234,6 +236,8 @@ export const StyledTr = styled.tr`
 
     .ArticleBoardAuthorInfo {
       position: relative;
+      display: flex;
+      justify-content: flex-start;
 
       button {
         text-align: left;
@@ -607,16 +611,16 @@ export const ArticleTable = ({
     }
   };
 
-  useEffect(() => {
-    async function fetchNotiArticle() {
-      try {
-        const fetchedNotices: ArticleType[] = await notiArticle();
-        setNoticeList(fetchedNotices);
-      } catch (err) {
-        console.log("Error fetching notices");
-      }
+  const fetchNotiArticle = async () => {
+    try {
+      const fetchedNotices: ArticleType[] = await notiArticle();
+      setNoticeList(fetchedNotices);
+    } catch (err) {
+      console.log("Error fetching notices");
     }
+  };
 
+  useEffect(() => {
     fetchNotiArticle();
 
     setIsSortLike(false);
@@ -671,6 +675,8 @@ export const ArticleTable = ({
                 notice={notice}
                 isLike={board.likeCol}
                 DateOnly={DateOnly}
+                noBtn={board.type === "home"}
+                refreshNotice={fetchNotiArticle}
               ></NoticeTr>
             ))
           : null}

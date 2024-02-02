@@ -28,6 +28,7 @@ const Wrapper = styled.li`
         margin-left: 5px;
         color: #ff2f3b;
         font-size: 13px;
+        font-style: normal;
       }
     }
   }

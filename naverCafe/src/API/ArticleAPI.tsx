@@ -158,4 +158,18 @@ export async function hotArticle(
   }
 }
 
-//공지로등록 (userInfo의 rank 확인)
+//공지 내리기
+//백엔드 메소드 수정
+export async function removeNotice(articleId: number) {
+  try {
+    await axios.delete(baseURL + `/api/v1/articles/${articleId}/notification`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+    });
+    return true;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}

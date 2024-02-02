@@ -18,6 +18,7 @@ const TopBarDiv = styled.div`
   font-size: 12px;
   align-items: center;
   box-sizing: border-box;
+  justify-content: flex-end;
   a {
     color: #333333;
     text-decoration: none;
@@ -29,10 +30,13 @@ const TopBarDiv = styled.div`
     width: 52px;
     height: 10px;
   }
+  .naverLogo {
+    margin-right: auto;
+  }
   .link,
   .menu {
     position: relative;
-    left: 658px;
+
     /* 모든 디자인 마친 뒤 left 속성 변경해야 할 것 같습니다. */
 
     .login_btn {
@@ -77,7 +81,7 @@ const TopBarDiv = styled.div`
     display: flex;
     align-items: center;
     .userInfo {
-      width: 56.4px;
+      min-width: 56.4px;
       height: 18px;
       margin-right: 7px;
       .userId {

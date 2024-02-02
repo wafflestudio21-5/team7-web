@@ -774,7 +774,7 @@ const SignUp = () => {
             <small>[필수]</small>
             인증 약관 전체동의
           </label>
-          <button className="authPaper" />
+          
         </AuthDiv>
         {isAuthPaperChecked || isAuthPaperNeverClicked ? null : (
           <p>필수 약관에 모두 동의해 주세요.</p>

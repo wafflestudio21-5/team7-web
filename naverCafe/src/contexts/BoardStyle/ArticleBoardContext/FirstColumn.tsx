@@ -6,6 +6,7 @@ import styled from "styled-components";
 
 const StyledBoardName = styled.div`
   padding-left: 6px;
+  white-space: nowrap;
   &:hover {
     text-decoration: underline;
     cursor: pointer;
@@ -32,9 +33,7 @@ export const FirstCol = (props: {
       );
     case "boardName":
       return (
-        <StyledBoardName
-          onClick={() => navigate(`/board/${props.board.id}`)}
-        >
+        <StyledBoardName onClick={() => navigate(`/board/${props.board.id}`)}>
           {props.board.name}
         </StyledBoardName>
       );
