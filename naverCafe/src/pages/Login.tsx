@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../API/UserAPI";
 import axios from "axios";
+import { baseURL } from "../Constants";
 
 const Wrapper = styled.div`
   width: 458px;
@@ -354,24 +355,23 @@ const Login = () => {
       const code = new URL(window.location.href).searchParams.get("code");
       console.log(code);
       if (code) {
-        // If code exists in the URL, send a request to exchange it for an access token
-        exchangeCodeForToken(code);
+        if (localStorage.getItem("accessToken")) {
+          navigate("/");
+        } else {
+          exchangeCodeForToken(code);
+        }
       }
     };
 
     const exchangeCodeForToken = async (code: string) => {
       try {
         const tokenResponse = await axios.get(
-          `http://localhost:8080/api/v1/auth/socialSignin/naver?code=${code}`
+          baseURL + `/api/v1/auth/socialSignin/naver?code=${code}`
         );
         const tokenData = await tokenResponse.data;
-        // Save the access token to localStorage
         console.log(tokenData);
         localStorage.setItem("accessToken", tokenData.accessToken);
-        // Clear the URL query string to remove the code parameter
-        // window.history.replaceState({}, document.title, "/");
         navigate("/");
-        window.location.reload();
       } catch (error) {
         console.error("Error exchanging code for token:", error);
       }
@@ -495,7 +495,8 @@ const Login = () => {
           ) : (
             <SocialLogin>
               <button className="loginButton">
-                <a href="https://nid.naver.com/oauth2.0/authorize?client_id=OemkbWdkEHFr93oA3sxR&redirect_uri=http://ec2-15-165-161-107.ap-northeast-2.compute.amazonaws.com:5173&response_type=code&state=STATE_STRING">
+                <a href="https://nid.naver.com/oauth2.0/authorize?client_id=OemkbWdkEHFr93oA3sxR&redirect_uri=http://ec2-15-165-161-107.ap-northeast-2.compute.amazonaws.com:5173/login&response_type=code&state=STATE_STRING">
+                  {/* <a href="https://nid.naver.com/oauth2.0/authorize?client_id=OemkbWdkEHFr93oA3sxR&redirect_uri=http://localhost:5173/login&response_type=code&state=STATE_STRING"> */}
                   Naver로 로그인
                 </a>
               </button>

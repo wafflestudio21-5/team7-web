@@ -76,7 +76,7 @@ export type ArticleAPIType = {
   isLiked: false;
   prevId: number;
   nextId: number;
-}
+};
 
 export type CommentType = {
   id: number;

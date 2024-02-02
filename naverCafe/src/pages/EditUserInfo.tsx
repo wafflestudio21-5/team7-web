@@ -4,7 +4,10 @@ import styled, { css } from "styled-components";
 import deleteIcon from "../assets/editUserInfo-deleteIcon.svg";
 import { editMyProfile, getUserInfo, useMyProfile } from "../API/UserAPI";
 
-const Wrapper = styled.div``;
+const Wrapper = styled.div`
+  display: inline-block;
+  /* width: 513px; */
+`;
 const Header = styled.div`
   height: 42px;
   background-color: #03c75a;

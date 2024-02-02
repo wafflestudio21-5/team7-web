@@ -1,8 +1,10 @@
 import styled from "styled-components";
+
 import { useMyProfile } from "../API/UserAPI";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { setMaxIdleHTTPParsers } from "http";
+import { waffleCafe } from "../Constants";
 
 const Wrapper = styled.div`
   display: inline-block;
@@ -32,7 +34,7 @@ const TopBarDiv = styled.div`
   .link,
   .menu {
     position: relative;
-    left: 595px;
+    left: 658px;
     /* 모든 디자인 마친 뒤 left 속성 변경해야 할 것 같습니다. */
 
     .login_btn {
@@ -202,6 +204,7 @@ const Header = () => {
           <a href="">채팅</a>
         </div>
         <div className="menu">
+
           {myProfile ? (
             <>
               <span className="userInfo">
@@ -225,8 +228,8 @@ const Header = () => {
         <a href="/">
           <div>
             <span>
-              <h1>카페 이름</h1>
-              <p>카페 주소</p>
+              <h1>{waffleCafe.name}</h1>
+              <p>{waffleCafe.url}</p>
             </span>
           </div>
         </a>
