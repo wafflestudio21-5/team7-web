@@ -4,7 +4,7 @@ export const GlobalStyle = createGlobalStyle`
   // naverCafe 전체적으로 적용되는 css입니다.
   :root {
     /* font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif; */
-    font-family: '맑은 고딕', Malgun Gothic, Helvetica,sans-serif;
+    font-family: 'Apple SD Gothic Neo', '애플 SD 산돌고딕 Neo', 나눔 고딕, 'NanumGothic', Helvetica,sans-serif;
     line-height: 1.5;
     font-weight: 400;
 
@@ -43,6 +43,14 @@ export const GlobalStyle = createGlobalStyle`
       background-color: #ffffff;
     }
   }
+  @media (prefers-color-scheme: dark) {
+  body {
+    background-color: white;
+    color: #213547;
+    /* 기타 다크 모드에서 변경할 스타일 */
+  }
+}
+
 `;
 export const Logo = css`
   display: block;

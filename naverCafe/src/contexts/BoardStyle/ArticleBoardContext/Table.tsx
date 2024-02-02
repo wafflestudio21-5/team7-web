@@ -545,7 +545,9 @@ const CardViewUl = ({
                 <div className="user_info">
                   <div
                     className="pers_nick_area"
-                    onClick={() => navigate(`/users/${article.author.id}`)}
+                    onClick={() =>
+                      navigate(`/users/${article.author.nickname}`)
+                    }
                   >
                     {article.author.nickname}
                   </div>
@@ -738,7 +740,7 @@ export const ArticleTable = ({
                         className="nickname"
                         onClick={() => {
                           if (myProfile) {
-                            navigate(`/users/${article.author.id}`);
+                            navigate(`/users/${article.author.nickname}`);
                           } else {
                             navigate(`/login`);
                           }
