@@ -187,6 +187,7 @@ export const StyledTr = styled.tr`
           font-weight: 700;
           color: #ff2f3b;
           margin-left: -1px;
+          white-space: nowrap;
 
           &:hover {
             text-decoration: underline;

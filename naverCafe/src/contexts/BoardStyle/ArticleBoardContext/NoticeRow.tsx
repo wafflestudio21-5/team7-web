@@ -37,6 +37,7 @@ const StyledNoticeTr = styled.tr`
             .article_title,
             .comment {
               color: #ff4e59;
+              white-space: nowrap;
 
               &:hover {
                 text-decoration: underline;

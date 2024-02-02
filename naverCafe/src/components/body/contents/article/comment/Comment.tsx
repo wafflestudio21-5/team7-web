@@ -132,7 +132,7 @@ const Comment = ({ comment, articleId, refetchComments }: PropsComment) => {
             </Link>
             <div className="commentBox">
               <div className="authorNickname">
-                <Link to={"/"}>
+                <Link to={`/users/${comment.nickname}`}>
                   <em>{comment.nickname}</em>
                 </Link>
               </div>
