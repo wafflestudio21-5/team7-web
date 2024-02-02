@@ -234,6 +234,8 @@ export const StyledTr = styled.tr`
 
     .ArticleBoardAuthorInfo {
       position: relative;
+      display:flex;
+      justify-content:flex-start;
 
       button {
         text-align: left;

@@ -74,6 +74,8 @@ const StyledNoticeTr = styled.tr`
   .td_author {
     .ArticleBoardAuthorInfo {
       position: relative;
+      display: flex;
+      justify-content: flex-start;
 
       button {
         text-align: left;
