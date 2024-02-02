@@ -189,7 +189,7 @@ export const NoticeTr = ({
           <button>
             <span
               className="nickname"
-              onClick={() => navigate(`/users/${notice.author.id}`)}
+              onClick={() => navigate(`/users/${notice.author.nickname}`)}
             >
               {notice.author.nickname}
             </span>
