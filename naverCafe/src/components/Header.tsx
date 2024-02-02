@@ -2,8 +2,6 @@ import styled from "styled-components";
 
 import { useMyProfile } from "../API/UserAPI";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { setMaxIdleHTTPParsers } from "http";
 import { waffleCafe } from "../Constants";
 
 const Wrapper = styled.div`
@@ -204,7 +202,6 @@ const Header = () => {
           <a href="">채팅</a>
         </div>
         <div className="menu">
-
           {myProfile ? (
             <>
               <span className="userInfo">
