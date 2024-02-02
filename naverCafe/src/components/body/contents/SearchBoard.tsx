@@ -112,7 +112,7 @@ const StyledSearchInput = styled.div`
       margin: 0;
       padding: 0;
       font-size: 13px;
-      cursor:pointer;
+      cursor: pointer;
     }
   }
 `;
@@ -257,15 +257,18 @@ const SearchTopDiv = ({ searchBody }: { searchBody: SearchBody }) => {
   //기간
   const TermOption = ["전체기간", "1일", "1주", "1개월", "6개월", "1년"];
   const [isTermSelected, setIsTermSelected] = useState(false);
+  const [localTermOp, setLocalTermOp] = useState(termOp);
+  const [localStartDate, setLocalStartDate] = useState(startDate);
+  const [localEndDate, setLocalEndDate] = useState(endDate);
 
   const handleTermOp = (arg: number) => {
-    setTermOp(arg);
+    setLocalTermOp(arg);
     setIsTermSelected(!isTermSelected);
 
     const now = new Date();
-    setStartDate(calculatePastDateISO(TermOption[arg]));
+    setLocalStartDate(calculatePastDateISO(TermOption[arg]));
     console.log(calculatePastDateISO(TermOption[arg]));
-    setEndDate(now.toISOString().split(".")[0]);
+    setLocalEndDate(now.toISOString().split(".")[0]);
   };
 
   //기간 입력
@@ -283,8 +286,9 @@ const SearchTopDiv = ({ searchBody }: { searchBody: SearchBody }) => {
   };
 
   const handleSetBtnClick = () => {
-    setStartDate(firstDate + "T00:00:00");
-    setEndDate(secondDate + "T23:59:59");
+    setLocalStartDate(firstDate + "T00:00:00");
+    setLocalEndDate(secondDate + "T23:59:59");
+    setIsTermSelected(false);
   };
 
   //게시판
@@ -313,23 +317,27 @@ const SearchTopDiv = ({ searchBody }: { searchBody: SearchBody }) => {
   ];
   const [isContentSelected, setIsContentSelected] = useState(false);
   const { contentOp, setContentOp } = searchBody; //ContentOption의 인덱스를 저장
+  const [localContentOp, setLocalContentOp] = useState(contentOp);
 
   const handleContentOp = (arg: number) => {
-    setContentOp(arg);
+    setLocalContentOp(arg);
     setIsContentSelected(!isContentSelected);
   };
 
+  const { searchRes } = useSearch();
   //초기화
   useEffect(() => {
-    //setTermOp(0);
-    setContentOp(0);
-    //setBoardOp(0);
-  }, []);
+    setLocalContentOp(contentOp);
+    setTermOp(termOp);
+    setLocalStartDate(startDate);
+    setLocalEndDate(endDate);
+    setKeyword(item);
+  }, [searchRes]);
   useEffect(() => {
     setIsDetailClicked(false);
   }, [contentOp]);
 
-  const [keyword, setKeyword] = useState(item);  
+  const [keyword, setKeyword] = useState(item);
 
   //검색 버튼 클릭
   const handleSearch = async () => {
@@ -337,18 +345,23 @@ const SearchTopDiv = ({ searchBody }: { searchBody: SearchBody }) => {
       alert("검색어를 입력하세요");
     } else {
       setItem(keyword);
+      setContentOp(localContentOp);
+      setTermOp(localTermOp);
+      setStartDate(localStartDate);
+      setEndDate(localEndDate);
       try {
         const fetchedSearchRes: ArticleBriefType = await searchArticles({
           size,
           page,
           boardId: boardOp,
-          item:keyword,
-          contentOp,
-          startDate,
-          endDate,
+          item: `${keyword}, ${addItem}`,
+          contentOp: localContentOp,
+          startDate: localStartDate,
+          endDate: localEndDate,
           wordInclude,
           wordExclude,
         });
+        console.log(`${boardOp} ${localContentOp}`);
         setSearchRes(fetchedSearchRes.content);
         setTotPage(fetchedSearchRes.totalPages);
       } catch (err) {
@@ -379,7 +392,7 @@ const SearchTopDiv = ({ searchBody }: { searchBody: SearchBody }) => {
               setIsBoardSelected(false);
             }}
           >
-            {TermOption[termOp]}
+            {TermOption[localTermOp]}
           </p>
           <StyledUl
             className="select_list"
@@ -453,7 +466,7 @@ const SearchTopDiv = ({ searchBody }: { searchBody: SearchBody }) => {
               setIsBoardSelected(false);
             }}
           >
-            {ContentOption[contentOp]}
+            {ContentOption[localContentOp]}
           </p>
           <StyledUl $isSelected={isContentSelected} $isTerm={false}>
             {ContentOption.map((option, index) => (
@@ -481,18 +494,20 @@ const SearchTopDiv = ({ searchBody }: { searchBody: SearchBody }) => {
         <DetailButton
           $isSelected={isDetailClicked}
           onClick={() => {
-            if (contentOp !== 2 && contentOp !== 4) {
+            if (localContentOp !== 2 && localContentOp !== 4) {
               setIsDetailClicked(!isDetailClicked);
             }
           }}
-          disabled={contentOp === 2 || contentOp === 4}
+          disabled={localContentOp === 2 || localContentOp === 4}
         >
           상세 검색
         </DetailButton>
       </StyledSearchInput>{" "}
       {/* 논리 연산자까지 고려해서 검색을 해야하는 걸까... 일단 tip layer는 제외 */}
       <DetailSearchDiv
-        $isSelected={isDetailClicked && contentOp !== 2 && contentOp !== 4}
+        $isSelected={
+          isDetailClicked && localContentOp !== 2 && localContentOp !== 4
+        }
       >
         <div className="input_component">
           <input
