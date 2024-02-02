@@ -206,7 +206,6 @@ const Header = () => {
           <a href="">채팅</a>
         </div>
         <div className="menu">
-
           {myProfile ? (
             <>
               <span className="userInfo">
