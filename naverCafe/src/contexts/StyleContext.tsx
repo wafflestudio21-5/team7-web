@@ -4,7 +4,7 @@ export const GlobalStyle = createGlobalStyle`
   // naverCafe 전체적으로 적용되는 css입니다.
   :root {
     /* font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif; */
-    font-family: 'Apple SD Gothic Neo', '애플 SD 산돌고딕 Neo', 나눔 고딕, 'NanumGothic', Helvetica,sans-serif;
+    font-family: Apple SD Gothic Neo, 애플 SD 산돌고딕 Neo, 나눔 고딕, NanumGothic, Helvetica,sans-serif;
     line-height: 1.5;
     font-weight: 400;
 
@@ -14,7 +14,7 @@ export const GlobalStyle = createGlobalStyle`
 
     font-synthesis: none;
     text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
+    //-webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 
     overflow-x:hidden;

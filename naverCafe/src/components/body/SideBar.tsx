@@ -484,10 +484,14 @@ const CafeSmartBot = styled.div`
 
 const StyledDiv = styled.div<{ $isCurBoard: boolean }>`
   ${(prop) => (prop.$isCurBoard ? "font-weight:bold" : "")};
-  .articleNum {
-    font-weight: 400;
-    display: inline-block;
-    margin-left: 90px;
+
+  &.totalBoard {
+    display: flex;
+    text-align: right;
+    .articleNum {
+      font-weight: 400;
+      margin-left: auto;
+    }
   }
 `;
 const StyledGroupTit = styled.div`
@@ -873,7 +877,7 @@ const SideBar = () => {
             </>
           )}
           <div className="boards">
-            <StyledDiv $isCurBoard={curBoardState === 0}>
+            <StyledDiv $isCurBoard={curBoardState === 0} className="totalBoard">
               <img
                 src="https://cafe.pstatic.net/cafe4/hidden.gif"
                 alt="전체글보기"
