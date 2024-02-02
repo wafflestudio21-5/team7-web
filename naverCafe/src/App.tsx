@@ -30,6 +30,7 @@ const Wrapper = styled.div`
   text-align: center;
 `;
 import EditUserInfo from "./pages/EditUserInfo";
+import NotDefinedPage from "./pages/404Page";
 
 function App() {
   const { boardList } = useWholeBoard();
@@ -62,6 +63,7 @@ function App() {
                   <Route path="/" element={<Layout />}>
                     <Route path="/" element={<Body />}>
                       <Route path="/" element={<Content />}>
+                        <Route Component={NotDefinedPage} path="*" />
                         <Route path="/" element={<HomeBoard />} />
 
                         {/* Boards */}
@@ -73,7 +75,7 @@ function App() {
                         {boardList &&
                           boardList.boards.map((board, index) => (
                             <Route
-                              path={"/board/" + (index+1)}
+                              path={"/board/" + (index + 1)}
                               element={<CommonBoard board={board} />}
                             />
                           ))}
