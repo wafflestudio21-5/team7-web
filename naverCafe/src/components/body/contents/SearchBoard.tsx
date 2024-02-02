@@ -329,17 +329,20 @@ const SearchTopDiv = ({ searchBody }: { searchBody: SearchBody }) => {
     setIsDetailClicked(false);
   }, [contentOp]);
 
+  const [keyword, setKeyword] = useState(item);  
+
   //검색 버튼 클릭
   const handleSearch = async () => {
-    if (item === "") {
+    if (keyword.trim() === "") {
       alert("검색어를 입력하세요");
     } else {
+      setItem(keyword);
       try {
         const fetchedSearchRes: ArticleBriefType = await searchArticles({
           size,
           page,
           boardId: boardOp,
-          item,
+          item:keyword,
           contentOp,
           startDate,
           endDate,
@@ -466,8 +469,8 @@ const SearchTopDiv = ({ searchBody }: { searchBody: SearchBody }) => {
             <input
               type="text"
               placeholder="검색어를 입력해주세요"
-              value={item}
-              onChange={(e) => setItem(e.target.value)}
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
             />
           </div>
           <button className="btn-search-grean" onClick={handleSearch}>

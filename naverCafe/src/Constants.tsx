@@ -3,8 +3,8 @@ import { useWholeBoard } from "./API/BoardAPI";
 import { ArticleType, type Cafe } from "./Types";
 
 
-export const baseURL = "";
-// "http://localhost:8080";
+export const baseURL = //"";
+"http://localhost:8080";
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const waffleCafe: Cafe = {
