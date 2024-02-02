@@ -640,7 +640,7 @@ const SideBar = () => {
   const handleOnClickProfile = () => {
     console.log("yes");
     if (myProfile) {
-      const url = `http://localhost:5173/users/${myProfile.nickname}/editInfo`;
+      const url = `http://cafewaffle.shop/${myProfile.nickname}/editInfo`;
       window.open(url, "_blank", "width=400, height=780");
       window.addEventListener("message", (event) => {
         if (event.data === "myProfileChanged") {
