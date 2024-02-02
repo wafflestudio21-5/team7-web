@@ -567,7 +567,7 @@ const SideBar = () => {
   const [cafeInfo, setCafeInfo] = useState<{
     cafeName: string;
     createdAt: string;
-    memberCount: number;
+    memberCnt: number;
   } | null>(null);
 
   const [titles, setTitles] = useState<string[]>([]);

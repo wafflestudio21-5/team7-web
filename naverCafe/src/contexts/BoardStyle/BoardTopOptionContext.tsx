@@ -242,6 +242,9 @@ const SortArea = ({ boardId }: { boardId: number }) => {
   const handleViewOp = (arg: number) => {
     setViewOp(arg);
     console.log(viewOp);
+    if (arg === 1) {
+      alert("사진 정렬은 지원하지 않습니다.");
+    }
   };
 
   return (

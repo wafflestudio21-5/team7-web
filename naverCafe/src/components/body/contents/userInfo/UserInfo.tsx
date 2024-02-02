@@ -138,6 +138,8 @@ const UserInfo = () => {
     }
   }, [userNickname]);
 
+  const [isAdmin, setIsAdmin] = useState(false);
+
   // 현재 보고 있는 게 나의 정보인지 아닌지 확인합니다.
   useEffect(() => {
     if (myProfile && userNickname) {
@@ -147,6 +149,8 @@ const UserInfo = () => {
         setIsMyInfo(false);
       }
     }
+
+    setIsAdmin(userInfo?.rank === "ADMIN");
   }, [myProfile, userNickname]);
 
   const [tabSelectIndex, setTabSelectIndex] = useState<number>(0);
@@ -224,7 +228,10 @@ const UserInfo = () => {
             />
           </span>
           <div className="text">
-            <h2>{`${userInfo?.nickname}(rank: ${userInfo?.rank})`}</h2>
+            <h2>
+              {`${userInfo?.nickname}`}
+              {isAdmin && `ADMIN`}
+            </h2>
             <div className="info">
               <span>
                 방문 <strong>{userInfo?.visitCount}</strong>
