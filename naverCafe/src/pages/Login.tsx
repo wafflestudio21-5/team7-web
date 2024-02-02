@@ -355,8 +355,11 @@ const Login = () => {
       const code = new URL(window.location.href).searchParams.get("code");
       console.log(code);
       if (code) {
-        // If code exists in the URL, send a request to exchange it for an access token
-        exchangeCodeForToken(code);
+        if (localStorage.getItem("accessToken")) {
+          navigate("/");
+        } else {
+          exchangeCodeForToken(code);
+        }
       }
     };
 
@@ -366,13 +369,9 @@ const Login = () => {
           baseURL + `/api/v1/auth/socialSignin/naver?code=${code}`
         );
         const tokenData = await tokenResponse.data;
-        // Save the access token to localStorage
         console.log(tokenData);
         localStorage.setItem("accessToken", tokenData.accessToken);
-        // Clear the URL query string to remove the code parameter
-        // window.history.replaceState({}, document.title, "/");
-        // navigate("/");
-        window.location.reload();
+        navigate("/");
       } catch (error) {
         console.error("Error exchanging code for token:", error);
       }

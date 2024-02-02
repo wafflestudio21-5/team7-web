@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { waffleCafe } from "../Constants";
 
 const Wrapper = styled.div`
   display: inline-block;
@@ -179,8 +180,8 @@ const Header = () => {
         <a href="/">
           <div>
             <span>
-              <h1>카페 이름</h1>
-              <p>카페 주소</p>
+              <h1>{waffleCafe.name}</h1>
+              <p>{waffleCafe.url}</p>
             </span>
           </div>
         </a>
