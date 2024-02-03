@@ -2,7 +2,7 @@ import styled, { css } from "styled-components";
 import { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getCafeInfo } from "../../API/CafeAPI";
-import { waffleCafe } from "../../Constants";
+import { baseURL, waffleCafe } from "../../Constants";
 import { useBoardGroup, useGetLikeBoard } from "../../API/BoardAPI";
 import { CurrentBoardContext } from "../../contexts/BoardContext/CurrentBoardContext";
 import { ArticleType, BoardType, UserInfoType } from "../../Types";
