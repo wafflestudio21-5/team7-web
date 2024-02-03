@@ -658,8 +658,8 @@ const SideBar = () => {
   const handleOnClickProfile = () => {
     console.log("yes");
     if (myProfile) {
-      const url = `http://cafewaffle.shop/${myProfile.nickname}/editInfo`;
-      window.open(url, "_blank", "width=400, height=780");
+      const url = `/users/${myProfile.nickname}/editInfo`;
+      window.open(url, "_blank", "width=500, height=780");
       window.addEventListener("message", (event) => {
         if (event.data === "myProfileChanged") {
           navigate("/");
@@ -677,7 +677,7 @@ const SideBar = () => {
     console.log("yes");
     if (myProfile) {
       // 배포시에는 링크 바꾸기!
-      const url = `http://cafewaffle.shop/users/${myProfile.nickname}/withdraw`;
+      const url = `/users/${myProfile.nickname}/withdraw`;
       window.open(url, "_blank", "width=450, height=250");
       window.addEventListener("message", (event) => {
         if (event.data === "withdrawCafe") {
