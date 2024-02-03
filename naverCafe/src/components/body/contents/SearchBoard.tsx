@@ -332,6 +332,7 @@ const SearchTopDiv = ({ searchBody }: { searchBody: SearchBody }) => {
     setLocalStartDate(startDate);
     setLocalEndDate(endDate);
     setKeyword(item);
+    setBoardOp(boardOp);
   }, [searchRes]);
   useEffect(() => {
     setIsDetailClicked(false);
@@ -671,7 +672,8 @@ const SearchBoard = () => {
     );
     setSize(15);
     setPage(1);
-    setBoardOp(0);
+    
+    //setBoardOp(0);
   }, []);
 
   useEffect(() => {
