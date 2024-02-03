@@ -37,7 +37,11 @@ export function useComments(articleId: number) {
   } | null>(null);
   const url = `/api/v1/articles/${articleId}/comments`;
   const refetchComments = useCallback(async () => {
-    const res = await axios.get(baseURL + url);
+    const res = await axios.get(baseURL + url, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+    });
     const data = await res.data;
     setComments(data);
   }, [url]);

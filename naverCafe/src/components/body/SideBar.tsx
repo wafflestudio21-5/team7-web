@@ -8,7 +8,7 @@ import { CurrentBoardContext } from "../../contexts/BoardContext/CurrentBoardCon
 import { ArticleType, BoardType, UserInfoType } from "../../Types";
 import { useMyProfile, withdrawCafe } from "../../API/UserAPI";
 import { getUserInfo } from "../../API/UserAPI";
-
+import CafeInfoModal from "./CafeInfoModal";
 import WaffleManagerLogo from "../../assets/waffleManagerLogo.svg";
 import { wholeArticle } from "../../API/ArticleAPI";
 
@@ -103,6 +103,9 @@ const CafeInfo = styled.div`
           line-height: 17px;
           color: #000;
           margin-top: 3px;
+        }
+        p.cafeInfo {
+          position: relative;
         }
       }
     }
@@ -331,7 +334,7 @@ const Boards = styled.div<{ $isFavListChecked: boolean }>`
         width: 12px;
         height: 12px;
         display: inline-block;
-        backgroun-repeat: no-repeat;
+        background-repeat: no-repeat;
         vertical-align: top;
         float: left;
       }
@@ -579,9 +582,13 @@ const SideBar = () => {
   const [isCafeInfoChecked, setIsCafeInfoChecked] = useState<boolean>(true);
   const { myProfile } = useMyProfile();
   const [myInfo, setMyInfo] = useState<UserInfoType | null>(null);
-  const [isFavListChecked, setIsFavListChecked] = useState(false);
-  const { favList, refetch } = useGetLikeBoard();
 
+  const [isCafeInfoModalOpen, setIsCafeInfoModalOpen] =
+    useState<boolean>(false);
+
+  const [isFavListChecked, setIsFavListChecked] = useState(false);
+
+  const { favList, refetch } = useGetLikeBoard();
   const { groupList } = useBoardGroup();
   const { curBoardState, setCurBoardState } = useContext(CurrentBoardContext);
   const navigate = useNavigate();
@@ -731,7 +738,14 @@ const SideBar = () => {
                 <div className="managerInfo">
                   <p>{waffleCafe.manager}</p>
                   <p>{waffleCafe.createdAt}</p>
-                  <p>카페소개</p>
+                  <p
+                    className="cafeIntroduce"
+                    onMouseOver={() => setIsCafeInfoModalOpen(true)}
+                    onMouseOut={() => setIsCafeInfoModalOpen(false)}
+                  >
+                    카페소개
+                    {isCafeInfoModalOpen ? <CafeInfoModal /> : null}
+                  </p>
                 </div>
               </div>
               {/* <div className="manageCafe">
