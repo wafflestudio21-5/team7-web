@@ -157,7 +157,7 @@ useEffect(() => {
     console.log(`board: `, board, `favList: `, favList, `isFav: ${isFav}`);
   }
 }, [myProfile, refetch, board]);
-
+  
 
   return (
     <StyledCommonBoardHeader $isFavorite={isFav ? isFav : false}>
