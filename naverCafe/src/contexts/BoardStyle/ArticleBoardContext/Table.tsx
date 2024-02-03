@@ -595,7 +595,7 @@ export const ArticleTable = ({
   const [noticeList, setNoticeList] = useState<ArticleType[]>([]);
   const [isSortLike, setIsSortLike] = useState(false);
   const { setSort } = usePagination();
-  const { viewOp } = useContext(ViewOptionContext);
+  const { setViewOp, viewOp } = useContext(ViewOptionContext);
 
   //특정 시간까지는 시간이 표시되고, 그 이후부터는 날짜가 표시되는데 일단 날짜만 표시하는 것으로 뒀습니다.
   const DateOnly = (arg: string) => {
@@ -627,6 +627,7 @@ export const ArticleTable = ({
 
     setIsSortLike(false);
     setSort("");
+    setViewOp(2);
   }, []);
 
   useEffect(() => {
