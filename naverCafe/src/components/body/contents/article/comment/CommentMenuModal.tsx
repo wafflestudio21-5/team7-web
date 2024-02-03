@@ -30,22 +30,26 @@ const Wrapper = styled.div`
 interface PropsCommentMenuModal {
   setIsEditMode: (value: boolean) => void;
   setIsMenuModalOpen: (value: boolean) => void;
+  setIsCommentWriterOpen: (value: boolean) => void;
   articleId: string;
   type: "comment" | "reComment";
   commentId?: number;
   reCommentId?: number;
   refetchComments: () => Promise<void>;
   isMyComment: boolean;
+  isCommentAllowed: boolean;
 }
 const CommentMenuModal = ({
   setIsEditMode,
   setIsMenuModalOpen,
+  setIsCommentWriterOpen,
   articleId,
   type,
   commentId,
   reCommentId,
   refetchComments,
   isMyComment,
+  isCommentAllowed,
 }: PropsCommentMenuModal) => {
   const [isBackgroundClicked, setIsBackgroundClicked] =
     useState<boolean>(false);
@@ -120,17 +124,22 @@ const CommentMenuModal = ({
       </Wrapper>
     );
   } else {
-    return (
-      <Wrapper ref={ModalRef}>
-        <button
-          onClick={() => {
-            setIsMenuModalOpen(false);
-          }}
-        >
-          댓글 쓰기
-        </button>
-      </Wrapper>
-    );
+    if (isCommentAllowed) {
+      return (
+        <Wrapper ref={ModalRef}>
+          <button
+            onClick={() => {
+              setIsMenuModalOpen(false);
+              setIsCommentWriterOpen(true);
+            }}
+          >
+            댓글 쓰기
+          </button>
+        </Wrapper>
+      );
+    } else {
+      return <></>;
+    }
   }
 };
 export default CommentMenuModal;

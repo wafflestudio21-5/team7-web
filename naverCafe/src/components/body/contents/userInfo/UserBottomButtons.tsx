@@ -252,7 +252,13 @@ const UserBottomButtons = ({
       <Wrapper $isMyInfo={isMyInfo}>
         <div className="right">
           <div className="writeArticle">
-            <button>글쓰기</button>
+            <button
+              onClick={() => {
+                navigate("/write");
+              }}
+            >
+              글쓰기
+            </button>
           </div>
         </div>
         <div className="pageButtons">{pageButtons}</div>
@@ -307,7 +313,13 @@ const UserBottomButtons = ({
             <button onClick={() => handleDeleteArticles()}>좋아요 취소</button>
           </div>
           <div className="writeArticle">
-            <button>글쓰기</button>
+            <button
+              onClick={() => {
+                navigate("/write");
+              }}
+            >
+              글쓰기
+            </button>
           </div>
         </div>
         <div className="pageButtons">{pageButtons}</div>

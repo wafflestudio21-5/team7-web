@@ -42,10 +42,7 @@ const UserComment = ({ comment }: PropsUserComment) => {
       <Link to={`/articles/${comment.articleId}`}>
         <div className="content">{comment.content}</div>
         <div className="date">
-          {comment.lastModified
-            .replace(/-/g, ".")
-            .replace(/T\d\d:\d\d:\d\d/, ". ")
-            .replace(/.\d\d\d\d\d\d/, "")}
+          {comment.lastModified.replace(/-/g, ".").replace(/T.*/, "")}
         </div>
         <div className="title">
           {comment.articleTitle}
