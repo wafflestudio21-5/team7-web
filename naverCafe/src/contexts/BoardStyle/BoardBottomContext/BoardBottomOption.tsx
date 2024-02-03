@@ -335,7 +335,7 @@ const ListSearch = ({ boardId }: { boardId: number }) => {
     setTermOp(localTermOp);
     setStartDate(localStartDate);
     setEndDate(localEndDate);
-
+    console.log(localBoardOp);
     // 검색 결과 페이지로 이동
     navigate(`/searchboard/${keyword}`);
     handleSearch();
@@ -346,11 +346,11 @@ const ListSearch = ({ boardId }: { boardId: number }) => {
       const fetchedSearchRes: ArticleBriefType = await searchArticles({
         size: 15,
         page: 1,
-        boardId: boardOp,
+        boardId: localBoardOp,
         item: keyword,
-        contentOp:localContentOp,
-        startDate:localStartDate,
-        endDate:localEndDate,
+        contentOp: localContentOp,
+        startDate: localStartDate,
+        endDate: localEndDate,
         wordInclude: "",
         wordExclude: "",
       });
@@ -368,14 +368,14 @@ const ListSearch = ({ boardId }: { boardId: number }) => {
       setContentOp(0);
       setBoardOp(boardId);
       setItem("");
-
-      setLocalBoardOp(boardId);
-      setLocalContentOp(0);
-      setLocalTermOp(0);
-      setLocalStartDate("2024-01-01");
-      setLocalEndDate("2024-02-01");
-      setKeyword("");
+      console.log(`boardOp: ${boardOp}, boardId: ${boardId}`)
     }
+    setLocalBoardOp(boardId);
+    setLocalContentOp(0);
+    setLocalTermOp(0);
+    setLocalStartDate("2024-01-01T00:00:00");
+    setLocalEndDate("2024-02-01T23:59:59");
+    setKeyword("");
   }, [boardId, setBoardOp, setContentOp, setTermOp]);
 
   useEffect(() => {
@@ -386,6 +386,10 @@ const ListSearch = ({ boardId }: { boardId: number }) => {
     setLocalEndDate(endDate);
     setKeyword(item);
   }, [searchRes]);
+
+  useEffect(() => {
+    setLocalBoardOp(boardId);
+  },[])
 
   return (
     <StyledListSearch>

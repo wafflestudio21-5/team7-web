@@ -2,7 +2,7 @@ import styled, { css } from "styled-components";
 import { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getCafeInfo } from "../../API/CafeAPI";
-import { waffleCafe } from "../../Constants";
+import { baseURL, waffleCafe } from "../../Constants";
 import { useBoardGroup, useGetLikeBoard } from "../../API/BoardAPI";
 import { CurrentBoardContext } from "../../contexts/BoardContext/CurrentBoardContext";
 import { ArticleType, BoardType, UserInfoType } from "../../Types";
@@ -644,8 +644,13 @@ const SideBar = () => {
   const handleOnClickProfile = () => {
     console.log("yes");
     if (myProfile) {
-      const url = `http://cafewaffle.shop/${myProfile.nickname}/editInfo`;
-      window.open(url, "_blank", "width=400, height=780");
+      const url = `users/${myProfile.nickname}/editInfo`;
+      window.open(
+        "http://localhost:5173" + url,
+        "_blank",
+        "width=400, height=780"
+      );
+      console.log(baseURL + url);
       window.addEventListener("message", (event) => {
         if (event.data === "myProfileChanged") {
           navigate("/");
