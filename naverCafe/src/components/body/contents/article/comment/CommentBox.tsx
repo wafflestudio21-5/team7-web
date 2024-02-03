@@ -4,6 +4,7 @@ import Comment from "./Comment";
 import CommentWriter from "./CommentWriter";
 import ReComment from "./ReComment";
 import { CommentType } from "../../../../../Types";
+import { useMyProfile } from "../../../../../API/UserAPI";
 
 const Wrapper = styled.div`
   position: relative;
@@ -22,44 +23,20 @@ const Wrapper = styled.div`
   }
 `;
 
-// 로컬에서 테스트하기 위한 데이터입니다.
-// const exampleComment = {
-//   comments: [
-//     {
-//       id: 1,
-//       content: "안녕하세요",
-//       created_at: "2024-01-14T12:30:45",
-//       username: "dodo",
-//       reComments: [
-//         {
-//           id: 101,
-//           content: "댓글 달아주셔서 감사합니다.",
-//           created_at: "2024-01-14T12:35:00",
-//           username: "subakbro123",
-//         },
-//       ],
-//     },
-//     {
-//       id: 2,
-//       content: "잘 부탁드립니다.dddddddddddddddddddddd",
-//       created_at: "2024-01-14T12:45:55",
-//       username: "testAccount",
-//       reComments: [],
-//     },
-//   ],
-// };
-
 interface PropsCommentList {
   articleId: string;
   comments: CommentType[];
   refetchComments: () => Promise<void>;
+  isCommentAllowed: boolean;
 }
 
 const CommentBox = ({
   articleId,
   comments,
   refetchComments,
+  isCommentAllowed,
 }: PropsCommentList) => {
+  const { myProfile } = useMyProfile();
   const commentList = comments.map((comment) => {
     return (
       <ul key={comment.id}>
@@ -67,6 +44,7 @@ const CommentBox = ({
           comment={comment}
           articleId={articleId}
           refetchComments={refetchComments}
+          isCommentAllowed={isCommentAllowed}
         />
         {comment.recomments.map((reComment) => {
           return (
@@ -76,6 +54,7 @@ const CommentBox = ({
                 reComment={reComment}
                 articleId={articleId}
                 refetchComments={refetchComments}
+                isCommentAllowed={isCommentAllowed}
               />
             </ul>
           );
@@ -85,17 +64,20 @@ const CommentBox = ({
   });
   // commentList 안에 reCommentList 포함...
   // recommentList의 reComment에는 commentId 데이터가 포함되어야 함
+  console.log("isCommentAllowed:", isCommentAllowed);
   return (
     <Wrapper>
       <h3>댓글</h3>
       <div className="commentList">{commentList}</div>
-      <CommentWriter
-        articleId={articleId}
-        info={{
-          type: "comment",
-        }}
-        refetchComments={refetchComments}
-      />
+      {myProfile && isCommentAllowed ? (
+        <CommentWriter
+          articleId={articleId}
+          info={{
+            type: "comment",
+          }}
+          refetchComments={refetchComments}
+        />
+      ) : null}
     </Wrapper>
   );
 };

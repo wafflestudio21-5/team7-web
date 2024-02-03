@@ -6,7 +6,7 @@ import { baseURL, waffleCafe } from "../../Constants";
 import { useBoardGroup, useGetLikeBoard } from "../../API/BoardAPI";
 import { CurrentBoardContext } from "../../contexts/BoardContext/CurrentBoardContext";
 import { ArticleType, BoardType, UserInfoType } from "../../Types";
-import { useMyProfile } from "../../API/UserAPI";
+import { useMyProfile, withdrawCafe } from "../../API/UserAPI";
 import { getUserInfo } from "../../API/UserAPI";
 
 import WaffleManagerLogo from "../../assets/waffleManagerLogo.svg";
@@ -121,7 +121,7 @@ const CafeInfo = styled.div`
         overflow: hidden;
         width: 18px;
         height: 17px;
-        margin: -2px 6px 0 0;
+        margin: -2px 2px 0 0;
         background: url(https://cafe.pstatic.net/img/section/indi_cafe/ico_sprite_ranktbl.gif)
           no-repeat;
         vertical-align: top;
@@ -245,40 +245,32 @@ const MyActivity = styled.div`
 `;
 
 const Buttons = styled.div`
-  button:first-child {
+  button {
     width: 100%;
     height: 38px;
     margin-bottom: 9px;
     font-size: 13px;
-    color: #fff;
     border-radius: 6px;
     background-color: #5a5a5a;
     border: none;
     font-weight: bold;
     line-height: 38px;
+    box-sizing: border-box;
     cursor: pointer;
     &:hover {
       text-decoration: underline;
     }
+  }
+  button:first-child {
+    color: #fff;
   }
   button.login {
-    /* background-color: #03c75a; */
+    background-color: #03c75a;
   }
-  button:last-child {
-    width: 100%;
-    height: 38px;
-    margin-bottom: 9px;
-    font-size: 13px;
+  button.logout {
     color: #333;
-    border-radius: 6px;
     background-color: #fff;
     border: 1px solid #e5e5e5;
-    font-weight: bold;
-    line-height: 38px;
-    cursor: pointer;
-    &:hover {
-      text-decoration: underline;
-    }
   }
 `;
 const Boards = styled.div<{ $isFavListChecked: boolean }>`
@@ -424,6 +416,7 @@ const Boards = styled.div<{ $isFavListChecked: boolean }>`
 const RecentComments = styled.div`
   padding: 16px 12px;
   margin-top: 10px;
+  margin-bottom: 8px;
   background-color: #f8f8f8;
   & > p {
     font-size: 13px;
@@ -461,6 +454,26 @@ const RecentComments = styled.div`
     vertical-align: top;
   }
 `;
+const WithdrawCafeBox = styled.div`
+  /* display: flex;
+  align-items: center; */
+  padding: 16px 12px;
+  margin: 0px 0px 8px;
+  background: #f8f8f8;
+  color: #333333;
+  font-size: 13px;
+  height: 70px;
+  box-sizing: border-box;
+  text-align: left;
+  & > span {
+    display: inline-block;
+    padding: 8px 0;
+    cursor: pointer;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+`;
 const CafeSmartBot = styled.div`
   margin-top: 10px;
   & > img {
@@ -468,6 +481,7 @@ const CafeSmartBot = styled.div`
     height: 64px;
   }
 `;
+
 const StyledDiv = styled.div<{ $isCurBoard: boolean }>`
   ${(prop) => (prop.$isCurBoard ? "font-weight:bold" : "")};
 
@@ -644,17 +658,41 @@ const SideBar = () => {
   const handleOnClickProfile = () => {
     console.log("yes");
     if (myProfile) {
-      const url = `users/${myProfile.nickname}/editInfo`;
-      window.open(
-        "http://localhost:5173" + url,
-        "_blank",
-        "width=400, height=780"
-      );
-      console.log(baseURL + url);
+      const url = `/users/${myProfile.nickname}/editInfo`;
+      window.open(url, "_blank", "width=500, height=780");
       window.addEventListener("message", (event) => {
         if (event.data === "myProfileChanged") {
           navigate("/");
           window.location.reload();
+        }
+      });
+    }
+  };
+  const handleLogOut = () => {
+    localStorage.removeItem("accessToken");
+    navigate("/");
+    window.location.reload();
+  };
+  const hanldeWithdrawCafe = () => {
+    console.log("yes");
+    if (myProfile) {
+      // 배포시에는 링크 바꾸기!
+      const url = `/users/${myProfile.nickname}/withdraw`;
+      window.open(url, "_blank", "width=450, height=250");
+      window.addEventListener("message", (event) => {
+        if (event.data === "withdrawCafe") {
+          withdrawCafe()
+            .then(() => {
+              navigate("/");
+              localStorage.removeItem("accessToken");
+              window.location.reload();
+            })
+
+            .catch((err) => {
+              console.log(err);
+              navigate("/");
+              window.location.reload();
+            });
         }
       });
     }
@@ -743,12 +781,22 @@ const SideBar = () => {
                 </li>
                 <li>
                   <span />
-                  <Link to={`/users/${myInfo?.nickname}`}>내가 쓴 게시글</Link>
+                  <Link
+                    to={`/users/${myInfo?.nickname}`}
+                    state={{ onfocus: 0 }}
+                  >
+                    내가 쓴 게시글
+                  </Link>
                   <em>{myInfo?.myArticleCount}</em>
                 </li>
                 <li>
                   <span />
-                  <Link to={`/users/${myInfo?.nickname}`}>내가 쓴 댓글</Link>
+                  <Link
+                    to={`/users/${myInfo?.nickname}`}
+                    state={{ onfocus: 1 }}
+                  >
+                    내가 쓴 댓글
+                  </Link>
                   <em>{myInfo?.myCommentCount}</em>
                 </li>
                 <li>
@@ -773,6 +821,11 @@ const SideBar = () => {
             {myProfile ? "카페 글쓰기" : "로그인"}
           </button>
           <br />
+          {myProfile ? (
+            <button className="logout" onClick={() => handleLogOut()}>
+              로그아웃
+            </button>
+          ) : null}
         </Buttons>
         <Boards $isFavListChecked={isFavListChecked}>
           {myProfile && (
@@ -917,6 +970,11 @@ const SideBar = () => {
             ))}
           </ul>
         </RecentComments>
+        {myProfile ? (
+          <WithdrawCafeBox>
+            <span onClick={() => hanldeWithdrawCafe()}>카페탈퇴하기</span>
+          </WithdrawCafeBox>
+        ) : null}
         <CafeSmartBot>
           <img
             src="https://ssl.pstatic.net/static/cafe/banner_chatbot.png"

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { ArticleType } from "../../../../../Types";
 const Wrapper = styled.li`
   display: grid;
-  height: 38px;
+  min-height: 38px;
   grid-template-columns: 660px 200px;
 
   & > .left {
@@ -48,9 +48,12 @@ const Wrapper = styled.li`
     }
     & > .title {
       display: flex;
+      width: 556px;
+      box-sizing: border-box;
       text-align: left;
       align-items: center;
       position: relative;
+      word-break: break-all;
       a {
         font-size: 12px;
         font-weight: 400;
@@ -65,7 +68,7 @@ const Wrapper = styled.li`
         margin-left: 5px;
         position: relative;
         top: -1.5px;
-        font-style:normal;
+        font-style: normal;
       }
     }
   }
@@ -74,14 +77,18 @@ const Wrapper = styled.li`
     box-sizing: border-box;
     grid-template-columns: 120px 80px;
     & > .date {
-      display: inline-block;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       color: #666666;
       font-size: 12px;
       padding: 4px 7px;
       box-sizing: border-box;
     }
     & > .viewCount {
-      display: inline-block;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       color: #666666;
       font-size: 12px;
       padding: 4px 7px;
@@ -147,10 +154,7 @@ const UserArticle = ({
       </div>
       <div className="right">
         <div className="date">
-          {article.createdAt
-            .replace(/-/g, ".")
-            .replace(/T\d\d:\d\d:\d\d/, ". ")
-            .replace(/.\d\d\d\d\d\d/, "")}
+          {article.createdAt.replace(/-/g, ".").replace(/T.*/, "")}
         </div>
         <div className="viewCount">{article.viewCount}</div>
       </div>

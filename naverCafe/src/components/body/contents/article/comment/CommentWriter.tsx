@@ -51,9 +51,12 @@ const Wrapper = styled.div<{
       height: 34px;
       position: relative;
       & > .right {
+        display: flex;
+        align-items: center;
         position: absolute;
         right: 0;
-        button {
+        button.submit,
+        button.cancel {
           display: inline-block;
           min-width: 46px;
           height: 34px;
@@ -65,10 +68,29 @@ const Wrapper = styled.div<{
           border-radius: 6px;
           cursor: pointer;
         }
+        .secret {
+          cursor: pointer;
+        }
+        button.secret {
+          width: 14px;
+          height: 14px;
+          border: transparent;
+          outline: none;
+          margin-right: 3px;
+          background-image: url(https://ca-fe.pstatic.net/web-section/static/img/ico-write-check-off.svg?35434b8085dcc93722a1fc0df301bcf1=);
+        }
+        button.secret.active {
+          background-image: url(https://ca-fe.pstatic.net/web-section/static/img/ico-write-check-on.svg?ed25ed391f00228242d83867666d617e=);
+        }
+        label.secret {
+          font-size: 11px;
+          margin-right: 10px;
+        }
         ${(props) =>
           props.$commentLength === 0
             ? css`
-                button {
+                button.submit,
+                button.cancel {
                   background: inherit;
                   color: #b7b7b7;
                 }
@@ -109,6 +131,7 @@ const CommentWriter = ({
   refetchComments,
 }: PropsCommentWriter) => {
   const [commentInput, setCommentInput] = useState<string>("");
+  const [isSecret, setIsSecret] = useState<boolean>(false);
   const commentTextarea = useRef<HTMLTextAreaElement | null>(null);
   const { myProfile } = useMyProfile();
 
@@ -127,7 +150,7 @@ const CommentWriter = ({
       await postComment({
         articleId: Number(articleId),
         content: commentInput,
-        isSecret: false,
+        isSecret: isSecret,
       });
       await refetchComments();
       setCommentInput("");
@@ -143,7 +166,7 @@ const CommentWriter = ({
           articleId: Number(articleId),
           commentId: info.commentId,
           content: commentInput,
-          isSecret: false,
+          isSecret: isSecret,
         });
         await refetchComments();
         setIsCommentWriterOpen(false);
@@ -200,6 +223,19 @@ const CommentWriter = ({
         />
         <div className="footer">
           <div className="right">
+            {info.type === "comment" || info.type === "reComment" ? (
+              <>
+                {" "}
+                <button
+                  id="setCommentSecretButton"
+                  className={isSecret ? "secret active" : "secret"}
+                  onClick={() => setIsSecret(!isSecret)}
+                />
+                <label htmlFor="setCommentSecretButton" className="secret">
+                  비밀댓글로 쓰기
+                </label>
+              </>
+            ) : null}
             {info.type !== "comment" ? (
               <button
                 className="cancel"

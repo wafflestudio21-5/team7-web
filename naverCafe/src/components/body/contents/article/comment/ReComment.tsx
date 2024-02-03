@@ -96,6 +96,7 @@ interface PropsReComment {
   };
   articleId: string;
   refetchComments: () => Promise<void>;
+  isCommentAllowed: boolean;
 }
 
 const ReComment = ({
@@ -103,6 +104,7 @@ const ReComment = ({
   reComment,
   articleId,
   refetchComments,
+  isCommentAllowed,
 }: PropsReComment) => {
   const [isCommentWriterOpen, setIsCommentWriterOpen] =
     useState<boolean>(false);
@@ -153,13 +155,15 @@ const ReComment = ({
                     .replace(/.\d\d\d\d\d\d/, "")}
                 </span>
                 <span>
-                  <button
-                    onClick={() => {
-                      setIsCommentWriterOpen(!isCommentWriterOpen);
-                    }}
-                  >
-                    답글쓰기
-                  </button>
+                  {isCommentAllowed ? (
+                    <button
+                      onClick={() => {
+                        setIsCommentWriterOpen(!isCommentWriterOpen);
+                      }}
+                    >
+                      답글쓰기
+                    </button>
+                  ) : null}
                 </span>
               </div>
             </div>
@@ -178,6 +182,8 @@ const ReComment = ({
                 reCommentId={reComment.id}
                 refetchComments={refetchComments}
                 isMyComment={myProfile.nickname === reComment.nickname}
+                setIsCommentWriterOpen={setIsCommentWriterOpen}
+                isCommentAllowed={isCommentAllowed}
               />
             ) : null}
           </div>

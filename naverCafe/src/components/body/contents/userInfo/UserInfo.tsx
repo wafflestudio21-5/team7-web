@@ -1,7 +1,7 @@
 //UserPage에서 MyPage, MemberPage로 나뉘면 될 것 같습니다.
 import styled from "styled-components";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { getUserInfo, useMyProfile } from "../../../../API/UserAPI";
 import { UserInfoType } from "../../../../Types";
 
@@ -114,6 +114,7 @@ const UserInfo = () => {
   // 내 정보인지, 타인의 정보인지 알아봅니다.
   const [isMyInfo, setIsMyInfo] = useState<boolean>(false);
 
+  const location = useLocation();
   // userInfo를 설정합니다.
   useEffect(() => {
     if (userNickname) {
@@ -157,6 +158,12 @@ const UserInfo = () => {
   const [checkedArticleIdList, setCheckedArticleIdList] = useState<number[]>(
     []
   );
+  useEffect(() => {
+    if (location.state) {
+      setTabSelectIndex(location.state.onfocus);
+    }
+  }, [location.state]);
+  console.log(location);
 
   const infoList = [
     {

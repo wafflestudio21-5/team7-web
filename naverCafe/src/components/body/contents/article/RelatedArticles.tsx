@@ -49,7 +49,7 @@ const RelatedArticle = styled.li<{ $isArticleFocused: boolean }>`
     props.$isArticleFocused ? "#f9f9fa" : "inherit"};
   & > a > .title {
     display: inline-block;
-    /* width: 608px; */
+    width: 608px;
     position: relative;
     text-align: left;
     overflow: hidden;
@@ -413,10 +413,7 @@ const RelatedArticles = ({
         <div className="right">
           <div className="authorNickname">{article.author.nickname}</div>
           <div className="createdAt">
-            {article.createdAt
-              .replace(/-/g, ". ")
-              .replace(/T\d\d:\d\d:\d\d/, "")
-              .replace(/.\d\d\d\d\d\d/, "")}
+            {article.createdAt.replace(/-/g, ". ").replace(/T.*/, "")}
           </div>
         </div>
       </RelatedArticle>
