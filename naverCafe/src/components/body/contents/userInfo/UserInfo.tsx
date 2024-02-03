@@ -162,6 +162,7 @@ const UserInfo = () => {
     if (location.state) {
       setTabSelectIndex(location.state.onfocus);
     }
+    setIsAdmin(userInfo?.rank === "ADMIN");
   }, [location.state]);
   console.log(location);
 
@@ -237,7 +238,7 @@ const UserInfo = () => {
           <div className="text">
             <h2>
               {`${userInfo?.nickname}`}
-              {isAdmin && `ADMIN`}
+              {isAdmin && ` 관리자 ADMIN`}
             </h2>
             <div className="info">
               <span>
